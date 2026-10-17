@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aastha Fresh | My Account</title>
+
+<style>
+:root {
+  --green: #159447;
+  --dark: #087c48;
+  --light: #f1f8f2;
+  --border: #dfe9e0;
+  --text: #26352a;
+  --muted: #738075;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #f6f8f6;
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button { cursor: pointer; }
+
+.header {
+  background: white;
+  padding: 17px 5%;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: var(--dark);
+  font-size: 23px;
+  font-weight: 800;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.logo span { color: var(--green); }
+
+.header small {
+  color: var(--muted);
+  display: block;
+  font-size: 11px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.container {
+  width: min(100% - 28px, 1050px);
+  margin: 30px auto;
+}
+
+h1 { font-size: 27px; margin-top: 0; }
+h2 { font-size: 21px; margin-top: 0; }
+
+.muted {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+
+.tab {
+  padding: 11px 15px;
+  background: white;
+  border: 1px solid #b2cbb5;
+  border-radius: 0px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.tab.active {
+  background: var(--green);
+  color: white;
+  border: 1px solid var(--green);
+  border-radius: 0px;
+}
+
+.primary, .secondary {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 11px 16px;
+}
+
+.secondary {
+  background: white;
+  color: var(--text);
+}
+
+.secondary:hover {
+  background: #f0f4f0;
+}
+
+.field { margin: 15px 0; }
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 7px;
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #d5dfd6;
+  border-radius: 6px;
+  outline-color: var(--green);
+  background: white;
+}
+
+.form {
+  max-width: 500px;
+}
+
+.hidden { display: none !important; }
+
+.notice {
+  background: var(--light);
+  border: 1px solid #cfe6d1;
+  padding: 13px;
+  border-radius: 6px;
+  line-height: 1.6;
+  font-size: 13px;
+}
+
+.order {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin: 14px 0;
+  background: #fff;
+}
+
+.order-top {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.status {
+  background: #e4f6e8;
+  color: #137b36;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status.cancelled {
+  background: #fde8e8;
+  color: #c81e1e;
+}
+
+.tracking {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  margin: 20px 0;
+}
+
+.step {
+  text-align: center;
+  padding: 10px 3px;
+  font-size: 11px;
+  background: #edf0ed;
+  border-radius: 5px;
+  color: #677168;
+}
+
+.step.done {
+  background: #d9f3df;
+  color: #087c36;
+  font-weight: bold;
+}
+
+.empty {
+  background: #f7faf7;
+  padding: 30px;
+  text-align: center;
+  color: var(--muted);
+  border-radius: 7px;
+  line-height: 1.6;
+}
+
+#message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #183e29;
+  color: white;
+  padding: 12px 18px;
+  border-radius: 7px;
+  display: none;
+  max-width: 90%;
+  z-index: 10;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+@media(max-width: 600px) {
+  .container { margin-top: 18px; }
+  .card { padding: 16px; }
+  h1 { font-size: 23px; }
+  .tracking { grid-template-columns: 1fr; }
+  .step { text-align: left; padding: 10px; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div>
+    <a href="index.html#home" class="logo">Aastha <span>Fresh</span></a>
+    <small>My Account</small>
+  </div>
+  <div class="header-actions">
+    <a href="index.html#shop" class="secondary" style="text-decoration:none;display:inline-block">Shop Groceries</a>
+    <button class="secondary" id="headerAuth" onclick="toggleAuth()">Sign Out</button>
+  </div>
+</header>
+
+<main class="container">
+  <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px">
+    <div>
+      <h1 id="pageTitle" style="margin-bottom:4px">My Account</h1>
+      <p class="muted" id="userGreeting" style="margin:0">Welcome! Manage your orders, personal details and shipping address.</p>
+    </div>
+    <div id="quickBadge"></div>
+  </div>
+
+  <div class="tabs" id="accountTabs">
+    <button class="tab active" data-tab="orders" onclick="setTab('orders')">My Orders</button>
+    <button class="tab" data-tab="profile" onclick="setTab('profile')">Profile Details</button>
+    <button class="tab" data-tab="address" onclick="setTab('address')">Saved Address</button>
+  </div>
+
+  <div id="tabContent"></div>
+</main>
+
+<div id="message"></div>
+
+<script type="module">
+import {
+  auth,
+  registerWithFirebase,
+  loginWithFirebase,
+  logoutFromFirebase,
+  updateUserProfile,
+  subscribeAuth,
+  testConnection
+} from './src/firebase.ts';
+
+testConnection();
+
+let activeTab = 'orders';
+let authMode = 'signin';
+let currentUser = null;
+
+function showMessage(msg) {
+  const m = document.getElementById('message');
+  m.textContent = msg;
+  m.style.display = 'block';
+  clearTimeout(window.msgTimer);
+  window.msgTimer = setTimeout(() => {
+    m.style.display = 'none';
+  }, 2500);
+}
+
+function read(k, d) {
+  try {
+    let v = localStorage.getItem(k);
+    if (v === null || v === undefined) return d;
+    try {
+      let p = JSON.parse(v);
+      return p ?? d;
+    } catch {
+      return v;
+    }
+  } catch (e) {
+    return d;
+  }
+}
+
+function getCustomer() {
+  return read('af_customer_profile', {
+    name: 'Customer',
+    phone: '',
+    email: '',
+    address: '',
+    area: 'Inside city',
+    note: ''
+  });
+}
+
+function getOrders() {
+  let all = read('af_orders', []);
+  let cust = getCustomer();
+  if (cust && cust.phone) {
+    let matched = all.filter(o => o.phone === cust.phone);
+    if (matched.length) return matched;
+  }
+  return all;
+}
+
+window.setTab = function(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+  renderTab();
+};
+
+window.setAuthMode = function(mode) {
+  authMode = mode;
+  updateUI();
+};
+
+window.toggleAuth = async function() {
+  if (currentUser) {
+    try {
+      await logoutFromFirebase();
+      currentUser = null;
+      showMessage('Signed out from Firebase');
+      updateUI();
+    } catch (err) {
+      showMessage('Sign out failed');
+    }
+  } else {
+    authMode = 'signin';
+    updateUI();
+  }
+};
+
+window.handleSignIn = async function(e) {
+  e.preventDefault();
+  let em = document.getElementById('fbLoginEmail').value.trim();
+  let pw = document.getElementById('fbLoginPass').value;
+  let btn = document.getElementById('fbLoginBtn');
+  let errBox = document.getElementById('fbLoginErr');
+  errBox.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Signing in with Firebase...';
+  try {
+    let prof = await loginWithFirebase(em, pw);
+    currentUser = auth.currentUser;
+    showMessage('Welcome back, ' + (prof.name || 'Customer') + '!');
+    updateUI();
+  } catch (err) {
+    let msg = 'Failed to sign in. Verify email & password.';
+    if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password') msg = 'Invalid email or password.';
+    else if (err.code === 'auth/user-not-found') msg = 'No account found with this email.';
+    errBox.textContent = msg;
+    errBox.style.display = 'block';
+    showMessage(msg);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In with Firebase';
+  }
+};
+
+window.handleSignUp = async function(e) {
+  e.preventDefault();
+  let name = document.getElementById('fbRegName').value.trim();
+  let em = document.getElementById('fbRegEmail').value.trim();
+  let phone = document.getElementById('fbRegPhone').value.trim();
+  let pass = document.getElementById('fbRegPass').value;
+  let conf = document.getElementById('fbRegConfirm').value;
+  let addr = document.getElementById('fbRegAddress').value.trim();
+  let btn = document.getElementById('fbRegBtn');
+  let errBox = document.getElementById('fbRegErr');
+  errBox.style.display = 'none';
+
+  if (pass !== conf) {
+    errBox.textContent = 'Passwords do not match.';
+    errBox.style.display = 'block';
+    return;
+  }
+  if (pass.length < 6) {
+    errBox.textContent = 'Password must be at least 6 characters.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Creating account with Firebase...';
+  try {
+    let prof = await registerWithFirebase(name, em, pass, phone, addr, 'Inside city');
+    currentUser = auth.currentUser;
+    showMessage('Account created successfully with Firebase!');
+    updateUI();
+  } catch (err) {
+    let msg = 'Sign Up failed: ' + (err.message || 'Error');
+    if (err.code === 'auth/email-already-in-use') msg = 'This email is already in use. Please sign in.';
+    else if (err.code === 'auth/weak-password') msg = 'Password should be at least 6 characters.';
+    errBox.textContent = msg;
+    errBox.style.display = 'block';
+    showMessage(msg);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Create Account with Firebase';
+  }
+};
+
+window.saveProfile = async function(e) {
+  e.preventDefault();
+  let name = document.getElementById('profName').value.trim();
+  let phone = document.getElementById('profPhone').value.trim();
+  try {
+    await updateUserProfile({ name, phone });
+    showMessage('Profile updated in Firebase & Firestore!');
+    updateUI();
+  } catch (err) {
+    showMessage('Failed to update profile');
+  }
+};
+
+window.saveAddress = async function(e) {
+  e.preventDefault();
+  let address = document.getElementById('profAddress').value.trim();
+  let area = document.getElementById('profArea').value;
+  let note = document.getElementById('profNote').value.trim();
+  try {
+    await updateUserProfile({ address, area, note });
+    showMessage('Delivery address saved to Firebase profile!');
+    updateUI();
+  } catch (err) {
+    showMessage('Failed to save address');
+  }
+};
+
+function updateUI() {
+  let cust = getCustomer();
+  let greeting = document.getElementById('userGreeting');
+  let authBtn = document.getElementById('headerAuth');
+  let tabs = document.getElementById('accountTabs');
+  let quickBadge = document.getElementById('quickBadge');
+
+  if (currentUser) {
+    greeting.textContent = 'Welcome, ' + (currentUser.displayName || cust.name || 'Customer') + '! Signed in via Firebase (' + currentUser.email + ').';
+    authBtn.textContent = 'Sign Out';
+    tabs.style.display = 'flex';
+    quickBadge.innerHTML = '<span style="background:#e4f6e8;color:#137b36;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:bold">Firebase Verified</span>';
+    renderTab();
+  } else {
+    greeting.textContent = 'Welcome! Sign In or Sign Up with Firebase to track orders and save your address.';
+    authBtn.textContent = 'Sign In';
+    tabs.style.display = 'none';
+    quickBadge.innerHTML = '';
+    renderAuthForm();
+  }
+}
+
+function renderAuthForm() {
+  const host = document.getElementById('tabContent');
+  host.innerHTML = `
+    <div class="card" style="max-width:520px;margin:20px auto">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="#f5820d"><path d="M4 19.5 7.5 3l4.5 7-3.5 2.5L16 2l4 17.5L12 22z"/></svg>
+        <div>
+          <h2 style="margin:0;font-size:20px">Firebase Account Portal</h2>
+          <p class="muted" style="margin:0;font-size:12px">Use Firebase Auth to access your account</p>
+        </div>
+      </div>
+
+      <div class="tabs" style="margin:16px 0">
+        <button class="tab ${authMode === 'signin' ? 'active' : ''}" onclick="setAuthMode('signin')">Sign In</button>
+        <button class="tab ${authMode === 'signup' ? 'active' : ''}" onclick="setAuthMode('signup')">Create Account (Sign Up)</button>
+      </div>
+
+      ${authMode === 'signin' ? `
+        <form class="form" onsubmit="handleSignIn(event)">
+          <div class="field">
+            <label>Email Address *</label>
+            <input type="email" id="fbLoginEmail" required placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label>Password *</label>
+            <input type="password" id="fbLoginPass" required placeholder="Your password">
+          </div>
+          <div id="fbLoginErr" style="display:none;color:#c81e1e;background:#fde8e8;padding:8px;border-radius:4px;font-size:12px;margin:8px 0"></div>
+          <button class="primary" id="fbLoginBtn" type="submit" style="width:100%;margin-top:10px">Sign In with Firebase</button>
+          <p class="muted" style="text-align:center;font-size:12px;margin-top:10px">
+            New here? <a href="javascript:void(0)" onclick="setAuthMode('signup')" style="color:var(--dark);font-weight:bold">Create an account</a>
+          </p>
+        </form>
+      ` : `
+        <form class="form" onsubmit="handleSignUp(event)">
+          <div class="field">
+            <label>Full Name *</label>
+            <input type="text" id="fbRegName" required placeholder="Your full name">
+          </div>
+          <div class="field">
+            <label>Email Address *</label>
+            <input type="email" id="fbRegEmail" required placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label>Phone Number *</label>
+            <input type="tel" id="fbRegPhone" required placeholder="01712345678">
+          </div>
+          <div class="field">
+            <label>Password * (min 6 characters)</label>
+            <input type="password" id="fbRegPass" required minlength="6" placeholder="At least 6 characters">
+          </div>
+          <div class="field">
+            <label>Confirm Password *</label>
+            <input type="password" id="fbRegConfirm" required minlength="6" placeholder="Re-type password">
+          </div>
+          <div class="field">
+            <label>Delivery Address</label>
+            <textarea id="fbRegAddress" rows="2" placeholder="Road, house number, area..."></textarea>
+          </div>
+          <div id="fbRegErr" style="display:none;color:#c81e1e;background:#fde8e8;padding:8px;border-radius:4px;font-size:12px;margin:8px 0"></div>
+          <button class="primary" id="fbRegBtn" type="submit" style="width:100%;margin-top:10px">Create Account with Firebase</button>
+          <p class="muted" style="text-align:center;font-size:12px;margin-top:10px">
+            Already registered? <a href="javascript:void(0)" onclick="setAuthMode('signin')" style="color:var(--dark);font-weight:bold">Sign in here</a>
+          </p>
+        </form>
+      `}
+    </div>
+  `;
+}
+
+function renderTab() {
+  const host = document.getElementById('tabContent');
+  const cust = getCustomer();
+  const products = read('af_products', []);
+  const orders = getOrders();
+
+  if (activeTab === 'orders') {
+    if (!orders.length) {
+      host.innerHTML = `
+        <div class="card">
+          <div class="empty">
+            <p style="font-size:16px;font-weight:600;margin:0 0 8px">No orders found</p>
+            <p>You have not placed any orders yet. Visit our shop to browse fresh groceries.</p>
+            <br>
+            <a href="index.html#shop" class="primary" style="text-decoration:none;display:inline-block">Start Shopping</a>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    host.innerHTML = orders.map(o => {
+      let st = (o.status || 'Pending').toLowerCase();
+      let step = 1;
+      if (st === 'pending') step = 1;
+      else if (st === 'confirmed') step = 2;
+      else if (st === 'packed') step = 3;
+      else if (st.includes('out') || st.includes('delivery')) step = 4;
+      else if (st === 'delivered') step = 5;
+      else if (st === 'cancelled') step = 0;
+
+      let itemsStr = (o.items || []).map(i => {
+        let p = products.find(prod => prod.id === i.id);
+        return (p ? p.name : 'Item #' + i.id) + ' × ' + i.qty;
+      }).join(', ');
+
+      return `
+        <div class="card order">
+          <div class="order-top">
+            <div>
+              <strong style="font-size:16px;color:var(--dark)">Order #${o.id}</strong>
+              <div class="muted" style="font-size:12px;margin-top:2px">${o.date || ''}</div>
+            </div>
+            <div>
+              <span class="status ${st === 'cancelled' ? 'cancelled' : ''}">${o.status || 'Pending'}</span>
+            </div>
+          </div>
+
+          <div class="tracking">
+            <div class="step ${step >= 1 ? 'done' : ''}">1. Order Placed</div>
+            <div class="step ${step >= 2 ? 'done' : ''}">2. Confirmed</div>
+            <div class="step ${step >= 3 ? 'done' : ''}">3. Packed</div>
+            <div class="step ${step >= 4 ? 'done' : ''}">4. Out for Delivery</div>
+            <div class="step ${step >= 5 ? 'done' : ''}">5. Delivered</div>
+          </div>
+
+          <div style="font-size:13px;line-height:1.6;margin:12px 0;padding-top:10px;border-top:1px solid var(--border)">
+            <div style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Order Summary</div>
+            <div style="margin-top:4px">${itemsStr || 'Fresh groceries items'}</div>
+            ${o.address ? `<div style="margin-top:6px;color:#555"><span style="color:var(--muted)">Delivery to:</span> ${o.address} (${o.area || 'Standard'})</div>` : ''}
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px dashed var(--border)">
+            <div style="font-size:15px;font-weight:bold;color:#f12e24">
+              Total: ৳ ${Number(o.total || 0).toLocaleString('en-BD', {maximumFractionDigits:2})}
+            </div>
+            <div style="font-size:12px;color:var(--muted)">
+              Payment: Cash on Delivery
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } else if (activeTab === 'profile') {
+    host.innerHTML = `
+      <div class="card">
+        <h2>Personal Details</h2>
+        <p class="muted">Update your customer name and contact information (saved to Firebase).</p>
+        <form class="form" onsubmit="saveProfile(event)">
+          <div class="field">
+            <label>Full Name *</label>
+            <input id="profName" required value="${currentUser ? (currentUser.displayName || cust.name || '') : (cust.name || '')}" placeholder="e.g. Tanvir Ahmed">
+          </div>
+          <div class="field">
+            <label>Email Address (Firebase)</label>
+            <input type="email" readonly disabled value="${currentUser ? currentUser.email : (cust.email || '')}" style="background:#f4f6f4;color:#666">
+          </div>
+          <div class="field">
+            <label>Phone Number *</label>
+            <input id="profPhone" type="tel" required value="${cust.phone || ''}" placeholder="e.g. 01712345678">
+          </div>
+          <button class="primary" type="submit">Save Profile Changes</button>
+        </form>
+      </div>
+    `;
+
+  } else if (activeTab === 'address') {
+    host.innerHTML = `
+      <div class="card">
+        <h2>Delivery Address</h2>
+        <p class="muted">Your saved address is saved to your Firebase profile and automatically used for checkout.</p>
+        <form class="form" onsubmit="saveAddress(event)">
+          <div class="field">
+            <label>Street & House Address *</label>
+            <textarea id="profAddress" required rows="3" placeholder="Road, house number, area...">${cust.address || ''}</textarea>
+          </div>
+          <div class="field">
+            <label>Delivery Area *</label>
+            <select id="profArea" required>
+              <option value="Inside city" ${cust.area === 'Inside city' ? 'selected' : ''}>Inside city</option>
+              <option value="Outside city" ${cust.area === 'Outside city' ? 'selected' : ''}>Outside city</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Delivery Instructions / Notes</label>
+            <input id="profNote" value="${cust.note || ''}" placeholder="e.g. Ring bell, leave at door">
+          </div>
+          <button class="primary" type="submit">Save Delivery Address</button>
+        </form>
+      </div>
+    `;
+  }
+}
+
+subscribeAuth((u, p) => {
+  currentUser = u;
+  updateUI();
+});
+</script>
+
+</body>
+</html>

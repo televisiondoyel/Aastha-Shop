@@ -1,0 +1,363 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#3da45b"><title>Aastha Fresh Grocery</title><meta name="description" content="Everyday grocery store with fresh essentials, packages, offers, cart and admin management." /><meta property="og:title" content="Aastha Fresh Grocery" /><meta property="og:description" content="Everyday grocery store with fresh essentials, packages, offers, cart and admin management." /><style>
+:root{--g:#3da45b;--gd:#087e6e;--red:#f12e24;--ink:#2b332d;--muted:#828982;--line:#e7ece7}*{box-sizing:border-box}body{margin:0;background:#f5f6f5;color:var(--ink);font:13px Arial,sans-serif}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}button{cursor:pointer}.nav{height:34px;background:var(--g);display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:9;overflow:auto}.nav a{color:#fff;padding:11px 16px;font-size:12px;font-weight:bold;white-space:nowrap}.nav a:hover,.nav a.active{background:#248747}.wrap{max-width:1400px;margin:auto;padding:0 10px}.hero{display:grid;grid-template-columns:3fr 1fr;gap:14px;margin-top:15px}.hero-main{min-width:0;background:#fff}.banner{display:block;width:100%;aspect-ratio:1200/360;object-fit:cover}.promos{display:grid;grid-template-rows:1fr 1fr;gap:14px}.promos img{width:100%;height:100%;object-fit:cover}.benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:15px 20px;background:#fff}.benefit{display:flex;align-items:center;gap:10px}.ico{color:#f33;width:29px;height:29px;flex-shrink:0}.ico svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}.ico img{width:100%;height:100%;object-fit:contain;display:block}.benefit b{display:block;font-size:12px;font-weight:500;margin-bottom:4px}.benefit small{color:#999;font-size:10px}.section{background:#fff;margin-top:27px;padding:16px 20px}.head{display:flex;align-items:center;gap:14px;margin-bottom:15px}.title{background:linear-gradient(100deg,var(--g),var(--g) 70%,white);height:30px;color:#fff;font-size:17px;font-weight:bold;padding:7px 13px;flex:1}.view{border:0;background:#f10e13;color:#fff;font-weight:bold;font-size:11px;padding:8px 14px}.timer{display:flex;gap:5px}.timer span{background:#ff4a0c;color:#fff;padding:4px 6px;text-align:center;font-weight:bold;min-width:30px}.timer small{display:block;font-size:8px;font-weight:normal}.products{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}.product{position:relative;border:1px solid #f0f0f0;padding:8px;background:#fff;min-width:0}.product:hover{box-shadow:0 5px 18px #0001}.discount{position:absolute;right:7px;top:7px;background:#ff4b0a;color:white;padding:4px 6px;font-size:10px}.pimg{width:100%;height:150px;object-fit:contain;display:block}.pname{font-size:11px;line-height:1.5;color:#737873;display:block;min-height:34px}.price{color:#f12e24;margin:5px 0;font-size:12px}.old{color:#999;text-decoration:line-through;font-size:10px;margin-left:4px}.add{width:100%;background:white;color:var(--g);border:1px solid var(--g);padding:7px 3px;font-size:11px}.add:hover,.primary{background:var(--g);color:white}.categories{display:grid;grid-template-columns:repeat(8,1fr);gap:10px}.cat{background:#fff;border:1px solid var(--line);min-height:96px;padding:10px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;text-align:center}.cat img{width:50px;height:48px;object-fit:contain}.cat span{font-size:11px;color:#667069}.page{display:none}.page.active{display:block}.crumb{color:#777;margin:17px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.crumb a{color:var(--gd);text-decoration:none;font-weight:600;cursor:pointer}.crumb a:hover{color:var(--g);text-decoration:underline}.tools{display:flex;gap:10px;margin-bottom:14px}.tools input,.tools select,.field input,.field select,.field textarea{padding:11px;border:1px solid #dce1dc;background:#fff}.tools input{flex:1;min-width:0}.detail,.box{background:#fff;padding:22px;margin-top:18px}.detail{display:grid;grid-template-columns:1fr 1fr;gap:25px}.detail img{width:100%;height:340px;object-fit:contain}.detail h1{font-size:24px}.bigprice{font-size:24px;color:var(--red);font-weight:bold}.primary,.secondary{border:0;padding:11px 17px}.secondary{background:#fff;border:1px solid var(--g);color:var(--g)}.qty{display:flex;align-items:center;gap:7px;margin:15px 0}.qty button{width:30px;height:30px;background:#fff;border:1px solid #ddd}.qty input{width:50px;padding:7px;text-align:center;border:1px solid #ddd}.cartrow{display:grid;grid-template-columns:70px 1fr 100px 100px 45px;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.cartrow img{width:60px;height:60px;object-fit:contain}.summary{max-width:360px;margin:18px 0 0 auto;border:1px solid var(--line);padding:18px}.sumrow{display:flex;justify-content:space-between;padding:8px 0}.total{border-top:1px solid #ddd;font-size:16px;font-weight:bold}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}.field label{font-weight:bold}.field textarea{min-height:85px}.notice{padding:12px;background:#eaf6ec;color:#247b3b;margin:12px 0}.admin{display:grid;grid-template-columns:200px 1fr;gap:16px;margin-top:18px}.side,.adminmain{background:#fff;padding:16px;min-width:0}.side button{display:block;width:100%;text-align:left;border:0;background:white;padding:12px;border-bottom:1px solid #eee}.side button.active{color:var(--gd);font-weight:bold}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{border:1px solid var(--line);padding:15px}.stat strong{display:block;font-size:22px;color:var(--gd);margin-top:8px}.table{border-collapse:collapse;width:100%;margin-top:14px}.table th,.table td{text-align:left;padding:9px;border-bottom:1px solid #eee;font-size:12px}.table img{width:40px;height:40px;object-fit:contain}.tiny{background:#fff;border:1px solid #ddd;padding:6px}.danger{color:#d21e1e}.upload{border:2px dashed #a7cfad;background:#f8fff8;text-align:center;padding:16px}.preview{width:90px;height:90px;object-fit:contain;background:white;border:1px solid #ddd;margin-top:8px}.footer{margin-top:35px;background:#173c2a;color:#e9f5ec;padding:28px 20px}.footgrid{max-width:1400px;margin:auto;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:20px}.footer p,.footer a{color:#c6d8cb;line-height:1.9}.toast{position:fixed;bottom:20px;right:20px;background:#203127;color:white;padding:13px 18px;opacity:0;transform:translateY(10px);transition:.2s;z-index:99;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}.empty{text-align:center;padding:28px;color:#888}.card{background:white;border:1px solid #dfe9e0;border-radius:10px;padding:22px;margin-bottom:18px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.tab{padding:11px 15px;background:white;border:1px solid #b2cbb5;border-radius:0px;color:#26352a;cursor:pointer;font-weight:600}.tab.active,.tab:hover{background:#159447;color:white;border:1px solid #159447;border-radius:0px}.order{border:1px solid #dfe9e0;border-radius:8px;padding:16px;margin:14px 0;background:#fff}.order-top{display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap;align-items:center}.status{background:#e4f6e8;color:#137b36;padding:6px 12px;border-radius:20px;font-size:12px;font-weight:700}.status.cancelled{background:#fde8e8;color:#c81e1e}.tracking{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin:20px 0}.step{text-align:center;padding:10px 3px;font-size:11px;background:#edf0ed;border-radius:5px;color:#677168}.step.done{background:#d9f3df;color:#087c36;font-weight:bold}@media(max-width:600px){.tracking{grid-template-columns:1fr}.step{text-align:left;padding:10px}}
+@media(max-width:900px){.nav{justify-content:flex-start}.nav a{padding:11px}.hero{grid-template-columns:1fr}.promos{grid-template-columns:1fr 1fr;grid-template-rows:auto}.promos img{height:auto}.products{grid-template-columns:repeat(3,minmax(0,1fr))}.categories{grid-template-columns:repeat(4,1fr)}.benefits{grid-template-columns:repeat(2,1fr)}.admin{grid-template-columns:1fr}.side{display:flex;overflow:auto;padding:6px}.side button{white-space:nowrap;width:auto}.footgrid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.wrap{padding:0 6px}.nav{height:38px}.nav a{font-size:11px;padding:12px 10px}.hero{margin-top:8px;gap:8px}.benefits{padding:11px 7px;gap:10px}.benefit{gap:6px}.ico{width:23px;height:23px}.benefit b{font-size:10px}.benefit small{font-size:9px}.section{margin-top:14px;padding:11px 7px}.head{gap:5px;flex-wrap:wrap}.title{font-size:14px;height:28px;padding:7px;min-width:125px}.timer{gap:3px}.timer span{min-width:25px;font-size:10px;padding:3px}.view{padding:7px}.products{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.pimg{height:130px}.pname{font-size:10px}.categories{grid-template-columns:repeat(4,1fr);gap:5px}.cat{min-height:86px}.cat img{width:42px;height:40px}.detail{grid-template-columns:1fr;padding:12px}.detail img{height:230px}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.cartrow{grid-template-columns:48px 1fr 70px 40px;gap:5px}.cartrow img{width:45px;height:45px}.line-total{display:none}.stats{grid-template-columns:1fr}.adminmain{overflow-x:auto;padding:10px}.table{min-width:550px}.tools{flex-wrap:wrap}.tools input{flex-basis:100%}.footgrid{grid-template-columns:1fr 1fr}}
+.brandbar{background:#fff;border-bottom:1px solid #e7ece7}.brand-inner{max-width:1400px;margin:auto;padding:9px 14px;display:flex;align-items:center;gap:18px}.brandmark{display:flex;align-items:center;border:0;background:transparent;padding:0;cursor:pointer;flex-shrink:0}.brandvisual{height:44px;display:flex;align-items:center;justify-content:center}.brandvisual svg{width:44px;height:44px}.brandvisual img{height:44px;max-width:180px;object-fit:contain}.brandtext b{display:block;font-size:19px;letter-spacing:-.5px}.brandtext small{display:block;color:#7b8d7e;font-size:8px;letter-spacing:1.3px;margin-top:3px}.brand-search{display:flex;max-width:520px;flex:1;margin:auto;border:1px solid #e2e8e2;height:35px}.brand-search input{border:0;outline:0;min-width:0;flex:1;padding:0 12px}.brand-search button{width:39px;border:0;background:var(--gd);color:white}.brand-search svg,.headercart svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8}.headericon{position:relative;flex:0 0 42px;width:42px;height:44px;display:flex;align-items:center;justify-content:center;border:0;background:transparent;color:#454b48;padding:2px;cursor:pointer}.headericon svg{width:35px;height:38px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}.headercart span{position:absolute;right:-1px;bottom:1px;background:#07964b;color:#fff;border:2px solid #fff;border-radius:50%;font-size:10px;line-height:16px;min-width:20px;height:20px;padding:0 3px;text-align:center;font-weight:700}.profileicon svg{width:35px;height:38px;stroke-width:2.2}.auth-wrap{min-height:60vh;display:flex;align-items:center;justify-content:center;padding:25px 10px}.auth-card{width:min(100%,410px);background:#fff;padding:28px;border:1px solid var(--line);box-shadow:0 10px 35px #183c2510}.auth-card h1{margin:12px 0 5px;font-size:23px}.auth-card>p{color:#7d857e}.auth-logo{width:48px;height:48px}.auth-logo img,.auth-logo svg{width:100%;height:100%;object-fit:contain}.auth-card .field{margin:13px 0}.authnote{font-size:11px;line-height:1.5;color:#7a837b}.hidden{display:none!important}@media(max-width:560px){.brand-inner{gap:8px;padding:8px}.brandmark{min-width:0;gap:0}.brandvisual{height:36px}.brandvisual svg{width:36px;height:36px}.brandvisual img{height:36px;max-width:140px}.brandtext b{font-size:15px}.brandtext small{font-size:6px;letter-spacing:.5px}.brand-search{height:32px}.brand-search input{padding:0 6px;font-size:11px}.brand-search button{width:31px}.headericon{flex-basis:33px;width:33px;height:36px;flex-shrink:0}.headericon svg{width:29px;height:32px}.headercart span{min-width:17px;height:17px;line-height:13px;font-size:9px}}
+</style><link id="sitefavicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23087e6e'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-size='28' fill='white' font-family='Arial'%3EA%3C/text%3E%3C/svg%3E"></head><body>
+<header class="brandbar"><div class="brand-inner"><button class="brandmark" id="brandmark" type="button" aria-label="Store logo"><span id="brandvisual" class="brandvisual"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#087e6e"/><path d="M24 36S9 28 12 17c2-7 10-7 12 0 3-7 11-7 13 0 3 11-13 19-13 19Z" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M24 34V20" stroke="#fff" stroke-width="2"/></svg></span></button><div class="brand-search"><input id="topsearch" placeholder="Search for groceries..." aria-label="Search products"><button id="topsearchbtn" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 5 5"/></svg></button></div><button class="headericon headercart" data-go="cart" aria-label="Open cart" title="Shopping cart"><svg viewBox="0 0 32 36" aria-hidden="true"><path d="M7 12V8.5a9 9 0 0 1 18 0V12" /><path d="M5 12h22l2 19H3L5 12Z"/><path d="M12 19v-2.5a4 4 0 0 1 8 0V19" /><path d="M12 23c1.5 2 6.5 2 8 0"/></svg><span id="headcartcount">0</span></button><button class="headericon profileicon" id="profilebutton" aria-label="Customer profile" title="My account"><svg viewBox="0 0 32 36" aria-hidden="true"><circle cx="16" cy="9" r="6.2"/><path d="M3.5 32v-3.8c0-6.1 5.6-10.4 12.5-10.4s12.5 4.3 12.5 10.4V32Z"/></svg></button></div></header>
+<nav class="nav"><a href="#home" data-page="home">Home</a><a href="#shop" data-page="shop">Shop</a><a href="#spices" data-page="spices">Spices</a><a href="#oil" data-page="oil">Oil</a><a href="#flour" data-page="flour">Flour</a><a href="#lentils" data-page="lentils">Dal or Lentil</a><a href="#packages" data-page="packages">Our Packages</a><a href="#offers" data-page="offers">Offers</a><a href="#about" data-page="about">About us</a><a href="#contact" data-page="contact">Contact us</a><a href="#cart" data-page="cart">Cart (<span id="cartcount">0</span>)</a></nav>
+<div class="wrap">
+<section class="page active" id="page-home"><div class="hero"><div class="hero-main"><img class="banner" src="assets/banner.svg" alt="Fresh groceries banner"><div class="benefits">
+<div class="benefit"><span class="ico"><img src="assets/reliable.png" alt="Reliable"></span><div><b>Reliable</b><small>Over 5K products</small></div></div>
+<div class="benefit"><span class="ico"><svg viewBox="0 0 32 32"><path d="M3 7h17v16H3zM20 13h5l4 5v5h-9"/><circle cx="9" cy="25" r="3"/><circle cx="24" cy="25" r="3"/></svg></span><div><b>Home Delivery</b><small>Free delivery to your home</small></div></div>
+<div class="benefit"><span class="ico"><svg viewBox="0 0 32 32"><rect x="3" y="6" width="26" height="20" rx="2"/><path d="M3 12h26M8 19h7"/></svg></span><div><b>Secure Payment</b><small>100% secure payments</small></div></div>
+<div class="benefit"><span class="ico"><svg viewBox="0 0 32 32"><path d="M5 22a10 10 0 1 1 4 3l-5 2Z"/><path d="M11 13h10M11 17h7"/></svg></span><div><b>24/7 Support</b><small>Dedicated support in 24h</small></div></div></div></div><div class="promos"><img src="assets/spices.svg" alt="Spices promotion"><img src="assets/grains.svg" alt="Grains promotion"></div></div>
+<div class="section"><div class="head"><div class="title">Deals Of The Day</div><div class="timer" id="dealtimer"><span>29<small>Days</small></span><span>23<small>Hrs</small></span><span>58<small>Min</small></span><span>16<small>Sec</small></span></div><button class="view" data-go="offers">View All</button></div><div class="products" id="deals"></div></div>
+<div class="section"><div class="head"><div class="title">Shop By Category</div><button class="view" data-go="shop">View All</button></div><div class="categories" id="categories"></div></div>
+<div class="section"><div class="head"><div class="title">Featured Products</div><button class="view" data-go="shop">View All</button></div><div class="products" id="featured"></div></div></section>
+<section class="page" id="page-shop"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Shop</span></p><div class="section"><div class="head"><div class="title">Shop Groceries</div></div><div class="tools"><input id="search" placeholder="Search products..."><select id="filter"><option value="">All categories</option></select><select id="sort"><option value="default">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="name">Name: A-Z</option></select></div><div class="products" id="catalog"></div></div></section>
+<section class="page" id="page-spices"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Spices</span></p><div class="section"><div class="head"><div class="title">Spices</div></div><div class="products" id="spiceslist"></div></div></section><section class="page" id="page-oil"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Oil</span></p><div class="section"><div class="head"><div class="title">Oil</div></div><div class="products" id="oillist"></div></div></section><section class="page" id="page-flour"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Flour</span></p><div class="section"><div class="head"><div class="title">Flour</div></div><div class="products" id="flourlist"></div></div></section><section class="page" id="page-lentils"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Dal or Lentil</span></p><div class="section"><div class="head"><div class="title">Dal or Lentil</div></div><div class="products" id="lentillist"></div></div></section><section class="page" id="page-packages"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Our Packages</span></p><div class="section"><div class="head"><div class="title">Our Packages</div></div><div class="products" id="packageslist"></div></div></section><section class="page" id="page-offers"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Offers</span></p><div class="section"><div class="head"><div class="title">Special Offers</div></div><div class="products" id="offerslist"></div></div></section>
+<section class="page" id="page-product"><p class="crumb" id="crumb"></p><div class="detail" id="detail"></div></section><section class="page" id="page-cart"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Shopping Cart</span></p><div class="box"><h2>Shopping Cart</h2><div id="cartitems"></div><div id="summary"></div></div></section>
+<section class="page" id="page-checkout"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Checkout</span></p><div class="box"><h2>Checkout</h2><p>Payment method: Cash on Delivery.</p><form id="checkout"><div class="formgrid"><div class="field"><label>Full name *</label><input id="name" required></div><div class="field"><label>Phone number *</label><input id="phone" type="tel" required></div><div class="field full"><label>Delivery address *</label><textarea id="address" required></textarea></div><div class="field"><label>Delivery area *</label><select id="area" required><option value="">Choose area</option><option>Inside city</option><option>Outside city</option></select></div><div class="field"><label>Order note</label><input id="note"></div></div><div class="notice" id="checkouttotal"></div><button class="primary">Place Order — Cash on Delivery</button></form></div></section>
+<section class="page" id="page-success"><div class="box" style="text-align:center;padding:45px"><h1 style="color:var(--g)">Thank you for your order!</h1><p id="confirmation"></p><button class="primary" data-go="shop">Continue Shopping</button></div></section><section class="page" id="page-about"><div class="box"><h1>About Aastha Fresh</h1><p>Everyday grocery essentials, fair prices and convenient local delivery for your family.</p></div></section><section class="page" id="page-contact"><div class="box"><h1>Contact us</h1><form id="contact" class="formgrid"><div class="field"><label>Name</label><input required></div><div class="field"><label>Phone or email</label><input required></div><div class="field full"><label>Message</label><textarea required></textarea></div><div><button class="primary">Send Message</button></div></form></div></section>
+<section class="page" id="page-auth"><div class="auth-wrap"><div class="auth-card"><div class="auth-logo"><span id="authbrandvisual"></span></div><h1 id="authheading">Admin access</h1><p id="authintro">Private store management</p><form id="authform"><div class="field"><label>Username</label><input id="authuser" autocomplete="username" required minlength="4"></div><div class="field"><label>Password</label><input id="authpass" type="password" autocomplete="current-password" required minlength="8"></div><div class="field" id="confirmfield"><label>Confirm password</label><input id="authconfirm" type="password" autocomplete="new-password" minlength="8"></div><button class="primary" id="authsubmit" style="width:100%;margin-top:14px">Create Admin Account</button><p class="authnote" id="authnote"></p></form><button class="secondary" data-go="home">Back to store</button></div></div></section>
+<section class="page" id="page-admin"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Admin</span></p><div class="admin"><aside class="side"><button class="active" data-tab="overview">Overview</button><button data-tab="products">Products</button><button data-tab="orders">Orders</button><button data-tab="settings">Settings</button><button data-go="home">Back to Store</button><button id="adminlogout">Log out</button></aside><div class="adminmain" id="admincontent"></div></div></section><section class="page" id="page-account"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>My Account</span></p><div id="accountcontent"></div></section>
+</div><footer class="footer"><div class="footgrid"><div><h3>Aastha Fresh</h3><p>Your everyday grocery store. Quality essentials, fair prices and convenient home delivery.</p></div><div><h3>Shop</h3><a href="#shop">All products</a><br><a href="#offers">Special offers</a><br><a href="#packages">Packages</a></div><div><h3>Customer Care</h3><a href="#contact">Contact us</a><br><a href="#about">About us</a><br><a href="#cart">Cart</a></div><div><h3>Shopping</h3><a href="#shop">Browse groceries</a><br><a href="#cart">Shopping cart</a><p>Cash on Delivery</p></div></div></footer><div class="toast" id="toast"></div>
+<script type="module">
+import {
+  auth,
+  db,
+  registerWithFirebase,
+  loginWithFirebase,
+  logoutFromFirebase,
+  updateUserProfile,
+  subscribeAuth,
+  testConnection
+} from './src/firebase.ts';
+testConnection();
+let firebaseUser = null;
+subscribeAuth((u, p) => {
+  firebaseUser = u;
+  if (p) localStorage.setItem('af_customer_profile', JSON.stringify(p));
+  let act = document.querySelector('#page-account.active');
+  if (act) accountRender();
+});
+const makeImg=(color,label,kind='bag')=>'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><rect width="240" height="240" fill="#fff"/><ellipse cx="120" cy="207" rx="60" ry="8" fill="#e7e9e6"/><path d="${kind==='bottle'?'M94 48h52l-5 20v15l15 20v88q0 10-10 10H94q-10 0-10-10v-88l15-20V68z':'M72 48L168 48l15 150H57z'}" fill="${color}" stroke="#d8ded8" stroke-width="3"/><rect x="88" y="25" width="64" height="28" rx="5" fill="#f5f0e3" stroke="#d7d6c9"/><rect x="69" y="104" width="102" height="57" rx="3" fill="#fffdf5"/><text x="120" y="127" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#277f43">Aastha Fresh</text><text x="120" y="143" text-anchor="middle" font-family="Arial" font-size="10" fill="#555">${label}</text><path d="M81 154h78" stroke="${color}" stroke-width="4"/></svg>`);
+const initial=[['Pure Mustard Oil 1 Ltr','Oil',330,350,6,'#c88a20','bottle',1],['Pure Mustard Oil 500 ml','Oil',170,180,6,'#d39a2e','bottle',1],['Alu Bokhara 100 gm','Spices',65,70,7,'#42b74d','bag',1],['Raisins (Kishmish) 100 gm','Spices',65,70,7,'#91c52f','bag',1],['Mace (Jaytree) 25 gm','Spices',85,90,5,'#9b303c','bag',1],['White Pepper 50 gm','Spices',65,75,13,'#7b4aa5','bag',1],['Premium Basmati Rice 1 kg','Packages',145,160,9,'#e5d6bd','bag',0],['Red Lentils 500 gm','Dal or Lentil',75,85,12,'#dc7041','bag',0],['Atta Flour 1 kg','Flour',60,65,8,'#d7c7a3','bag',0],['Turmeric Powder 100 gm','Spices',55,60,8,'#dfbb35','bag',0],['Chilli Powder 100 gm','Spices',58,65,10,'#d74b35','bag',0],['Family Grocery Package','Packages',1250,1400,11,'#60a96a','bag',0]];
+function read(k,d){try{let v=localStorage.getItem(k);if(v===null||v===undefined)return d;try{let p=JSON.parse(v);return p??d}catch{return v}}catch(e){return d}}let products=read('af_products',null);if(!products)products=initial.map((x,i)=>({id:i+1,name:x[0],category:x[1],price:x[2],old:x[3],discount:x[4],color:x[5],kind:x[6],deal:!!x[7],image:makeImg(x[5],x[1],x[6])}));else products=products.map(p=>({...p,image:p.image||makeImg(p.color||'#6ab06b',p.category)}));let cart=read('af_cart',[]),orders=read('af_orders',[]),editing=null,tab='overview';
+const $=id=>document.getElementById(id),money=n=>'৳ '+Number(n).toLocaleString('en-BD',{maximumFractionDigits:2}),save=()=>{localStorage.setItem('af_products',JSON.stringify(products));localStorage.setItem('af_cart',JSON.stringify(cart));localStorage.setItem('af_orders',JSON.stringify(orders))},esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),toast=s=>{let t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2400)};
+function card(p){return `<article class="product"><span class="discount">-${p.discount||5}%</span><a href="#product-${p.id}" data-product="${p.id}"><img class="pimg" src="${p.image}" alt="${esc(p.name)}"></a><a class="pname" href="#product-${p.id}" data-product="${p.id}">${esc(p.name)}</a><div class="price">${money(p.price)} <span class="old">${money(p.old||p.price)}</span></div><button class="add" data-add="${p.id}">Add to Cart</button></article>`}
+function list(id,arr){if($(id))$(id).innerHTML=arr.length?arr.map(card).join(''):'<div class="empty">No products found.</div>'}
+function render(){list('deals',products.filter(p=>p.deal).slice(0,6));list('featured',products.slice(0,6));list('spiceslist',products.filter(p=>p.category==='Spices'));list('oillist',products.filter(p=>p.category==='Oil'));list('flourlist',products.filter(p=>p.category==='Flour'));list('lentillist',products.filter(p=>p.category==='Dal or Lentil'));list('packageslist',products.filter(p=>p.category==='Packages'));list('offerslist',products.filter(p=>p.discount));$('categories').innerHTML=[['Oil','#d9a82f'],['Spices','#b74a47'],['Flour','#d4c4a0'],['Dal or Lentil','#d66a37'],['Packages','#5da86b'],['Rice','#e5d8b9'],['Pantry','#6aa4be'],['Offers','#ef7454']].map(([n,c])=>`<a class="cat" href="#${n==='Dal or Lentil'?'lentils':n==='Offers'?'offers':n==='Packages'?'packages':n.toLowerCase()}"><img src="${makeImg(c,n)}" alt="${n}"><span>${n}</span></a>`).join('');fillFilter();catalog();count()}
+function fillFilter(){let f=$('filter'),old=f.value;f.innerHTML='<option value="">All categories</option>'+[...new Set(products.map(p=>p.category))].map(c=>`<option>${esc(c)}</option>`).join('');f.value=old}
+function catalog(){let q=$('search').value.toLowerCase(),cat=$('filter').value,s=$('sort').value,a=products.filter(p=>p.name.toLowerCase().includes(q)&&(!cat||p.category===cat));if(s==='low')a.sort((x,y)=>x.price-y.price);if(s==='high')a.sort((x,y)=>y.price-x.price);if(s==='name')a.sort((x,y)=>x.name.localeCompare(y.name));list('catalog',a)}
+function count(){let n=cart.reduce((s,i)=>s+i.qty,0);$('cartcount').textContent=n;$('headcartcount').textContent=n}
+function go(page){if(page==='profile')page='account';if(page==='admin'&&!sessionStorage.getItem('af_admin_session'))page='auth';document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));let el=$('page-'+page);if(!el){page='home';el=$('page-home')}el.classList.add('active');document.querySelectorAll('.nav a[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page===page));if(page==='cart')cartRender();if(page==='checkout')checkoutTotal();if(page==='admin')adminRender();if(page==='auth')authRender();if(page==='shop')catalog();if(page==='account')accountRender();window.scrollTo({top:0,behavior:'smooth'})}
+function route(){let h=location.hash.slice(1)||'home';if(h.startsWith('product-')){showProduct(+h.split('-')[1]);return}go(h)}
+function showProduct(id){let p=products.find(x=>x.id===id);if(!p){go('shop');return}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('page-product').classList.add('active');let catSlug=p.category==='Dal or Lentil'?'lentils':p.category==='Offers'?'offers':p.category==='Packages'?'packages':p.category.toLowerCase();$('crumb').innerHTML=`<a href="#home" data-go="home">Home</a> / <a href="#${catSlug}" data-go="${catSlug}">${esc(p.category)}</a> / <span>${esc(p.name)}</span>`;$('detail').innerHTML=`<img src="${p.image}" alt="${esc(p.name)}"><div><p>${esc(p.category)}</p><h1>${esc(p.name)}</h1><p>Quality grocery essential for everyday use. Product details and photos can be updated in the admin panel.</p><div class="bigprice">${money(p.price)} <span class="old">${money(p.old||p.price)}</span></div><p style="color:#288847">In stock · Local delivery available</p><div class="qty"><button data-q="-1">−</button><input id="detailqty" type="number" min="1" value="1"><button data-q="1">+</button></div><button class="primary" data-add="${p.id}" data-detailadd>Add to Cart</button> <button class="secondary" data-go="cart">View Cart</button><p>Payment: Cash on Delivery</p></div>`;window.scrollTo(0,0)}
+function add(id,n=1){let p=products.find(p=>p.id===+id);if(!p)return;let i=cart.find(i=>i.id===p.id);if(i)i.qty+=n;else cart.push({id:p.id,qty:n});save();count();toast('Added to cart')}
+function cartRender(){let host=$('cartitems');if(!cart.length){host.innerHTML='<div class="empty">Your cart is empty. <p><button class="primary" data-go="shop">Start Shopping</button></p></div>';$('summary').innerHTML='';return}host.innerHTML=cart.map(i=>{let p=products.find(p=>p.id===i.id);return p?`<div class="cartrow"><img src="${p.image}" alt=""><div><b>${esc(p.name)}</b><div class="price">${money(p.price)}</div></div><div class="qty" style="margin:0"><button data-change="${p.id}" data-delta="-1">−</button><span>${i.qty}</span><button data-change="${p.id}" data-delta="1">+</button></div><div class="line-total">${money(p.price*i.qty)}</div><button class="tiny danger" data-remove="${p.id}">Remove</button></div>`:''}).join('');let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60;$('summary').innerHTML=`<div class="summary"><div class="sumrow"><span>Subtotal</span><b>${money(s)}</b></div><div class="sumrow"><span>Delivery</span><b>${d?money(d):'FREE'}</b></div><div class="sumrow total"><span>Total</span><b>${money(s+d)}</b></div><button class="primary" style="width:100%;margin-top:12px" data-go="checkout">Proceed to Checkout</button><p>Free delivery on orders of ৳1,000 or more.</p></div>`}
+function checkoutTotal(){let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60;$('checkouttotal').textContent='Order total: '+money(s+d)+' (Delivery: '+(d?money(d):'FREE')+')';let cp=read('af_customer_profile',null);if(cp){if(!$('name').value&&cp.name)$('name').value=cp.name;if(!$('phone').value&&cp.phone)$('phone').value=cp.phone;if(!$('address').value&&cp.address)$('address').value=cp.address;if(!$('area').value&&cp.area)$('area').value=cp.area;if(!$('note').value&&cp.note)$('note').value=cp.note;}}
+$('checkout').addEventListener('submit',e=>{e.preventDefault();if(!cart.length){toast('Your cart is empty');location.hash='shop';return}let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60,o={id:'AF'+Date.now().toString().slice(-7),name:$('name').value,phone:$('phone').value,address:$('address').value,area:$('area').value,note:$('note').value,items:cart.map(i=>({...i})),total:s+d,status:'Pending',date:new Date().toLocaleString()};orders.unshift(o);let cp=read('af_customer_profile',null);if(!cp){localStorage.setItem('af_customer_profile',JSON.stringify({name:o.name,phone:o.phone,email:'',address:o.address,area:o.area,note:o.note}))}else{if(!cp.address)cp.address=o.address;if(!cp.area)cp.area=o.area;if(!cp.phone)cp.phone=o.phone;localStorage.setItem('af_customer_profile',JSON.stringify(cp))}cart=[];save();$('confirmation').textContent='Order '+o.id+' received. Total '+money(o.total)+'. Payment: Cash on Delivery.';location.hash='success';toast('Order placed')});
+$('contact').addEventListener('submit',e=>{e.preventDefault();toast('Message received in demo mode');e.target.reset()});$('topsearchbtn').addEventListener('click',()=>{location.hash='shop';setTimeout(()=>{$('search').value=$('topsearch').value;catalog();$('search').focus()},40)});$('topsearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('topsearchbtn').click()});$('search').addEventListener('input',catalog);$('filter').addEventListener('change',catalog);$('sort').addEventListener('change',catalog);
+document.addEventListener('click',e=>{let g=e.target.closest('[data-go]');if(g){let t=g.dataset.go;if(t==='home'&&(!location.hash||location.hash==='#home'||location.hash==='#')){go('home')}else if(location.hash==='#'+t){go(t)}else{location.hash=t}return}let ah=e.target.closest('a[href="#home"]');if(ah){if(!location.hash||location.hash==='#home'||location.hash==='#'){go('home')}}let st=e.target.closest('[data-set-timer]');if(st){let days=+st.dataset.setTimer;let newDate=new Date(Date.now()+days*24*3600*1000);localStorage.setItem('af_deal_end',newDate.toISOString());let inp=$('dealEndSetting');if(inp)inp.value=getDealEndInputValue();startDealTimer();toast('Deals countdown set to '+days+(days===1?' day':' days')+'!');return}let pr=e.target.closest('[data-product]');if(pr){e.preventDefault();location.hash='product-'+pr.dataset.product;return}let ad=e.target.closest('[data-add]');if(ad){add(ad.dataset.add,ad.hasAttribute('data-detailadd')?Math.max(1,+$('detailqty').value||1):1);return}let q=e.target.closest('[data-q]');if(q){$('detailqty').value=Math.max(1,(+$('detailqty').value||1)+ +q.dataset.q);return}let ch=e.target.closest('[data-change]');if(ch){let i=cart.find(i=>i.id===+ch.dataset.change);if(i)i.qty=Math.max(1,i.qty+(+ch.dataset.delta));save();cartRender();count();return}let rm=e.target.closest('[data-remove]');if(rm){cart=cart.filter(i=>i.id!==+rm.dataset.remove);save();cartRender();count();return}let t=e.target.closest('[data-tab]');if(t){tab=t.dataset.tab;adminRender();return}let ed=e.target.closest('[data-edit]');if(ed){editing=+ed.dataset.edit;adminRender();return}let del=e.target.closest('[data-delete]');if(del){products=products.filter(p=>p.id!==+del.dataset.delete);save();render();adminRender();toast('Product deleted');return}let os=e.target.closest('[data-order-save]');if(os){let o=orders.find(o=>o.id===os.dataset.orderSave);if(o){o.status=document.querySelector('[data-status="'+o.id+'"]').value;save();adminRender();toast('Order status updated')}return}if(e.target.closest('[data-save-settings]')){let sn=$('storeNameSetting'),dv=$('deliverySetting'),de=$('dealEndSetting');if(sn)localStorage.setItem('af_store_name',sn.value.trim()||'Aastha Fresh');if(dv)localStorage.setItem('af_free_delivery',String(Math.max(0,+dv.value||0)));if(de&&de.value){let dt=new Date(de.value);if(!isNaN(dt.getTime()))localStorage.setItem('af_deal_end',dt.toISOString())}applyBranding();startDealTimer();toast('Design & deals timer settings saved')}});
+function productForm(){let p=products.find(p=>p.id===editing);return `<form id="productform" class="formgrid"><div class="field"><label>Product name *</label><input name="name" required value="${esc(p?.name||'')}"></div><div class="field"><label>Category</label><select name="category">${['Oil','Spices','Flour','Dal or Lentil','Packages','Rice','Pantry'].map(c=>`<option ${p?.category===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>Price (৳)</label><input name="price" type="number" min="0" required value="${p?.price??''}"></div><div class="field"><label>Old price (৳)</label><input name="old" type="number" min="0" value="${p?.old??''}"></div><div class="field"><label>Discount (%)</label><input name="discount" type="number" min="0" max="99" value="${p?.discount??0}"></div><div class="field"><label>Deal of the Day</label><select name="deal"><option value="false" ${p?.deal?'':'selected'}>No</option><option value="true" ${p?.deal?'selected':''}>Yes</option></select></div><div class="field full"><label>Product photo — upload from mobile gallery or computer</label><div class="upload"><input type="file" id="photo" accept="image/*"><p>Choose JPG, PNG or WebP. Use image files under 1.5 MB.</p><img id="preview" class="preview ${p?'':'hidden'}" src="${p?.image||''}" alt="Preview"></div><input type="hidden" name="image" id="imagedata" value="${p?esc(p.image):''}"></div><div class="field full"><button class="primary">${p?'Update Product':'Add Product'}</button> ${p?'<button type="button" class="secondary" data-cancel>Cancel</button>':''}</div></form>`}
+function productTable(){return `<table class="table"><thead><tr><th>Photo</th><th>Product</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead><tbody>${products.map(p=>`<tr><td><img src="${p.image}" alt=""></td><td>${esc(p.name)}</td><td>${esc(p.category)}</td><td>${money(p.price)}</td><td><button class="tiny" data-edit="${p.id}">Edit</button> <button class="tiny danger" data-delete="${p.id}">Delete</button></td></tr>`).join('')}</tbody></table>`}
+function orderTable(){if(!orders.length)return '<div class="empty">No orders yet.</div>';return `<table class="table"><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Update</th></tr>${orders.map(o=>`<tr><td>${o.id}<br><small>${esc(o.date)}</small></td><td>${esc(o.name)}<br>${esc(o.phone)}</td><td>${money(o.total)}</td><td>${esc(o.status)}</td><td><select data-status="${o.id}">${['Pending','Confirmed','Packed','Out for delivery','Delivered','Cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select> <button class="tiny" data-order-save="${o.id}">Save</button></td></tr>`).join('')}</table>`}
+function adminRender(){document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h=$('admincontent');if(tab==='overview')h.innerHTML=`<h2>Store Overview</h2><div class="stats"><div class="stat">Products<strong>${products.length}</strong></div><div class="stat">Orders<strong>${orders.length}</strong></div><div class="stat">Pending Orders<strong>${orders.filter(o=>o.status==='Pending').length}</strong></div></div><div class="notice">Static demo: data is saved in this browser only. A production site needs a secure backend and database.</div><h3>Recent orders</h3>${orderTable()}`;else if(tab==='products')h.innerHTML='<h2>Product Management</h2><p>Add or edit products and upload photos from your device gallery.</p>'+productForm()+'<h3>Products</h3>'+productTable();else if(tab==='orders')h.innerHTML='<h2>Order Management</h2>'+orderTable();else h.innerHTML=`<h2>Store & Design Settings</h2><p>Upload your own logo, site icon and three promotional banners directly from your phone gallery.</p><div class="formgrid"><div class="field full"><label>Website logo</label><div class="upload"><input type="file" id="logoUpload" accept="image/*"><p>Shown in the website header. PNG or WebP with transparent background works best.</p><img id="logoPreview" class="preview" alt="Logo preview" src="${read('af_logo','')||''}" style="${read('af_logo','')?'':'display:none'}"></div></div><div class="field full"><label>Site icon / favicon</label><div class="upload"><input type="file" id="faviconUpload" accept="image/*"><p>Small icon shown in the browser tab. A square logo is recommended.</p><img id="faviconPreview" class="preview" alt="Favicon preview" src="${read('af_favicon','')||''}" style="${read('af_favicon','')?'':'display:none'}"></div></div><div class="field full"><label>Main hero banner</label><div class="upload"><input type="file" id="heroUpload" accept="image/*"><p>Recommended wide image, around 1200 × 360 px.</p><img id="heroPreview" class="preview" alt="Hero banner preview" src="${read('af_hero','')||'assets/banner.svg'}"></div></div><div class="field"><label>Promotion banner 1</label><div class="upload"><input type="file" id="promo1Upload" accept="image/*"><img id="promo1Preview" class="preview" alt="Promotion 1 preview" src="${read('af_promo1','')||'assets/spices.svg'}"></div></div><div class="field"><label>Promotion banner 2</label><div class="upload"><input type="file" id="promo2Upload" accept="image/*"><img id="promo2Preview" class="preview" alt="Promotion 2 preview" src="${read('af_promo2','')||'assets/grains.svg'}"></div></div><div class="field full"><label>Deals Of The Day — Offer End Date &amp; Time</label><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input type="datetime-local" id="dealEndSetting" value="${getDealEndInputValue()}" style="max-width:240px"><button type="button" class="tiny" data-set-timer="1">24 Hours</button><button type="button" class="tiny" data-set-timer="3">3 Days</button><button type="button" class="tiny" data-set-timer="7">7 Days</button><button type="button" class="tiny" data-set-timer="30">30 Days</button></div><small style="color:#666">Controls the homepage Deals Of The Day countdown. The seconds and minutes tick live.</small></div><div class="field"><label>Store name</label><input id="storeNameSetting" value="${esc(read('af_store_name','Aastha Fresh'))}"></div><div class="field"><label>Free delivery threshold (৳)</label><input id="deliverySetting" type="number" value="${read('af_free_delivery',1000)}"></div><div class="field full"><button class="primary" data-save-settings>Save design settings</button></div></div><div class="notice">Important: this demo saves image settings in this browser only. For all visitors to see the same uploaded images, connect a server/database and shared image storage.</div>`}
+function optimizeImage(file,maxW,maxH,quality,cb){if(!file)return;let reader=new FileReader();reader.onload=ev=>{let img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(w>maxW||h>maxH){let ratio=Math.min(maxW/w,maxH/h);w=Math.max(1,Math.round(w*ratio));h=Math.max(1,Math.round(h*ratio))}let canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;let ctx=canvas.getContext('2d');let isPng=file.type==='image/png';if(!isPng){ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h)}ctx.drawImage(img,0,0,w,h);let mime=isPng?'image/png':'image/jpeg';let dataUrl=canvas.toDataURL(mime,quality||0.85);cb(dataUrl)};img.onerror=()=>toast('Failed to load image');img.src=ev.target.result};reader.onerror=()=>toast('Failed to read file');reader.readAsDataURL(file)}
+document.addEventListener('change',e=>{if(e.target.id==='photo'){let f=e.target.files?.[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Choose an image file');return}optimizeImage(f,500,500,0.85,dataUrl=>{$('imagedata').value=dataUrl;$('preview').src=dataUrl;$('preview').classList.remove('hidden');$('preview').style.display='inline-block';toast('Product photo ready')})}});
+document.addEventListener('submit',e=>{if(e.target.id==='productform'){e.preventDefault();let f=new FormData(e.target),id=editing||Math.max(0,...products.map(p=>p.id))+1,obj={id,name:String(f.get('name')).trim(),category:f.get('category'),price:+f.get('price'),old:+f.get('old')||+f.get('price'),discount:+f.get('discount')||0,deal:f.get('deal')==='true',image:f.get('image')||makeImg('#68a96a',f.get('category')),color:'#68a96a',kind:'bag'};if(editing)products=products.map(p=>p.id===editing?obj:p);else products.unshift(obj);editing=null;save();render();adminRender();toast('Product saved')}});
+document.addEventListener('click',e=>{if(e.target.closest('[data-cancel]')){editing=null;adminRender()}});
+
+function getDealEndInputValue(){let val=read('af_deal_end',null);let d=val?new Date(val):new Date(Date.now()+(29*24+23)*3600*1000+58*60*1000+16*1000);if(isNaN(d.getTime()))d=new Date(Date.now()+30*24*3600*1000);let p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
+let dealTimerInterval=null;
+function startDealTimer(){if(dealTimerInterval)clearInterval(dealTimerInterval);function tick(){let timerEl=$('dealtimer');if(!timerEl)return;let endVal=read('af_deal_end',null);let endTime=endVal?new Date(endVal).getTime():0;if(!endTime||isNaN(endTime)){endTime=Date.now()+(29*24+23)*3600*1000+58*60*1000+16*1000;localStorage.setItem('af_deal_end',new Date(endTime).toISOString())}let diff=Math.max(0,endTime-Date.now());let d=Math.floor(diff/(1000*60*60*24));let h=Math.floor((diff/(1000*60*60))%24);let m=Math.floor((diff/(1000*60))%60);let s=Math.floor((diff/1000)%60);let p=n=>String(n).padStart(2,'0');timerEl.innerHTML=`<span>${d}<small>Days</small></span><span>${p(h)}<small>Hrs</small></span><span>${p(m)}<small>Min</small></span><span>${p(s)}<small>Sec</small></span>`}tick();dealTimerInterval=setInterval(tick,1000)}
+
+let accountTab='orders';
+let authTab='signin';
+
+function accountRender(){
+  let h=$('accountcontent');
+  if(!h)return;
+  let user=auth.currentUser||firebaseUser;
+  let cust=read('af_customer_profile',null);
+
+  if(!user){
+    // Render Firebase Sign In / Sign Up Form
+    h.innerHTML=`
+      <div class="card" style="max-width:540px;margin:20px auto;border-radius:10px;padding:26px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;background:#fef3e9;border-radius:8px">
+            <svg viewBox="0 0 24 24" width="26" height="26" fill="#f5820d"><path d="M4 19.5 7.5 3l4.5 7-3.5 2.5L16 2l4 17.5L12 22z"/></svg>
+          </span>
+          <div>
+            <h2 style="margin:0;font-size:20px;color:var(--text)">Firebase Customer Portal</h2>
+            <p class="muted" style="margin:0;font-size:12px">Sign In or Sign Up securely with Firebase Authentication</p>
+          </div>
+        </div>
+
+        <div class="tabs" style="margin:16px 0">
+          <button class="tab ${authTab==='signin'?'active':''}" data-set-authtab="signin">Sign In</button>
+          <button class="tab ${authTab==='signup'?'active':''}" data-set-authtab="signup">Create Account (Sign Up)</button>
+        </div>
+
+        ${authTab==='signin'?`
+          <form id="fbSignInForm" class="formgrid">
+            <div class="field full">
+              <label>Email Address *</label>
+              <input type="email" id="fbEmail" required placeholder="name@example.com" autocomplete="email">
+            </div>
+            <div class="field full">
+              <label>Password *</label>
+              <input type="password" id="fbPass" required placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <div id="fbAuthErr" class="field full" style="display:none;color:#c81e1e;background:#fde8e8;padding:10px;border-radius:4px;font-size:12px"></div>
+            <div class="field full" style="margin-top:10px">
+              <button class="primary" id="fbSubmitBtn" type="submit" style="width:100%;padding:12px;font-size:14px">Sign In with Firebase</button>
+            </div>
+            <p class="muted full" style="text-align:center;font-size:12px;margin-top:8px">
+              Don't have an account? <a href="javascript:void(0)" data-set-authtab="signup" style="color:var(--gd);font-weight:bold">Create a new account</a>
+            </p>
+          </form>
+        `:`
+          <form id="fbSignUpForm" class="formgrid">
+            <div class="field full">
+              <label>Full Name *</label>
+              <input type="text" id="fbRegName" required placeholder="Your full name" autocomplete="name">
+            </div>
+            <div class="field full">
+              <label>Email Address *</label>
+              <input type="email" id="fbRegEmail" required placeholder="name@example.com" autocomplete="email">
+            </div>
+            <div class="field full">
+              <label>Phone Number *</label>
+              <input type="tel" id="fbRegPhone" required placeholder="01712345678" autocomplete="tel">
+            </div>
+            <div class="field">
+              <label>Password * (min 6 characters)</label>
+              <input type="password" id="fbRegPass" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password">
+            </div>
+            <div class="field">
+              <label>Confirm Password *</label>
+              <input type="password" id="fbRegConfirm" required minlength="6" placeholder="Re-type password" autocomplete="new-password">
+            </div>
+            <div class="field full">
+              <label>Delivery Address</label>
+              <textarea id="fbRegAddress" placeholder="Road, house number, area..." style="min-height:60px"></textarea>
+            </div>
+            <div id="fbRegErr" class="field full" style="display:none;color:#c81e1e;background:#fde8e8;padding:10px;border-radius:4px;font-size:12px"></div>
+            <div class="field full" style="margin-top:10px">
+              <button class="primary" id="fbRegSubmitBtn" type="submit" style="width:100%;padding:12px;font-size:14px">Create Account with Firebase</button>
+            </div>
+            <p class="muted full" style="text-align:center;font-size:12px;margin-top:8px">
+              Already registered? <a href="javascript:void(0)" data-set-authtab="signin" style="color:var(--gd);font-weight:bold">Sign in here</a>
+            </p>
+          </form>
+        `}
+      </div>
+    `;
+    return;
+  }
+
+  // User is authenticated with Firebase
+  let userOrders=orders;
+  if(cust&&cust.phone){
+    let filtered=orders.filter(o=>o.phone===cust.phone);
+    if(filtered.length)userOrders=filtered;
+  }
+  let displayName=user.displayName||cust?.name||'Customer';
+  let headerHtml=`
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <h1 id="pageTitle" style="font-size:24px;margin:0">${esc(displayName)}</h1>
+          <span style="background:#e4f6e8;color:#137b36;font-size:11px;font-weight:bold;padding:3px 8px;border-radius:12px;display:inline-flex;align-items:center;gap:4px">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            Firebase Verified
+          </span>
+        </div>
+        <p class="muted" id="userGreeting" style="margin:4px 0 0;font-size:12px">${esc(user.email||'')} ${cust?.phone?' · '+esc(cust.phone):''}</p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="secondary" id="custLogoutBtn">Sign Out</button>
+        <button class="secondary" data-go="shop">Shop More</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab ${accountTab==='orders'?'active':''}" data-actab="orders">My Orders (${userOrders.length})</button>
+      <button class="tab ${accountTab==='profile'?'active':''}" data-actab="profile">Profile Details</button>
+      <button class="tab ${accountTab==='address'?'active':''}" data-actab="address">Saved Address</button>
+    </div>
+  `;
+  let bodyHtml='';
+  if(accountTab==='orders'){
+    if(!userOrders.length){
+      bodyHtml=`<div class="card"><div class="empty"><h3 style="margin-top:0">No orders placed yet</h3><p>You have not placed any orders yet. Fresh groceries, spices, oil, and packages are ready for delivery.</p><br><button class="primary" data-go="shop">Start Shopping</button></div></div>`;
+    }else{
+      bodyHtml=userOrders.map(o=>{
+        let st=(o.status||'Pending').toLowerCase(),step=1;
+        if(st==='pending')step=1;
+        else if(st==='confirmed')step=2;
+        else if(st==='packed')step=3;
+        else if(st.includes('out')||st.includes('delivery'))step=4;
+        else if(st==='delivered')step=5;
+        else if(st==='cancelled')step=0;
+        let itemsStr=(o.items||[]).map(i=>{let p=products.find(x=>x.id===i.id);return(p?esc(p.name):'Item #'+i.id)+' × '+i.qty}).join(', ');
+        return `<div class="card order"><div class="order-top"><div><strong style="font-size:15px;color:var(--gd)">Order #${esc(o.id)}</strong><div class="muted" style="font-size:12px;margin-top:3px">${esc(o.date)}</div></div><div><span class="status ${st==='cancelled'?'cancelled':''}">${esc(o.status||'Pending')}</span></div></div><div class="tracking"><div class="step ${step>=1?'done':''}">1. Order Placed</div><div class="step ${step>=2?'done':''}">2. Confirmed</div><div class="step ${step>=3?'done':''}">3. Packed</div><div class="step ${step>=4?'done':''}">4. Out for Delivery</div><div class="step ${step>=5?'done':''}">5. Delivered</div></div><div style="font-size:13px;line-height:1.6;margin:12px 0;padding-top:10px;border-top:1px solid #dfe9e0"><div style="color:var(--muted);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Items in this order</div><div style="margin-top:3px">${itemsStr||'Standard grocery order'}</div>${o.address?`<div style="margin-top:6px;color:#555"><span style="color:var(--muted)">Delivery to:</span> ${esc(o.address)} (${esc(o.area||'Standard')})</div>`:''}${o.note?`<div style="margin-top:4px;color:#666"><span style="color:var(--muted)">Note:</span> ${esc(o.note)}</div>`:''}</div><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;padding-top:10px;border-top:1px dashed #dfe9e0"><div style="font-size:14px;font-weight:bold;color:var(--red)">Total: ${money(o.total)}</div><div style="font-size:12px;color:var(--muted)">Payment: Cash on Delivery</div></div></div>`;
+      }).join('');
+    }
+  }else if(accountTab==='profile'){
+    bodyHtml=`<div class="card"><h2>Profile Details</h2><p class="muted">Update your customer name and contact info (saved to Firebase & Firestore).</p><form id="acProfileForm" class="formgrid" style="max-width:550px"><div class="field full"><label>Full Name *</label><input id="acNameInput" required value="${esc(displayName)}" placeholder="e.g. Tanvir Ahmed"></div><div class="field full"><label>Email Address (Firebase)</label><input id="acEmailInput" type="email" readonly disabled value="${esc(user.email||'')}" style="background:#f4f6f4;color:#666"></div><div class="field full"><label>Phone Number *</label><input id="acPhoneInput" type="tel" required value="${esc(cust?.phone||'')}" placeholder="e.g. 01712345678"></div><div class="field full"><button class="primary" type="submit" id="acSaveProfileBtn">Save Profile Changes</button></div></form></div>`;
+  }else if(accountTab==='address'){
+    bodyHtml=`<div class="card"><h2>Saved Delivery Address</h2><p class="muted">This address is saved to your Firebase profile and automatically prefilled whenever you checkout.</p><form id="acAddressForm" class="formgrid" style="max-width:550px"><div class="field full"><label>Delivery Address *</label><textarea id="acAddressInput" required placeholder="House, road, flat, landmark...">${esc(cust?.address||'')}</textarea></div><div class="field full"><label>Delivery Area *</label><select id="acAreaInput" required><option value="Inside city" ${cust?.area==='Inside city'?'selected':''}>Inside city</option><option value="Outside city" ${cust?.area==='Outside city'?'selected':''}>Outside city</option></select></div><div class="field full"><label>Delivery Instructions / Note</label><input id="acNoteInput" value="${esc(cust?.note||'')}" placeholder="e.g. Call before delivery, ring flat 3A bell"></div><div class="field full"><button class="primary" type="submit" id="acSaveAddressBtn">Save Delivery Address</button></div></form></div>`;
+  }
+  h.innerHTML=headerHtml+bodyHtml;
+}
+
+$('profilebutton').addEventListener('click',()=>{if(!location.hash||location.hash==='#account'||location.hash==='#profile'){go('account')}else{location.hash='account'}});
+
+document.addEventListener('click',async e=>{
+  let aut=e.target.closest('[data-set-authtab]');
+  if(aut){
+    authTab=aut.dataset.setAuthtab;
+    accountRender();
+    return;
+  }
+  let act=e.target.closest('[data-actab]');
+  if(act){accountTab=act.dataset.actab;accountRender();return}
+  if(e.target.id==='custLogoutBtn'){
+    try{
+      await logoutFromFirebase();
+      firebaseUser=null;
+      toast('Signed out from Firebase');
+      accountRender();
+    }catch(err){
+      toast('Sign out failed');
+    }
+    return;
+  }
+});
+
+document.addEventListener('submit',async e=>{
+  if(e.target.id==='fbSignInForm'){
+    e.preventDefault();
+    let em=$('fbEmail').value.trim();
+    let pw=$('fbPass').value;
+    let btn=$('fbSubmitBtn');
+    let errBox=$('fbAuthErr');
+    errBox.style.display='none';
+    btn.disabled=true;
+    btn.textContent='Signing in with Firebase...';
+    try{
+      let profile=await loginWithFirebase(em,pw);
+      firebaseUser=auth.currentUser;
+      toast('Welcome back, '+(profile.name||'Customer')+'! Signed in with Firebase');
+      accountRender();
+    }catch(err){
+      let msg='Failed to sign in. Please verify your credentials.';
+      if(err.code==='auth/invalid-credential'||err.code==='auth/wrong-password')msg='Invalid email or password.';
+      else if(err.code==='auth/user-not-found')msg='No user found with this email.';
+      else if(err.code==='auth/too-many-requests')msg='Too many attempts. Please try again later.';
+      errBox.textContent=msg;
+      errBox.style.display='block';
+      toast(msg);
+    }finally{
+      btn.disabled=false;
+      btn.textContent='Sign In with Firebase';
+    }
+  }
+
+  if(e.target.id==='fbSignUpForm'){
+    e.preventDefault();
+    let name=$('fbRegName').value.trim();
+    let em=$('fbRegEmail').value.trim();
+    let phone=$('fbRegPhone').value.trim();
+    let pass=$('fbRegPass').value;
+    let conf=$('fbRegConfirm').value;
+    let addr=$('fbRegAddress').value.trim();
+    let btn=$('fbRegSubmitBtn');
+    let errBox=$('fbRegErr');
+    errBox.style.display='none';
+
+    if(pass!==conf){
+      errBox.textContent='Passwords do not match.';
+      errBox.style.display='block';
+      return;
+    }
+    if(pass.length<6){
+      errBox.textContent='Password must be at least 6 characters.';
+      errBox.style.display='block';
+      return;
+    }
+
+    btn.disabled=true;
+    btn.textContent='Creating account with Firebase...';
+    try{
+      let profile=await registerWithFirebase(name,em,pass,phone,addr,'Inside city');
+      firebaseUser=auth.currentUser;
+      toast('Account created successfully with Firebase! Welcome, '+name);
+      accountRender();
+    }catch(err){
+      let msg='Registration failed: '+(err.message||'Unknown error');
+      if(err.code==='auth/email-already-in-use')msg='This email is already in use. Please sign in.';
+      else if(err.code==='auth/weak-password')msg='Password should be at least 6 characters.';
+      else if(err.code==='auth/invalid-email')msg='Invalid email format.';
+      errBox.textContent=msg;
+      errBox.style.display='block';
+      toast(msg);
+    }finally{
+      btn.disabled=false;
+      btn.textContent='Create Account with Firebase';
+    }
+  }
+
+  if(e.target.id==='acProfileForm'){
+    e.preventDefault();
+    let name=$('acNameInput').value.trim();
+    let phone=$('acPhoneInput').value.trim();
+    let btn=$('acSaveProfileBtn');
+    btn.disabled=true;
+    btn.textContent='Saving to Firebase...';
+    try{
+      await updateUserProfile({name,phone});
+      toast('Profile updated in Firebase & Firestore!');
+      accountRender();
+    }catch(err){
+      toast('Failed to update profile');
+    }finally{
+      btn.disabled=false;
+      btn.textContent='Save Profile Changes';
+    }
+  }
+
+  if(e.target.id==='acAddressForm'){
+    e.preventDefault();
+    let addr=$('acAddressInput').value.trim();
+    let area=$('acAreaInput').value;
+    let note=$('acNoteInput').value.trim();
+    let btn=$('acSaveAddressBtn');
+    btn.disabled=true;
+    btn.textContent='Saving address...';
+    try{
+      await updateUserProfile({address:addr,area,note});
+      toast('Delivery address saved to Firebase profile!');
+      accountRender();
+    }catch(err){
+      toast('Failed to save address');
+    }finally{
+      btn.disabled=false;
+      btn.textContent='Save Delivery Address';
+    }
+  }
+});
+function applyBranding(){let logo=read('af_logo',''),favicon=read('af_favicon',''),hero=read('af_hero',''),p1=read('af_promo1',''),p2=read('af_promo2',''),name=read('af_store_name','Aastha Fresh');let visual=$('brandvisual');if(logo)visual.innerHTML=`<img src="${logo}" alt="Store logo">`;else visual.innerHTML='<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#087e6e"/><path d="M24 36S9 28 12 17c2-7 10-7 12 0 3-7 11-7 13 0 3 11-13 19-13 19Z" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M24 34V20" stroke="#fff" stroke-width="2"/></svg>';let bt=document.querySelector('.brandtext b');if(bt)bt.textContent=name;let av=$('authbrandvisual');if(av)av.innerHTML=visual.innerHTML;if(favicon)$('sitefavicon').href=favicon;let b=document.querySelector('.banner');if(b&&hero)b.src=hero;else if(b)b.src='assets/banner.svg';let promo=document.querySelectorAll('.promos img');if(promo[0])promo[0].src=p1||'assets/spices.svg';if(promo[1])promo[1].src=p2||'assets/grains.svg';document.title=name+' Grocery';}
+let logoClicks=0,logoClickTimer=null;
+$('brandmark').addEventListener('click',()=>{logoClicks++;clearTimeout(logoClickTimer);logoClickTimer=setTimeout(()=>logoClicks=0,2500);if(logoClicks>=7){logoClicks=0;location.hash='admin'}else{if(!location.hash||location.hash==='#home'||location.hash==='#'){go('home')}else{location.hash='home'}}});
+function authRender(){let registered=!!read('af_admin_user',null);$('authheading').textContent=registered?'Admin Login':'Admin Registration';$('authintro').textContent=registered?'Sign in to manage your store.':'Create the one-time administrator account.';$('authsubmit').textContent=registered?'Login':'Register Admin';$('confirmfield').style.display=registered?'none':'flex';$('authconfirm').required=!registered;$('authnote').textContent=registered?'Registration is closed. Use the username and password created earlier.':'Only one admin account can be registered on this browser. Save your credentials safely.';$('authuser').value='';$('authpass').value='';$('authconfirm').value='';}
+$('authform').addEventListener('submit',e=>{e.preventDefault();let u=$('authuser').value.trim(),pw=$('authpass').value,conf=$('authconfirm').value,existing=read('af_admin_user',null);if(!existing){if(pw.length<8){toast('Password must be at least 8 characters');return}if(pw!==conf){toast('Passwords do not match');return}localStorage.setItem('af_admin_user',JSON.stringify({username:u,password:pw}));sessionStorage.setItem('af_admin_session','1');toast('Admin account created');go('admin');return}if(existing.username===u&&existing.password===pw){sessionStorage.setItem('af_admin_session','1');toast('Login successful');go('admin')}else toast('Incorrect username or password')});
+document.addEventListener('click',e=>{if(e.target.id==='adminlogout'){sessionStorage.removeItem('af_admin_session');location.hash='home';toast('Logged out')}});
+document.addEventListener('change',e=>{if(e.target.id==='dealEndSetting'){let dt=new Date(e.target.value);if(!isNaN(dt.getTime())){localStorage.setItem('af_deal_end',dt.toISOString());startDealTimer();toast('Deals timer updated')}}let map={logoUpload:['af_logo','logoPreview',300,300,0.9,'Website logo'],faviconUpload:['af_favicon','faviconPreview',128,128,0.9,'Favicon'],heroUpload:['af_hero','heroPreview',1400,480,0.85,'Main hero banner'],promo1Upload:['af_promo1','promo1Preview',700,400,0.85,'Promotion banner 1'],promo2Upload:['af_promo2','promo2Preview',700,400,0.85,'Promotion banner 2']};let item=map[e.target.id];if(item){let f=e.target.files&&e.target.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Please select an image file');return}toast('Processing '+item[5]+'...');optimizeImage(f,item[2],item[3],item[4],dataUrl=>{try{localStorage.setItem(item[0],dataUrl);let prev=$(item[1]);if(prev){prev.src=dataUrl;prev.style.display='inline-block';prev.classList.remove('hidden')}applyBranding();toast(item[5]+' updated successfully!')}catch(err){toast('Storage quota full. Clear old browser data.')}})}});
+
+window.addEventListener('hashchange',route);render();applyBranding();startDealTimer();route();
+</script></body></html>

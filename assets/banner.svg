@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#087e6e" />
+      <stop offset="60%" stop-color="#1b8d5e" />
+      <stop offset="100%" stop-color="#3da45b" />
+    </linearGradient>
+    <radialGradient id="sun" cx="85%" cy="30%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.25" />
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="360" fill="url(#bgGrad)" />
+  <rect width="1200" height="360" fill="url(#sun)" />
+  <circle cx="1050" cy="180" r="140" fill="#ffffff" fill-opacity="0.08" />
+  <circle cx="1120" cy="90" r="80" fill="#ffffff" fill-opacity="0.06" />
+  <text x="60" y="95" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#fdf07a" letter-spacing="2">100% PURE &amp; NATURAL</text>
+  <text x="60" y="160" font-family="Arial, sans-serif" font-size="44" font-weight="800" fill="#ffffff">Aastha Fresh Grocery</text>
+  <text x="60" y="210" font-family="Arial, sans-serif" font-size="22" font-weight="500" fill="#e2f5e8">Quality Daily Essentials Directly Delivered to Your Doorstep</text>
+  <g transform="translate(60, 245)">
+    <rect width="180" height="42" rx="6" fill="#f12e24" />
+    <text x="90" y="26" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">Shop Now</text>
+  </g>
+  <g transform="translate(260, 245)">
+    <rect width="260" height="42" rx="6" fill="#ffffff" fill-opacity="0.2" stroke="#ffffff" stroke-width="1.5" />
+    <text x="130" y="26" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-weight="600" fill="#ffffff">Free Delivery over ৳1,000</text>
+  </g>
+  <g transform="translate(900, 70)">
+    <rect x="20" y="70" width="170" height="150" rx="16" fill="#f9e2b0" stroke="#d5b47a" stroke-width="4"/>
+    <path d="M50 70 V35 A55 55 0 0 1 160 35 V70" fill="none" stroke="#b08c50" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="70" cy="55" r="28" fill="#e74c3c" />
+    <circle cx="105" cy="40" r="30" fill="#2ecc71" />
+    <circle cx="140" cy="55" r="26" fill="#f39c12" />
+    <path d="M105 20 Q115 5 130 10 Q120 25 105 20 Z" fill="#27ae60" />
+    <rect x="45" y="125" width="120" height="42" rx="4" fill="#ffffff" />
+    <text x="105" y="151" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#087e6e">AASTHA FRESH</text>
+  </g>
+</svg>
