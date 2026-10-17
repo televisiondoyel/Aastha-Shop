@@ -13,6 +13,10 @@ import {
   doc,
   setDoc,
   getDoc,
+  getDocs,
+  deleteDoc,
+  collection,
+  onSnapshot,
   getDocFromServer
 } from 'firebase/firestore';
 
@@ -44,6 +48,53 @@ export async function testConnection() {
   }
 }
 
+export enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+export interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: {
+    userId?: string | null;
+    email?: string | null;
+    emailVerified?: boolean | null;
+    isAnonymous?: boolean | null;
+    tenantId?: string | null;
+    providerInfo?: {
+      providerId?: string | null;
+      email?: string | null;
+    }[];
+  };
+}
+
+export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: auth.currentUser?.uid,
+      email: auth.currentUser?.email,
+      emailVerified: auth.currentUser?.emailVerified,
+      isAnonymous: auth.currentUser?.isAnonymous,
+      tenantId: auth.currentUser?.tenantId,
+      providerInfo: auth.currentUser?.providerData?.map(provider => ({
+        providerId: provider.providerId,
+        email: provider.email,
+      })) || []
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  return errInfo;
+}
+
 export interface UserProfileData {
   uid: string;
   name: string;
@@ -52,6 +103,51 @@ export interface UserProfileData {
   address?: string;
   area?: string;
   note?: string;
+  createdAt?: string;
+}
+
+export interface ProductItem {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  old: number;
+  discount: number;
+  deal: boolean;
+  image: string;
+  color?: string;
+  kind?: string;
+  updatedAt?: string;
+}
+
+export interface StoreSettingsData {
+  storeName?: string;
+  freeDelivery?: number;
+  dealEnd?: string;
+  logo?: string;
+  favicon?: string;
+  hero?: string;
+  promo1?: string;
+  promo2?: string;
+  updatedAt?: string;
+}
+
+export interface OrderItem {
+  id: number;
+  qty: number;
+}
+
+export interface OrderData {
+  id: string;
+  name: string;
+  phone: string;
+  address: string;
+  area: string;
+  note?: string;
+  items: OrderItem[];
+  total: number;
+  status: string;
+  date: string;
   createdAt?: string;
 }
 
@@ -80,7 +176,7 @@ export async function registerWithFirebase(
     try {
       await setDoc(doc(db, 'users', cred.user.uid), profile);
     } catch (e) {
-      console.warn("Failed to save profile to Firestore, saving locally:", e);
+      handleFirestoreError(e, OperationType.WRITE, `users/${cred.user.uid}`);
     }
     localStorage.setItem('af_customer_profile', JSON.stringify(profile));
     return profile;
@@ -104,7 +200,7 @@ export async function loginWithFirebase(email: string, pass: string) {
       profile = snap.data() as UserProfileData;
     }
   } catch (e) {
-    console.warn("Could not fetch remote user profile, using auth data", e);
+    handleFirestoreError(e, OperationType.GET, `users/${cred.user.uid}`);
   }
   localStorage.setItem('af_customer_profile', JSON.stringify(profile));
   return profile;
@@ -118,7 +214,6 @@ export async function logoutFromFirebase() {
 export async function updateUserProfile(data: Partial<UserProfileData>) {
   const user = auth.currentUser;
   if (!user) {
-    // Save to local
     const cur = JSON.parse(localStorage.getItem('af_customer_profile') || '{}');
     const updated = { ...cur, ...data };
     localStorage.setItem('af_customer_profile', JSON.stringify(updated));
@@ -129,7 +224,7 @@ export async function updateUserProfile(data: Partial<UserProfileData>) {
   try {
     await setDoc(doc(db, 'users', user.uid), updated, { merge: true });
   } catch (e) {
-    console.warn("Could not save to Firestore:", e);
+    handleFirestoreError(e, OperationType.WRITE, `users/${user.uid}`);
   }
   localStorage.setItem('af_customer_profile', JSON.stringify(updated));
   return updated;
@@ -152,12 +247,153 @@ export function subscribeAuth(callback: (user: FirebaseUser | null, profile: Use
           p = snap.data() as UserProfileData;
         }
       } catch (err) {
-        console.warn("Could not load user doc:", err);
+        handleFirestoreError(err, OperationType.GET, `users/${u.uid}`);
       }
       localStorage.setItem('af_customer_profile', JSON.stringify(p));
       callback(u, p);
     } else {
       callback(null, null);
     }
+  });
+}
+
+// =================== ADMIN & STORE FIRESTORE INTEGRATION ===================
+
+export async function saveProductToFirestore(p: ProductItem) {
+  const path = `products/${p.id}`;
+  try {
+    const payload = {
+      ...p,
+      updatedAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, 'products', String(p.id)), payload);
+    return payload;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export async function deleteProductFromFirestore(productId: number | string) {
+  const path = `products/${productId}`;
+  try {
+    await deleteDoc(doc(db, 'products', String(productId)));
+  } catch (err) {
+    handleFirestoreError(err, OperationType.DELETE, path);
+    throw err;
+  }
+}
+
+export async function getProductsFromFirestore(): Promise<ProductItem[]> {
+  const path = 'products';
+  try {
+    const snap = await getDocs(collection(db, path));
+    const items: ProductItem[] = [];
+    snap.forEach(d => {
+      items.push(d.data() as ProductItem);
+    });
+    return items;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.LIST, path);
+    return [];
+  }
+}
+
+export async function saveSettingsToFirestore(settings: StoreSettingsData) {
+  const path = 'settings/store';
+  try {
+    const payload = {
+      ...settings,
+      updatedAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, 'settings', 'store'), payload, { merge: true });
+    return payload;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export async function getSettingsFromFirestore(): Promise<StoreSettingsData | null> {
+  const path = 'settings/store';
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'store'));
+    if (snap.exists()) {
+      return snap.data() as StoreSettingsData;
+    }
+    return null;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+    return null;
+  }
+}
+
+export async function saveOrderToFirestore(o: OrderData) {
+  const path = `orders/${o.id}`;
+  try {
+    const payload = {
+      ...o,
+      createdAt: o.createdAt || new Date().toISOString()
+    };
+    await setDoc(doc(db, 'orders', String(o.id)), payload);
+    return payload;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export async function updateOrderStatusInFirestore(orderId: string, status: string) {
+  const path = `orders/${orderId}`;
+  try {
+    await setDoc(doc(db, 'orders', String(orderId)), { status, updatedAt: new Date().toISOString() }, { merge: true });
+  } catch (err) {
+    handleFirestoreError(err, OperationType.UPDATE, path);
+    throw err;
+  }
+}
+
+export async function getOrdersFromFirestore(): Promise<OrderData[]> {
+  const path = 'orders';
+  try {
+    const snap = await getDocs(collection(db, path));
+    const orders: OrderData[] = [];
+    snap.forEach(d => {
+      orders.push(d.data() as OrderData);
+    });
+    return orders;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.LIST, path);
+    return [];
+  }
+}
+
+export function subscribeProducts(cb: (products: ProductItem[]) => void) {
+  return onSnapshot(collection(db, 'products'), (snap) => {
+    const list: ProductItem[] = [];
+    snap.forEach(d => list.push(d.data() as ProductItem));
+    cb(list);
+  }, (err) => {
+    handleFirestoreError(err, OperationType.LIST, 'products');
+  });
+}
+
+export function subscribeSettings(cb: (settings: StoreSettingsData) => void) {
+  return onSnapshot(doc(db, 'settings', 'store'), (snap) => {
+    if (snap.exists()) {
+      cb(snap.data() as StoreSettingsData);
+    }
+  }, (err) => {
+    handleFirestoreError(err, OperationType.GET, 'settings/store');
+  });
+}
+
+export function subscribeOrders(cb: (orders: OrderData[]) => void) {
+  return onSnapshot(collection(db, 'orders'), (snap) => {
+    const list: OrderData[] = [];
+    snap.forEach(d => list.push(d.data() as OrderData));
+    cb(list);
+  }, (err) => {
+    handleFirestoreError(err, OperationType.LIST, 'orders');
   });
 }
