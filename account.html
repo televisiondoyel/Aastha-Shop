@@ -360,7 +360,7 @@ window.toggleAuth = async function() {
     try {
       await logoutFromFirebase();
       currentUser = null;
-      showMessage('Signed out from Firebase');
+      showMessage('Signed out successfully');
       updateUI();
     } catch (err) {
       showMessage('Sign out failed');
@@ -379,7 +379,7 @@ window.handleSignIn = async function(e) {
   let errBox = document.getElementById('fbLoginErr');
   errBox.style.display = 'none';
   btn.disabled = true;
-  btn.textContent = 'Signing in with Firebase...';
+  btn.textContent = 'Signing in...';
   try {
     let prof = await loginWithFirebase(em, pw);
     currentUser = auth.currentUser;
@@ -394,7 +394,7 @@ window.handleSignIn = async function(e) {
     showMessage(msg);
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Sign In with Firebase';
+    btn.textContent = 'Sign In';
   }
 };
 
@@ -422,11 +422,11 @@ window.handleSignUp = async function(e) {
   }
 
   btn.disabled = true;
-  btn.textContent = 'Creating account with Firebase...';
+  btn.textContent = 'Creating account...';
   try {
     let prof = await registerWithFirebase(name, em, pass, phone, addr, 'Inside city');
     currentUser = auth.currentUser;
-    showMessage('Account created successfully with Firebase!');
+    showMessage('Account created successfully!');
     updateUI();
   } catch (err) {
     let msg = 'Sign Up failed: ' + (err.message || 'Error');
@@ -437,7 +437,7 @@ window.handleSignUp = async function(e) {
     showMessage(msg);
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Create Account with Firebase';
+    btn.textContent = 'Create Account';
   }
 };
 
@@ -447,7 +447,7 @@ window.saveProfile = async function(e) {
   let phone = document.getElementById('profPhone').value.trim();
   try {
     await updateUserProfile({ name, phone });
-    showMessage('Profile updated in Firebase & Firestore!');
+    showMessage('Profile updated successfully!');
     updateUI();
   } catch (err) {
     showMessage('Failed to update profile');
@@ -461,7 +461,7 @@ window.saveAddress = async function(e) {
   let note = document.getElementById('profNote').value.trim();
   try {
     await updateUserProfile({ address, area, note });
-    showMessage('Delivery address saved to Firebase profile!');
+    showMessage('Delivery address saved successfully!');
     updateUI();
   } catch (err) {
     showMessage('Failed to save address');
@@ -485,7 +485,7 @@ function updateUI() {
     quickBadge.innerHTML = '';
     renderTab();
   } else {
-    greeting.textContent = 'Welcome! Sign In or Sign Up with Firebase to track orders and save your address.';
+    greeting.textContent = 'Welcome! Sign In or Sign Up to track orders and save your address.';
     authBtn.textContent = 'Sign In';
     tabs.style.display = 'none';
     quickBadge.innerHTML = '';
@@ -518,7 +518,7 @@ function renderAuthForm() {
             <input type="password" id="fbLoginPass" required placeholder="Your password">
           </div>
           <div id="fbLoginErr" style="display:none;color:#c81e1e;background:#fde8e8;padding:8px;border-radius:4px;font-size:12px;margin:8px 0"></div>
-          <button class="primary" id="fbLoginBtn" type="submit" style="width:100%;margin-top:10px">Sign In with Firebase</button>
+          <button class="primary" id="fbLoginBtn" type="submit" style="width:100%;margin-top:10px">Sign In</button>
           <p class="muted" style="text-align:center;font-size:12px;margin-top:10px">
             New here? <a href="javascript:void(0)" onclick="setAuthMode('signup')" style="color:var(--dark);font-weight:bold">Create an account</a>
           </p>
@@ -550,7 +550,7 @@ function renderAuthForm() {
             <textarea id="fbRegAddress" rows="2" placeholder="Road, house number, area..."></textarea>
           </div>
           <div id="fbRegErr" style="display:none;color:#c81e1e;background:#fde8e8;padding:8px;border-radius:4px;font-size:12px;margin:8px 0"></div>
-          <button class="primary" id="fbRegBtn" type="submit" style="width:100%;margin-top:10px">Create Account with Firebase</button>
+          <button class="primary" id="fbRegBtn" type="submit" style="width:100%;margin-top:10px">Create Account</button>
           <p class="muted" style="text-align:center;font-size:12px;margin-top:10px">
             Already registered? <a href="javascript:void(0)" onclick="setAuthMode('signin')" style="color:var(--dark);font-weight:bold">Sign in here</a>
           </p>
