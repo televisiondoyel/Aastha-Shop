@@ -173,14 +173,18 @@ input, select, textarea {
   background: #e4f6e8;
   color: #137b36;
   padding: 6px 12px;
-  border-radius: 20px;
+  border: 1px solid #159447;
+  border-radius: 0px;
   font-size: 12px;
   font-weight: 700;
+  display: inline-block;
 }
 
 .status.cancelled {
   background: #fde8e8;
   color: #c81e1e;
+  border: 1px solid #c81e1e;
+  border-radius: 0px;
 }
 
 .tracking {
@@ -195,12 +199,15 @@ input, select, textarea {
   padding: 10px 3px;
   font-size: 11px;
   background: #edf0ed;
-  border-radius: 5px;
+  border: 1px solid #b2cbb5;
+  border-radius: 0px;
   color: #677168;
 }
 
 .step.done {
   background: #d9f3df;
+  border: 1px solid #159447;
+  border-radius: 0px;
   color: #087c36;
   font-weight: bold;
 }
@@ -469,10 +476,13 @@ function updateUI() {
   let quickBadge = document.getElementById('quickBadge');
 
   if (currentUser) {
-    greeting.textContent = 'Welcome, ' + (currentUser.displayName || cust.name || 'Customer') + '! Signed in via Firebase (' + currentUser.email + ').';
+    greeting.textContent = '';
+    greeting.style.display = 'none';
+    let titleEl = document.getElementById('pageTitle');
+    if (titleEl) titleEl.textContent = currentUser.displayName || cust.name || 'My Account';
     authBtn.textContent = 'Sign Out';
     tabs.style.display = 'flex';
-    quickBadge.innerHTML = '<span style="background:#e4f6e8;color:#137b36;padding:5px 10px;border-radius:20px;font-size:12px;font-weight:bold">Firebase Verified</span>';
+    quickBadge.innerHTML = '';
     renderTab();
   } else {
     greeting.textContent = 'Welcome! Sign In or Sign Up with Firebase to track orders and save your address.';
@@ -487,17 +497,14 @@ function renderAuthForm() {
   const host = document.getElementById('tabContent');
   host.innerHTML = `
     <div class="card" style="max-width:520px;margin:20px auto">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="#f5820d"><path d="M4 19.5 7.5 3l4.5 7-3.5 2.5L16 2l4 17.5L12 22z"/></svg>
-        <div>
-          <h2 style="margin:0;font-size:20px">Firebase Account Portal</h2>
-          <p class="muted" style="margin:0;font-size:12px">Use Firebase Auth to access your account</p>
-        </div>
+      <div style="margin-bottom:14px">
+        <h2 style="margin:0;font-size:22px">My Account</h2>
+        <p class="muted" style="margin:4px 0 0 0;font-size:13px">Manage your orders, profile and more.</p>
       </div>
 
       <div class="tabs" style="margin:16px 0">
         <button class="tab ${authMode === 'signin' ? 'active' : ''}" onclick="setAuthMode('signin')">Sign In</button>
-        <button class="tab ${authMode === 'signup' ? 'active' : ''}" onclick="setAuthMode('signup')">Create Account (Sign Up)</button>
+        <button class="tab ${authMode === 'signup' ? 'active' : ''}" onclick="setAuthMode('signup')">Create Account</button>
       </div>
 
       ${authMode === 'signin' ? `
@@ -631,14 +638,14 @@ function renderTab() {
     host.innerHTML = `
       <div class="card">
         <h2>Personal Details</h2>
-        <p class="muted">Update your customer name and contact information (saved to Firebase).</p>
+        <p class="muted">Update your personal information.</p>
         <form class="form" onsubmit="saveProfile(event)">
           <div class="field">
             <label>Full Name *</label>
             <input id="profName" required value="${currentUser ? (currentUser.displayName || cust.name || '') : (cust.name || '')}" placeholder="e.g. Tanvir Ahmed">
           </div>
           <div class="field">
-            <label>Email Address (Firebase)</label>
+            <label>Email Address</label>
             <input type="email" readonly disabled value="${currentUser ? currentUser.email : (cust.email || '')}" style="background:#f4f6f4;color:#666">
           </div>
           <div class="field">
@@ -654,7 +661,7 @@ function renderTab() {
     host.innerHTML = `
       <div class="card">
         <h2>Delivery Address</h2>
-        <p class="muted">Your saved address is saved to your Firebase profile and automatically used for checkout.</p>
+        <p class="muted">Your saved address will be used for future deliveries.</p>
         <form class="form" onsubmit="saveAddress(event)">
           <div class="field">
             <label>Street & House Address *</label>
