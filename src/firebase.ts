@@ -198,6 +198,11 @@ export async function loginWithFirebase(email: string, pass: string) {
     const snap = await getDoc(doc(db, 'users', cred.user.uid));
     if (snap.exists()) {
       profile = snap.data() as UserProfileData;
+      if (profile.name && cred.user.displayName !== profile.name) {
+        try {
+          await updateProfile(cred.user, { displayName: profile.name });
+        } catch (e) {}
+      }
     }
   } catch (e) {
     handleFirestoreError(e, OperationType.GET, `users/${cred.user.uid}`);
@@ -221,6 +226,13 @@ export async function updateUserProfile(data: Partial<UserProfileData>) {
   }
   const cur = JSON.parse(localStorage.getItem('af_customer_profile') || '{}');
   const updated = { ...cur, ...data, uid: user.uid, email: user.email || cur.email };
+  if (data.name) {
+    try {
+      await updateProfile(user, { displayName: data.name });
+    } catch (e) {
+      console.error('Failed to update displayName on auth user:', e);
+    }
+  }
   try {
     await setDoc(doc(db, 'users', user.uid), updated, { merge: true });
   } catch (e) {
@@ -245,6 +257,11 @@ export function subscribeAuth(callback: (user: FirebaseUser | null, profile: Use
         const snap = await getDoc(doc(db, 'users', u.uid));
         if (snap.exists()) {
           p = snap.data() as UserProfileData;
+          if (p.name && u.displayName !== p.name) {
+            try {
+              await updateProfile(u, { displayName: p.name });
+            } catch (e) {}
+          }
         }
       } catch (err) {
         handleFirestoreError(err, OperationType.GET, `users/${u.uid}`);
@@ -467,3 +484,58 @@ export async function hashPassword(str: string): Promise<string> {
   }
   return 'pw_' + Math.abs(hash).toString(16);
 }
+
+export interface CategoryItem {
+  id: string;
+  name: string;
+  image?: string;
+  color?: string;
+  slug?: string;
+  updatedAt?: string;
+}
+
+export async function getCategoriesFromFirestore(): Promise<CategoryItem[]> {
+  const path = 'settings/categories';
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'categories'));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        return data.items as CategoryItem[];
+      }
+    }
+    return [];
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+    return [];
+  }
+}
+
+export async function saveCategoriesToFirestore(items: CategoryItem[]): Promise<CategoryItem[]> {
+  const path = 'settings/categories';
+  try {
+    const payload = {
+      items,
+      updatedAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, 'settings', 'categories'), payload);
+    return items;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export function subscribeCategories(cb: (items: CategoryItem[]) => void) {
+  return onSnapshot(doc(db, 'settings', 'categories'), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        cb(data.items as CategoryItem[]);
+      }
+    }
+  }, (err) => {
+    handleFirestoreError(err, OperationType.GET, 'settings/categories');
+  });
+}
+

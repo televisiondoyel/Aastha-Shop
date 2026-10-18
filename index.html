@@ -21,7 +21,7 @@
 <section class="page" id="page-checkout"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Checkout</span></p><div class="box"><h2>Checkout</h2><p>Payment method: Cash on Delivery.</p><form id="checkout"><div class="formgrid"><div class="field"><label>Full name *</label><input id="name" required></div><div class="field"><label>Phone number *</label><input id="phone" type="tel" required></div><div class="field full"><label>Delivery address *</label><textarea id="address" required></textarea></div><div class="field"><label>Delivery area *</label><select id="area" required><option value="">Choose area</option><option>Inside city</option><option>Outside city</option></select></div><div class="field"><label>Order note</label><input id="note"></div></div><div class="notice" id="checkouttotal"></div><button class="primary">Place Order — Cash on Delivery</button></form></div></section>
 <section class="page" id="page-success"><div class="box" style="text-align:center;padding:45px"><h1 style="color:var(--g)">Thank you for your order!</h1><p id="confirmation"></p><button class="primary" data-go="shop">Continue Shopping</button></div></section><section class="page" id="page-about"><div class="box"><h1>About Aastha</h1><p>Everyday grocery essentials, fair prices and convenient local delivery for your family.</p></div></section><section class="page" id="page-contact"><div class="box"><h1>Contact us</h1><form id="contact" class="formgrid"><div class="field"><label>Name</label><input required></div><div class="field"><label>Phone or email</label><input required></div><div class="field full"><label>Message</label><textarea required></textarea></div><div><button class="primary">Send Message</button></div></form></div></section>
 <section class="page" id="page-auth"><div class="auth-wrap"><div class="auth-card"><div class="auth-logo"><span id="authbrandvisual"></span></div><h1 id="authheading">Admin access</h1><p id="authintro">Private store management</p><form id="authform"><div class="field"><label>Username</label><input id="authuser" autocomplete="username" required minlength="4"></div><div class="field"><label>Password</label><input id="authpass" type="password" autocomplete="current-password" required minlength="8"></div><div class="field" id="confirmfield"><label>Confirm password</label><input id="authconfirm" type="password" autocomplete="new-password" minlength="8"></div><button class="primary" id="authsubmit" style="width:100%;margin-top:14px">Create Admin Account</button><p class="authnote" id="authnote"></p></form><button class="secondary" data-go="home">Back to store</button></div></div></section>
-<section class="page" id="page-admin"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Admin</span></p><div class="admin"><aside class="side"><button class="active" data-tab="overview">Overview</button><button data-tab="products">Products</button><button data-tab="orders">Orders</button><button data-tab="settings">Settings</button><button data-go="home">Back to Store</button><button id="adminlogout">Log out</button></aside><div class="adminmain" id="admincontent"></div></div></section><section class="page" id="page-account"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>My Account</span></p><div id="accountcontent"></div></section>
+<section class="page" id="page-admin"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Admin</span></p><div class="admin"><aside class="side"><button class="active" data-tab="overview">Overview</button><button data-tab="products">Products</button><button data-tab="categories">Categories</button><button data-tab="orders">Orders</button><button data-tab="settings">Settings</button><button data-go="home">Back to Store</button><button id="adminlogout">Log out</button></aside><div class="adminmain" id="admincontent"></div></div></section><section class="page" id="page-account"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>My Account</span></p><div id="accountcontent"></div></section>
 </div><footer class="footer"><div class="footgrid"><div><h3>Aastha</h3><p>Your everyday grocery store. Quality essentials, fair prices and convenient home delivery.</p></div><div><h3>Shop</h3><a href="#shop">All products</a><br><a href="#offers">Special offers</a><br><a href="#packages">Packages</a></div><div><h3>Customer Care</h3><a href="#contact">Contact us</a><br><a href="#about">About us</a><br><a href="#cart">Cart</a></div><div><h3>Shopping</h3><a href="#shop">Browse groceries</a><br><a href="#cart">Shopping cart</a><p>Cash on Delivery</p></div></div></footer><div class="toast" id="toast"></div>
 <script type="module">
 import {
@@ -47,7 +47,10 @@ import {
   getAdminAuthFromFirestore,
   saveAdminAuthToFirestore,
   subscribeAdminAuth,
-  hashPassword
+  hashPassword,
+  getCategoriesFromFirestore,
+  saveCategoriesToFirestore,
+  subscribeCategories
 } from './src/firebase.ts';
 testConnection();
 let firebaseUser = null;
@@ -65,30 +68,505 @@ let cachedProducts=read('af_products',null);
 let isProductsLoaded=Array.isArray(cachedProducts)&&cachedProducts.length>0;
 let products=isProductsLoaded?cachedProducts.map(p=>({...p,image:p.image||makeImg(p.color||'#6ab06b',p.category)})):[];
 let cart=read('af_cart',[]),orders=read('af_orders',[]),editing=null,tab='overview';
-const $=id=>document.getElementById(id),money=n=>'৳ '+Number(n).toLocaleString('en-BD',{maximumFractionDigits:2}),save=()=>{try{localStorage.setItem('af_products',JSON.stringify(products));localStorage.setItem('af_cart',JSON.stringify(cart));localStorage.setItem('af_orders',JSON.stringify(orders))}catch(e){console.warn('Storage limit',e)}},esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),toast=s=>{let t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2400)};
+
+const DEFAULT_CATEGORIES=[
+  {id:'cat_oil',name:'Oil',slug:'oil',color:'#d9a82f'},
+  {id:'cat_spices',name:'Spices',slug:'spices',color:'#b74a47'},
+  {id:'cat_flour',name:'Flour',slug:'flour',color:'#d4c4a0'},
+  {id:'cat_dal',name:'Dal or Lentil',slug:'lentils',color:'#d66a37'},
+  {id:'cat_packages',name:'Packages',slug:'packages',color:'#5da86b'},
+  {id:'cat_rice',name:'Rice',slug:'rice',color:'#e5d8b9'},
+  {id:'cat_pantry',name:'Pantry',slug:'pantry',color:'#6aa4be'},
+  {id:'cat_offers',name:'Offers',slug:'offers',color:'#ef7454'}
+];
+let rawCategories=read('af_categories',null);
+let categories=Array.isArray(rawCategories)&&rawCategories.length>0?rawCategories:DEFAULT_CATEGORIES;
+let editingCatId=null;
+let adminProductSearch='';
+let adminProductCategory='';
+let orderStatusFilter='All';
+
+function getActiveCategoryNames(){
+  let names=categories.map(c=>c.name);
+  products.forEach(p=>{
+    if(p.category&&!names.includes(p.category))names.push(p.category);
+  });
+  return names.length?names:['Oil','Spices','Flour','Dal or Lentil','Packages','Rice','Pantry','Offers'];
+}
+
+const $=id=>document.getElementById(id),money=n=>'৳ '+Number(n).toLocaleString('en-BD',{maximumFractionDigits:2}),save=()=>{try{localStorage.setItem('af_products',JSON.stringify(products));localStorage.setItem('af_cart',JSON.stringify(cart));localStorage.setItem('af_orders',JSON.stringify(orders));localStorage.setItem('af_categories',JSON.stringify(categories))}catch(e){console.warn('Storage limit',e)}},esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),toast=s=>{let t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2400)};
 function skeletonGrid(count=6){return Array(count).fill(0).map(()=>`<article class="product skeleton-card"><div class="skeleton-img"></div><div class="skeleton-line" style="width:75%;height:14px;margin:10px 0 6px"></div><div class="skeleton-line" style="width:45%;height:14px;margin-bottom:10px"></div><div class="skeleton-btn"></div></article>`).join('')}
 function card(p){return `<article class="product"><span class="discount">-${p.discount||5}%</span><a href="#product-${p.id}" data-product="${p.id}"><img class="pimg" src="${p.image}" alt="${esc(p.name)}"></a><a class="pname" href="#product-${p.id}" data-product="${p.id}">${esc(p.name)}</a><div class="price">${money(p.price)} <span class="old">${money(p.old||p.price)}</span></div><button class="add" data-add="${p.id}">Add to Cart</button></article>`}
 function list(id,arr){let el=$(id);if(!el)return;if(!isProductsLoaded&&!arr.length){el.innerHTML=skeletonGrid(id==='catalog'?8:6);return}el.innerHTML=arr.length?arr.map(card).join(''):'<div class="empty">No products found.</div>'}
-function render(){list('deals',products.filter(p=>p.deal).slice(0,8));list('featured',products.slice(0,8));list('spiceslist',products.filter(p=>p.category==='Spices'));list('oillist',products.filter(p=>p.category==='Oil'));list('flourlist',products.filter(p=>p.category==='Flour'));list('lentillist',products.filter(p=>p.category==='Dal or Lentil'));list('packageslist',products.filter(p=>p.category==='Packages'));list('offerslist',products.filter(p=>p.discount));$('categories').innerHTML=[['Oil','#d9a82f'],['Spices','#b74a47'],['Flour','#d4c4a0'],['Dal or Lentil','#d66a37'],['Packages','#5da86b'],['Rice','#e5d8b9'],['Pantry','#6aa4be'],['Offers','#ef7454']].map(([n,c])=>`<a class="cat" href="#${n==='Dal or Lentil'?'lentils':n==='Offers'?'offers':n==='Packages'?'packages':n.toLowerCase()}"><img src="${makeImg(c,n)}" alt="${n}"><span>${n}</span></a>`).join('');fillFilter();catalog();count()}
-function fillFilter(){let f=$('filter'),old=f.value;f.innerHTML='<option value="">All categories</option>'+[...new Set(products.map(p=>p.category))].map(c=>`<option>${esc(c)}</option>`).join('');f.value=old}
+function render(){
+  list('deals',products.filter(p=>p.deal).slice(0,8));
+  list('featured',products.slice(0,8));
+  list('spiceslist',products.filter(p=>p.category==='Spices'));
+  list('oillist',products.filter(p=>p.category==='Oil'));
+  list('flourlist',products.filter(p=>p.category==='Flour'));
+  list('lentillist',products.filter(p=>p.category==='Dal or Lentil'));
+  list('packageslist',products.filter(p=>p.category==='Packages'));
+  list('offerslist',products.filter(p=>p.discount));
+  $('categories').innerHTML=categories.map(c=>{
+    let imgSrc=c.image||makeImg(c.color||'#3da45b',c.name);
+    let slug=c.slug||(c.name==='Dal or Lentil'?'lentils':c.name==='Offers'?'offers':c.name==='Packages'?'packages':c.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+    return `<a class="cat" href="#${slug}" data-cat="${esc(c.name)}"><img src="${imgSrc}" alt="${esc(c.name)}"><span>${esc(c.name)}</span></a>`;
+  }).join('');
+  fillFilter();
+  catalog();
+  count();
+}
+function fillFilter(){
+  let f=$('filter'),old=f.value;
+  let allCats=[...new Set([...categories.map(c=>c.name),...products.map(p=>p.category)])].filter(Boolean);
+  f.innerHTML='<option value="">All categories</option>'+allCats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('');
+  f.value=old;
+}
 function catalog(){let q=$('search').value.toLowerCase(),cat=$('filter').value,s=$('sort').value,a=products.filter(p=>p.name.toLowerCase().includes(q)&&(!cat||p.category===cat));if(s==='low')a.sort((x,y)=>x.price-y.price);if(s==='high')a.sort((x,y)=>y.price-x.price);if(s==='name')a.sort((x,y)=>x.name.localeCompare(y.name));list('catalog',a)}
 function count(){let n=cart.reduce((s,i)=>s+i.qty,0);$('cartcount').textContent=n;$('headcartcount').textContent=n}
-function go(page){if(page==='profile')page='account';if(page==='admin'&&!sessionStorage.getItem('af_admin_session'))page='auth';document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));let el=$('page-'+page);if(!el){page='home';el=$('page-home')}el.classList.add('active');document.querySelectorAll('.nav a[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page===page));if(page==='cart')cartRender();if(page==='checkout')checkoutTotal();if(page==='admin')adminRender();if(page==='auth')authRender();if(page==='shop')catalog();if(page==='account')accountRender();window.scrollTo({top:0,behavior:'smooth'})}
+function go(page){
+  if(page==='profile')page='account';
+  if(page==='admin'&&!sessionStorage.getItem('af_admin_session'))page='auth';
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  let el=$('page-'+page);
+  if(!el){
+    let matchedCat=categories.find(c=>{
+      let slug=c.slug||(c.name==='Dal or Lentil'?'lentils':c.name==='Offers'?'offers':c.name==='Packages'?'packages':c.name.toLowerCase().replace(/[^a-z0-9]+/g,'-'));
+      return slug===page||c.name.toLowerCase()===page.toLowerCase();
+    });
+    if(matchedCat){
+      page='shop';
+      el=$('page-shop');
+      if(el)el.classList.add('active');
+      let f=$('filter');
+      if(f){f.value=matchedCat.name;catalog();}
+    }else{
+      page='home';
+      el=$('page-home');
+      if(el)el.classList.add('active');
+    }
+  }else{
+    el.classList.add('active');
+  }
+  document.querySelectorAll('.nav a[data-page]').forEach(a=>a.classList.toggle('active',a.dataset.page===page));
+  if(page==='cart')cartRender();
+  if(page==='checkout')checkoutTotal();
+  if(page==='admin')adminRender();
+  if(page==='auth')authRender();
+  if(page==='shop')catalog();
+  if(page==='account')accountRender();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 function route(){let h=location.hash.slice(1)||'home';if(h.startsWith('product-')){showProduct(+h.split('-')[1]);return}go(h)}
-function showProduct(id){let p=products.find(x=>x.id===id);if(!p){go('shop');return}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('page-product').classList.add('active');let catSlug=p.category==='Dal or Lentil'?'lentils':p.category==='Offers'?'offers':p.category==='Packages'?'packages':p.category.toLowerCase();$('crumb').innerHTML=`<a href="#home" data-go="home">Home</a> / <a href="#${catSlug}" data-go="${catSlug}">${esc(p.category)}</a> / <span>${esc(p.name)}</span>`;$('detail').innerHTML=`<img src="${p.image}" alt="${esc(p.name)}"><div><p>${esc(p.category)}</p><h1>${esc(p.name)}</h1><p>Quality grocery essential for everyday use. Product details and photos can be updated in the admin panel.</p><div class="bigprice">${money(p.price)} <span class="old">${money(p.old||p.price)}</span></div><p style="color:#288847">In stock · Local delivery available</p><div class="qty"><button data-q="-1">−</button><input id="detailqty" type="number" min="1" value="1"><button data-q="1">+</button></div><button class="primary" data-add="${p.id}" data-detailadd>Add to Cart</button> <button class="secondary" data-go="cart">View Cart</button><p>Payment: Cash on Delivery</p></div>`;window.scrollTo(0,0)}
+function showProduct(id){let p=products.find(x=>x.id===id);if(!p){go('shop');return}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('page-product').classList.add('active');let catSlug=p.category==='Dal or Lentil'?'lentils':p.category==='Offers'?'offers':p.category==='Packages'?'packages':(categories.find(c=>c.name===p.category)?.slug||p.category.toLowerCase().replace(/[^a-z0-9]+/g,'-'));$('crumb').innerHTML=`<a href="#home" data-go="home">Home</a> / <a href="#${catSlug}" data-go="${catSlug}">${esc(p.category)}</a> / <span>${esc(p.name)}</span>`;$('detail').innerHTML=`<img src="${p.image}" alt="${esc(p.name)}"><div><p>${esc(p.category)}</p><h1>${esc(p.name)}</h1><p>Quality grocery essential for everyday use. Product details and photos can be updated in the admin panel.</p><div class="bigprice">${money(p.price)} <span class="old">${money(p.old||p.price)}</span></div><p style="color:#288847">In stock · Local delivery available</p><div class="qty"><button data-q="-1">−</button><input id="detailqty" type="number" min="1" value="1"><button data-q="1">+</button></div><button class="primary" data-add="${p.id}" data-detailadd>Add to Cart</button> <button class="secondary" data-go="cart">View Cart</button><p>Payment: Cash on Delivery</p></div>`;window.scrollTo(0,0)}
 function add(id,n=1){let p=products.find(p=>p.id===+id);if(!p)return;let i=cart.find(i=>i.id===p.id);if(i)i.qty+=n;else cart.push({id:p.id,qty:n});save();count();toast('Added to cart')}
 function cartRender(){let host=$('cartitems');if(!cart.length){host.innerHTML='<div class="empty">Your cart is empty. <p><button class="primary" data-go="shop">Start Shopping</button></p></div>';$('summary').innerHTML='';return}host.innerHTML=cart.map(i=>{let p=products.find(p=>p.id===i.id);return p?`<div class="cartrow"><img src="${p.image}" alt=""><div><b>${esc(p.name)}</b><div class="price">${money(p.price)}</div></div><div class="qty" style="margin:0"><button data-change="${p.id}" data-delta="-1">−</button><span>${i.qty}</span><button data-change="${p.id}" data-delta="1">+</button></div><div class="line-total">${money(p.price*i.qty)}</div><button class="tiny danger" data-remove="${p.id}">Remove</button></div>`:''}).join('');let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60;$('summary').innerHTML=`<div class="summary"><div class="sumrow"><span>Subtotal</span><b>${money(s)}</b></div><div class="sumrow"><span>Delivery</span><b>${d?money(d):'FREE'}</b></div><div class="sumrow total"><span>Total</span><b>${money(s+d)}</b></div><button class="primary" style="width:100%;margin-top:12px" data-go="checkout">Proceed to Checkout</button><p>Free delivery on orders of ৳1,000 or more.</p></div>`}
 function checkoutTotal(){let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60;$('checkouttotal').textContent='Order total: '+money(s+d)+' (Delivery: '+(d?money(d):'FREE')+')';let cp=read('af_customer_profile',null);if(cp){if(!$('name').value&&cp.name)$('name').value=cp.name;if(!$('phone').value&&cp.phone)$('phone').value=cp.phone;if(!$('address').value&&cp.address)$('address').value=cp.address;if(!$('area').value&&cp.area)$('area').value=cp.area;if(!$('note').value&&cp.note)$('note').value=cp.note;}}
 $('checkout').addEventListener('submit',e=>{e.preventDefault();if(!cart.length){toast('Your cart is empty');location.hash='shop';return}let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60,o={id:'AF'+Date.now().toString().slice(-7),name:$('name').value,phone:$('phone').value,address:$('address').value,area:$('area').value,note:$('note').value,items:cart.map(i=>({...i})),total:s+d,status:'Pending',date:new Date().toLocaleString()};orders.unshift(o);let cp=read('af_customer_profile',null);if(!cp){localStorage.setItem('af_customer_profile',JSON.stringify({name:o.name,phone:o.phone,email:'',address:o.address,area:o.area,note:o.note}))}else{if(!cp.address)cp.address=o.address;if(!cp.area)cp.area=o.area;if(!cp.phone)cp.phone=o.phone;localStorage.setItem('af_customer_profile',JSON.stringify(cp))}cart=[];save();saveOrderToFirestore(o).catch(err=>console.error('Failed to save order to Firestore:',err));$('confirmation').textContent='Order '+o.id+' received. Total '+money(o.total)+'. Payment: Cash on Delivery.';location.hash='success';toast('Order placed')});
 $('contact').addEventListener('submit',e=>{e.preventDefault();toast('Message received in demo mode');e.target.reset()});$('topsearchbtn').addEventListener('click',()=>{location.hash='shop';setTimeout(()=>{$('search').value=$('topsearch').value;catalog();$('search').focus()},40)});$('topsearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('topsearchbtn').click()});$('search').addEventListener('input',catalog);$('filter').addEventListener('change',catalog);$('sort').addEventListener('change',catalog);
-document.addEventListener('click',e=>{let g=e.target.closest('[data-go]');if(g){let t=g.dataset.go;if(t==='home'&&(!location.hash||location.hash==='#home'||location.hash==='#')){go('home')}else if(location.hash==='#'+t){go(t)}else{location.hash=t}return}let ah=e.target.closest('a[href="#home"]');if(ah){if(!location.hash||location.hash==='#home'||location.hash==='#'){go('home')}}let st=e.target.closest('[data-set-timer]');if(st){let days=+st.dataset.setTimer;let newDate=new Date(Date.now()+days*24*3600*1000);let iso=newDate.toISOString();storeSettings.dealEnd=iso;try{localStorage.setItem('af_deal_end',iso);}catch(err){}let inp=$('dealEndSetting');if(inp)inp.value=getDealEndInputValue();startDealTimer();toast('Deals countdown set to '+days+(days===1?' day':' days')+'!');saveSettingsToFirestore({dealEnd:iso}).catch(err=>console.error('Failed to save dealEnd to Firestore:',err));return}let pr=e.target.closest('[data-product]');if(pr){e.preventDefault();location.hash='product-'+pr.dataset.product;return}let ad=e.target.closest('[data-add]');if(ad){add(ad.dataset.add,ad.hasAttribute('data-detailadd')?Math.max(1,+$('detailqty').value||1):1);return}let q=e.target.closest('[data-q]');if(q){$('detailqty').value=Math.max(1,(+$('detailqty').value||1)+ +q.dataset.q);return}let ch=e.target.closest('[data-change]');if(ch){let i=cart.find(i=>i.id===+ch.dataset.change);if(i)i.qty=Math.max(1,i.qty+(+ch.dataset.delta));save();cartRender();count();return}let rm=e.target.closest('[data-remove]');if(rm){cart=cart.filter(i=>i.id!==+rm.dataset.remove);save();cartRender();count();return}let t=e.target.closest('[data-tab]');if(t){tab=t.dataset.tab;adminRender();return}let ed=e.target.closest('[data-edit]');if(ed){editing=+ed.dataset.edit;adminRender();return}let del=e.target.closest('[data-delete]');if(del){let delId=+del.dataset.delete;products=products.filter(p=>p.id!==delId);save();render();adminRender();toast('Product deleted successfully');deleteProductFromFirestore(delId).catch(err=>console.error('Failed to delete product from Firestore:',err));return}let os=e.target.closest('[data-order-save]');if(os){let o=orders.find(o=>o.id===os.dataset.orderSave);if(o){let newStatus=document.querySelector('[data-status="'+o.id+'"]').value;o.status=newStatus;save();adminRender();toast('Order status updated successfully');updateOrderStatusInFirestore(o.id,newStatus).catch(err=>console.error('Failed to update order status in Firestore:',err));}return}if(e.target.closest('[data-save-settings]')){let sn=$('storeNameSetting'),dv=$('deliverySetting'),de=$('dealEndSetting');let storeName=sn?(sn.value.trim()||'Aastha'):'Aastha';let freeDelivery=dv?Math.max(0,+dv.value||0):1000;let dealEnd=storeSettings.dealEnd||'';if(de&&de.value){let dt=new Date(de.value);if(!isNaN(dt.getTime()))dealEnd=dt.toISOString();}storeSettings.storeName=storeName;storeSettings.freeDelivery=freeDelivery;if(dealEnd)storeSettings.dealEnd=dealEnd;try{localStorage.setItem('af_store_name',storeName);localStorage.setItem('af_free_delivery',String(freeDelivery));if(dealEnd)localStorage.setItem('af_deal_end',dealEnd);}catch(e){}applyBranding();startDealTimer();toast('Store settings saved successfully');let payload={storeName,freeDelivery,dealEnd:dealEnd||'',logo:storeSettings.logo||'',favicon:storeSettings.favicon||'',hero:storeSettings.hero||'',promo1:storeSettings.promo1||'',promo2:storeSettings.promo2||''};saveSettingsToFirestore(payload).catch(err=>console.error('Failed to save settings to Firestore:',err));}});
-function productForm(){let p=products.find(p=>p.id===editing);return `<form id="productform" class="formgrid"><div class="field"><label>Product name *</label><input name="name" required value="${esc(p?.name||'')}"></div><div class="field"><label>Category</label><select name="category">${['Oil','Spices','Flour','Dal or Lentil','Packages','Rice','Pantry'].map(c=>`<option ${p?.category===c?'selected':''}>${c}</option>`).join('')}</select></div><div class="field"><label>Price (৳)</label><input name="price" type="number" min="0" required value="${p?.price??''}"></div><div class="field"><label>Old price (৳)</label><input name="old" type="number" min="0" value="${p?.old??''}"></div><div class="field"><label>Discount (%)</label><input name="discount" type="number" min="0" max="99" value="${p?.discount??0}"></div><div class="field"><label>Deal of the Day</label><select name="deal"><option value="false" ${p?.deal?'':'selected'}>No</option><option value="true" ${p?.deal?'selected':''}>Yes</option></select></div><div class="field full"><label>Product photo — upload from mobile gallery or computer</label><div class="upload"><input type="file" id="photo" accept="image/*"><p>Choose JPG, PNG or WebP. Use image files under 1.5 MB.</p><img id="preview" class="preview ${p?'':'hidden'}" src="${p?.image||''}" alt="Preview"></div><input type="hidden" name="image" id="imagedata" value="${p?esc(p.image):''}"></div><div class="field full"><button class="primary">${p?'Update Product':'Add Product'}</button> ${p?'<button type="button" class="secondary" data-cancel>Cancel</button>':''}</div></form>`}
-function productTable(){return `<table class="table"><thead><tr><th>Photo</th><th>Product</th><th>Category</th><th>Price</th><th>Actions</th></tr></thead><tbody>${products.map(p=>`<tr><td><img src="${p.image}" alt=""></td><td>${esc(p.name)}</td><td>${esc(p.category)}</td><td>${money(p.price)}</td><td><button class="tiny" data-edit="${p.id}">Edit</button> <button class="tiny danger" data-delete="${p.id}">Delete</button></td></tr>`).join('')}</tbody></table>`}
-function orderTable(){if(!orders.length)return '<div class="empty">No orders yet.</div>';return `<table class="table"><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th><th>Update</th></tr>${orders.map(o=>`<tr><td>${o.id}<br><small>${esc(o.date)}</small></td><td>${esc(o.name)}<br>${esc(o.phone)}</td><td>${money(o.total)}</td><td>${esc(o.status)}</td><td><select data-status="${o.id}">${['Pending','Confirmed','Packed','Out for delivery','Delivered','Cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}</select> <button class="tiny" data-order-save="${o.id}">Save</button></td></tr>`).join('')}</table>`}
-function adminRender(){document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));let h=$('admincontent');if(tab==='overview')h.innerHTML=`<h2>Store Overview</h2><div class="stats"><div class="stat">Products<strong>${products.length}</strong></div><div class="stat">Orders<strong>${orders.length}</strong></div><div class="stat">Pending Orders<strong>${orders.filter(o=>o.status==='Pending').length}</strong></div></div><div class="notice" style="background:#eaf8ee;border-color:#52b769;color:#185a2d"><b>Cloud Connected:</b> All store products, customer orders, and settings are synchronized in real-time.</div><h3>Recent orders</h3>${orderTable()}`;else if(tab==='products')h.innerHTML='<h2>Product Management</h2><p>Add or edit products and upload photos from your device gallery. All products are saved automatically.</p>'+productForm()+'<h3>Products</h3>'+productTable();else if(tab==='orders')h.innerHTML='<h2>Order Management</h2>'+orderTable();else h.innerHTML=`<h2>Store & Design Settings</h2><p>Upload your own logo, site icon and three promotional banners directly from your phone gallery.</p><div class="formgrid"><div class="field full"><label>Website logo</label><div class="upload"><input type="file" id="logoUpload" accept="image/*"><p>Shown in the website header. PNG or WebP with transparent background works best.</p><img id="logoPreview" class="preview" alt="Logo preview" src="${storeSettings.logo||''}" style="${storeSettings.logo?'':'display:none'}"></div></div><div class="field full"><label>Site icon / favicon</label><div class="upload"><input type="file" id="faviconUpload" accept="image/*"><p>Small icon shown in the browser tab. A square logo is recommended.</p><img id="faviconPreview" class="preview" alt="Favicon preview" src="${storeSettings.favicon||''}" style="${storeSettings.favicon?'':'display:none'}"></div></div><div class="field full"><label>Main hero banner</label><div class="upload"><input type="file" id="heroUpload" accept="image/*"><p>Recommended wide image, around 1200 × 420 px.</p><img id="heroPreview" class="preview" alt="Hero banner preview" src="${storeSettings.hero||'assets/banner.svg'}"></div></div><div class="field"><label>Promotion banner 1</label><div class="upload"><input type="file" id="promo1Upload" accept="image/*"><img id="promo1Preview" class="preview" alt="Promotion 1 preview" src="${storeSettings.promo1||'assets/spices.svg'}"></div></div><div class="field"><label>Promotion banner 2</label><div class="upload"><input type="file" id="promo2Upload" accept="image/*"><img id="promo2Preview" class="preview" alt="Promotion 2 preview" src="${storeSettings.promo2||'assets/grains.svg'}"></div></div><div class="field full"><label>Deals Of The Day — Offer End Date &amp; Time</label><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input type="datetime-local" id="dealEndSetting" value="${getDealEndInputValue()}" style="max-width:240px"><button type="button" class="tiny" data-set-timer="1">24 Hours</button><button type="button" class="tiny" data-set-timer="3">3 Days</button><button type="button" class="tiny" data-set-timer="7">7 Days</button><button type="button" class="tiny" data-set-timer="30">30 Days</button></div><small style="color:#666">Controls the homepage Deals Of The Day countdown. The seconds and minutes tick live.</small></div><div class="field"><label>Store name</label><input id="storeNameSetting" value="${esc(storeSettings.storeName||'Aastha')}"></div><div class="field"><label>Free delivery threshold (৳)</label><input id="deliverySetting" type="number" value="${storeSettings.freeDelivery||1000}"></div><div class="field full"><button class="primary" data-save-settings>Save design settings</button></div></div><div class="notice" style="background:#eaf8ee;border-color:#52b769;color:#185a2d"><b>Saved Automatically:</b> All uploaded images and design settings are permanently saved.</div>`}
+document.addEventListener('click',e=>{
+  let g=e.target.closest('[data-go]');
+  if(g){let t=g.dataset.go;if(t==='home'&&(!location.hash||location.hash==='#home'||location.hash==='#')){go('home')}else if(location.hash==='#'+t){go(t)}else{location.hash=t}return}
+  let ah=e.target.closest('a[href="#home"]');if(ah){if(!location.hash||location.hash==='#home'||location.hash==='#'){go('home')}}
+  let st=e.target.closest('[data-set-timer]');
+  if(st){let days=+st.dataset.setTimer;let newDate=new Date(Date.now()+days*24*3600*1000);let iso=newDate.toISOString();storeSettings.dealEnd=iso;try{localStorage.setItem('af_deal_end',iso);}catch(err){}let inp=$('dealEndSetting');if(inp)inp.value=getDealEndInputValue();startDealTimer();toast('Deals countdown set to '+days+(days===1?' day':' days')+'!');saveSettingsToFirestore({dealEnd:iso}).catch(err=>console.error('Failed to save dealEnd to Firestore:',err));return}
+  let pr=e.target.closest('[data-product]');if(pr){e.preventDefault();location.hash='product-'+pr.dataset.product;return}
+  let ad=e.target.closest('[data-add]');if(ad){add(ad.dataset.add,ad.hasAttribute('data-detailadd')?Math.max(1,+$('detailqty').value||1):1);return}
+  let q=e.target.closest('[data-q]');if(q){$('detailqty').value=Math.max(1,(+$('detailqty').value||1)+ +q.dataset.q);return}
+  let ch=e.target.closest('[data-change]');if(ch){let i=cart.find(i=>i.id===+ch.dataset.change);if(i)i.qty=Math.max(1,i.qty+(+ch.dataset.delta));save();cartRender();count();return}
+  let rm=e.target.closest('[data-remove]');if(rm){cart=cart.filter(i=>i.id!==+rm.dataset.remove);save();cartRender();count();return}
+  let t=e.target.closest('[data-tab]');if(t){tab=t.dataset.tab;editing=null;editingCatId=null;adminRender();return}
+  let ag=e.target.closest('[data-admin-goto]');if(ag){tab=ag.dataset.adminGoto;editing=null;editingCatId=null;adminRender();return}
+  let ed=e.target.closest('[data-edit]');if(ed){editing=+ed.dataset.edit;adminRender();return}
+  let del=e.target.closest('[data-delete]');
+  if(del){
+    let delId=+del.dataset.delete;
+    if(confirm('Are you sure you want to delete this product?')){
+      products=products.filter(p=>p.id!==delId);
+      save();render();adminRender();toast('Product deleted successfully');
+      deleteProductFromFirestore(delId).catch(err=>console.error('Failed to delete product from Firestore:',err));
+    }
+    return;
+  }
+  let ce=e.target.closest('[data-cat-edit]');
+  if(ce){editingCatId=ce.dataset.catEdit;adminRender();let f=$('categoryform');if(f)f.scrollIntoView({behavior:'smooth'});return}
+  if(e.target.closest('[data-cancel-cat]')){editingCatId=null;adminRender();return}
+  let cd=e.target.closest('[data-cat-delete]');
+  if(cd){
+    let catId=cd.dataset.catDelete;
+    let c=categories.find(x=>x.id===catId);
+    if(c&&confirm('Are you sure you want to delete category "'+c.name+'"?')){
+      categories=categories.filter(x=>x.id!==catId);
+      if(editingCatId===catId)editingCatId=null;
+      save();render();adminRender();toast('Category deleted');
+      saveCategoriesToFirestore(categories).catch(err=>console.error('Failed to save categories to Firestore:',err));
+    }
+    return;
+  }
+  let of=e.target.closest('[data-order-filter]');if(of){orderStatusFilter=of.dataset.orderFilter;adminRender();return}
+  let os=e.target.closest('[data-order-save]');
+  if(os){
+    let o=orders.find(o=>o.id===os.dataset.orderSave);
+    if(o){
+      let newStatus=document.querySelector('[data-status="'+o.id+'"]').value;
+      o.status=newStatus;save();adminRender();toast('Order status updated successfully');
+      updateOrderStatusInFirestore(o.id,newStatus).catch(err=>console.error('Failed to update order status in Firestore:',err));
+    }
+    return;
+  }
+  if(e.target.closest('[data-save-settings]')){
+    let sn=$('storeNameSetting'),dv=$('deliverySetting'),de=$('dealEndSetting');
+    let storeName=sn?(sn.value.trim()||'Aastha'):'Aastha';
+    let freeDelivery=dv?Math.max(0,+dv.value||0):1000;
+    let dealEnd=storeSettings.dealEnd||'';
+    if(de&&de.value){let dt=new Date(de.value);if(!isNaN(dt.getTime()))dealEnd=dt.toISOString();}
+    storeSettings.storeName=storeName;storeSettings.freeDelivery=freeDelivery;if(dealEnd)storeSettings.dealEnd=dealEnd;
+    try{localStorage.setItem('af_store_name',storeName);localStorage.setItem('af_free_delivery',String(freeDelivery));if(dealEnd)localStorage.setItem('af_deal_end',dealEnd);}catch(e){}
+    applyBranding();startDealTimer();toast('Store settings saved successfully');
+    let payload={storeName,freeDelivery,dealEnd:dealEnd||'',logo:storeSettings.logo||'',favicon:storeSettings.favicon||'',hero:storeSettings.hero||'',promo1:storeSettings.promo1||'',promo2:storeSettings.promo2||''};
+    saveSettingsToFirestore(payload).catch(err=>console.error('Failed to save settings to Firestore:',err));
+  }
+});
+
+function productForm(){
+  let p=products.find(p=>p.id===editing);
+  return `<form id="productform" class="formgrid"><div class="field"><label>Product name *</label><input name="name" required value="${esc(p?.name||'')}"></div><div class="field"><label>Category</label><select name="category">${getActiveCategoryNames().map(c=>`<option ${p?.category===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="field"><label>Price (৳)</label><input name="price" type="number" min="0" required value="${p?.price??''}"></div><div class="field"><label>Old price (৳)</label><input name="old" type="number" min="0" value="${p?.old??''}"></div><div class="field"><label>Discount (%)</label><input name="discount" type="number" min="0" max="99" value="${p?.discount??0}"></div><div class="field"><label>Deal of the Day</label><select name="deal"><option value="false" ${p?.deal?'':'selected'}>No</option><option value="true" ${p?.deal?'selected':''}>Yes</option></select></div><div class="field full"><label>Product photo — upload from mobile gallery or computer</label><div class="upload"><input type="file" id="photo" accept="image/*"><p>Choose JPG, PNG or WebP from your mobile gallery.</p><img id="preview" class="preview ${p?'':'hidden'}" src="${p?.image||''}" alt="Preview"></div><input type="hidden" name="image" id="imagedata" value="${p?esc(p.image):''}"></div><div class="field full"><button class="primary">${p?'Update Product':'Add Product'}</button> ${p?'<button type="button" class="secondary" data-cancel>Cancel</button>':''}</div></form>`
+}
+
+function productTable(){
+  let filtered=products;
+  if(adminProductSearch){let q=adminProductSearch.toLowerCase();filtered=filtered.filter(p=>p.name.toLowerCase().includes(q));}
+  if(adminProductCategory){filtered=filtered.filter(p=>p.category===adminProductCategory);}
+  return `
+    <div style="display:flex;gap:10px;margin:12px 0;flex-wrap:wrap">
+      <input id="adminProdSearch" placeholder="Search products..." value="${esc(adminProductSearch)}" style="flex:1;min-width:180px;padding:9px;border:1px solid #dce1dc">
+      <select id="adminProdCat" style="padding:9px;border:1px solid #dce1dc">
+        <option value="">All Categories (${products.length})</option>
+        ${getActiveCategoryNames().map(c=>`<option value="${esc(c)}" ${adminProductCategory===c?'selected':''}>${esc(c)} (${products.filter(p=>p.category===c).length})</option>`).join('')}
+      </select>
+    </div>
+    ${!filtered.length?'<div class="empty">No products found matching filter.</div>':`
+    <table class="table">
+      <thead>
+        <tr><th>Photo</th><th>Product</th><th>Category</th><th>Price</th><th>Deal?</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        ${filtered.map(p=>`<tr>
+          <td><img src="${p.image}" alt=""></td>
+          <td><strong>${esc(p.name)}</strong></td>
+          <td>${esc(p.category)}</td>
+          <td>${money(p.price)}</td>
+          <td>${p.deal?'<b style="color:#f12e24">Yes</b>':'No'}</td>
+          <td><button class="tiny" data-edit="${p.id}">Edit</button> <button class="tiny danger" data-delete="${p.id}">Delete</button></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`}
+  `;
+}
+
+function categoryForm(){
+  let c=categories.find(x=>x.id===editingCatId);
+  let imgSrc=c?(c.image||makeImg(c.color||'#3da45b',c.name)):'';
+  return `
+    <div style="margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line)">
+      <h3 style="margin:0 0 6px 0">${c?'Edit Category: '+esc(c.name):'Add New Category'}</h3>
+      <p style="color:#666;font-size:12px;margin:0 0 14px 0">Upload category photos from your mobile phone gallery or computer. Changes appear immediately on the storefront.</p>
+      <form id="categoryform" class="formgrid">
+        <div class="field">
+          <label>Category Name *</label>
+          <input name="catname" id="catname" required value="${esc(c?.name||'')}" placeholder="e.g. Vegetables, Dairy, Bakery, Beverages...">
+        </div>
+        <div class="field">
+          <label>Tile Accent Color</label>
+          <input name="catcolor" id="catcolor" type="color" value="${c?.color||'#3da45b'}" style="height:42px;padding:3px;cursor:pointer">
+        </div>
+        <div class="field full">
+          <label>Category Photo — Upload from Mobile Gallery</label>
+          <div class="upload">
+            <input type="file" id="catPhotoFile" accept="image/*">
+            <p style="margin:6px 0 0;font-size:11px;color:#666">Select any JPG, PNG or WebP photo from your phone gallery or take a picture.</p>
+            <img id="catPhotoPreview" class="preview ${imgSrc?'':'hidden'}" src="${imgSrc}" alt="Category Preview" style="width:70px;height:70px;object-fit:contain;border:1px solid #ddd;margin-top:8px">
+          </div>
+          <input type="hidden" name="catimage" id="catImageData" value="${c?.image||''}">
+        </div>
+        <div class="field full" style="display:flex;gap:10px;align-items:center;margin-top:5px">
+          <button class="primary" type="submit" id="catSubmitBtn">${c?'Update Category':'Save New Category'}</button>
+          ${c?'<button type="button" class="secondary" data-cancel-cat>Cancel Edit</button>':''}
+        </div>
+      </form>
+    </div>
+  `;
+}
+
+function categoryTable(){
+  if(!categories.length)return '<div class="empty">No categories configured. Add a category above.</div>';
+  return `
+    <table class="table">
+      <thead>
+        <tr>
+          <th style="width:70px">Photo</th>
+          <th>Category Name</th>
+          <th>Products</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${categories.map(c=>{
+          let count=products.filter(p=>p.category===c.name).length;
+          let imgSrc=c.image||makeImg(c.color||'#3da45b',c.name);
+          return `
+            <tr>
+              <td>
+                <img src="${imgSrc}" alt="${esc(c.name)}" style="width:48px;height:48px;object-fit:contain;border:1px solid #eee;background:#fff">
+              </td>
+              <td>
+                <strong style="font-size:14px">${esc(c.name)}</strong>
+                <div style="font-size:11px;color:#888;margin-top:2px">Slug: #${esc(c.slug||c.name.toLowerCase())}</div>
+              </td>
+              <td>
+                ${count} item${count===1?'':'s'}
+              </td>
+              <td>
+                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                  <label class="tiny" style="cursor:pointer" title="Upload new photo from mobile gallery">
+                    Change Photo
+                    <input type="file" accept="image/*" class="cat-quick-upload" data-quick-cat="${c.id}" style="display:none">
+                  </label>
+                  <button type="button" class="tiny" data-cat-edit="${c.id}">Edit</button>
+                  <button type="button" class="tiny danger" data-cat-delete="${c.id}">Delete</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function orderTable(){
+  if(!orders.length)return '<div class="empty">No orders yet.</div>';
+  let filtered=orderStatusFilter==='All'?orders:orders.filter(o=>o.status===orderStatusFilter);
+  return `
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin:12px 0">
+      ${['All','Pending','Confirmed','Packed','Out for delivery','Delivered','Cancelled'].map(st=>`
+        <button type="button" class="tiny ${orderStatusFilter===st?'active':''}" data-order-filter="${st}">
+          ${st} (${st==='All'?orders.length:orders.filter(o=>o.status===st).length})
+        </button>
+      `).join('')}
+    </div>
+    ${!filtered.length?'<div class="empty">No orders in this status.</div>':`
+    <table class="table">
+      <tr><th>Order</th><th>Customer</th><th>Details</th><th>Total</th><th>Status</th><th>Update</th></tr>
+      ${filtered.map(o=>`<tr>
+        <td><strong>#${esc(o.id)}</strong><br><small style="color:#888">${esc(o.date)}</small></td>
+        <td><strong>${esc(o.name)}</strong><br><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></td>
+        <td><small>${esc(o.address)}</small><br><small style="color:#666">${(o.items||[]).length} items</small></td>
+        <td><strong>${money(o.total)}</strong></td>
+        <td><span class="status ${o.status==='Cancelled'?'cancelled':''}" style="font-size:11px;padding:3px 8px">${esc(o.status)}</span></td>
+        <td>
+          <div style="display:flex;gap:4px">
+            <select data-status="${o.id}" style="padding:4px">
+              ${['Pending','Confirmed','Packed','Out for delivery','Delivered','Cancelled'].map(s=>`<option ${s===o.status?'selected':''}>${s}</option>`).join('')}
+            </select>
+            <button class="tiny" data-order-save="${o.id}">Save</button>
+          </div>
+        </td>
+      </tr>`).join('')}
+    </table>`}
+  `;
+}
+
+function adminRender(){
+  document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  let h=$('admincontent');
+  if(tab==='overview'){
+    h.innerHTML=`
+      <h2>Store Overview &amp; Control</h2>
+      <div class="stats">
+        <div class="stat">Products<strong>${products.length}</strong></div>
+        <div class="stat">Categories<strong>${categories.length}</strong></div>
+        <div class="stat">Total Orders<strong>${orders.length}</strong></div>
+        <div class="stat">Pending Orders<strong>${orders.filter(o=>o.status==='Pending').length}</strong></div>
+        <div class="stat">Delivered Orders<strong>${orders.filter(o=>o.status==='Delivered').length}</strong></div>
+        <div class="stat">Total Sales<strong>${money(orders.reduce((s,o)=>s+(o.total||0),0))}</strong></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin:16px 0">
+        <button class="primary" data-admin-goto="products">Add Product</button>
+        <button class="primary" data-admin-goto="categories">Manage Categories</button>
+        <button class="secondary" data-admin-goto="orders">View Orders (${orders.length})</button>
+        <button class="secondary" data-admin-goto="settings">Store Settings</button>
+      </div>
+      <div class="notice">
+        <b>Cloud Synchronized:</b> Products, categories, orders, images, and store settings are synchronized in real-time.
+      </div>
+      <h3>Recent Customer Orders</h3>
+      ${orderTable()}
+    `;
+  }else if(tab==='products'){
+    h.innerHTML=`
+      <h2>Product Management</h2>
+      <p>Add or edit products and upload photos from your device gallery. Categories reflect your active category list.</p>
+      ${productForm()}
+      <h3>All Store Products (${products.length})</h3>
+      ${productTable()}
+    `;
+  }else if(tab==='categories'){
+    h.innerHTML=`
+      <h2>Category Management &amp; Mobile Gallery Upload</h2>
+      <p>Add new categories, edit category names, change category photos directly from your phone gallery, or delete categories. All changes sync in real-time with the storefront.</p>
+      ${categoryForm()}
+      <h3>Active Categories (${categories.length})</h3>
+      ${categoryTable()}
+    `;
+  }else if(tab==='orders'){
+    h.innerHTML=`
+      <h2>Order Management</h2>
+      <p>Filter customer orders, review delivery details, and update live order statuses.</p>
+      ${orderTable()}
+    `;
+  }else{
+    h.innerHTML=`
+      <h2>Store &amp; Design Settings</h2>
+      <p>Upload your own logo, site icon and three promotional banners directly from your phone gallery.</p>
+      <div class="formgrid">
+        <div class="field full"><label>Website logo</label><div class="upload"><input type="file" id="logoUpload" accept="image/*"><p>Shown in the website header. PNG or WebP with transparent background works best.</p><img id="logoPreview" class="preview" alt="Logo preview" src="${storeSettings.logo||''}" style="${storeSettings.logo?'':'display:none'}"></div></div>
+        <div class="field full"><label>Site icon / favicon</label><div class="upload"><input type="file" id="faviconUpload" accept="image/*"><p>Small icon shown in the browser tab. A square logo is recommended.</p><img id="faviconPreview" class="preview" alt="Favicon preview" src="${storeSettings.favicon||''}" style="${storeSettings.favicon?'':'display:none'}"></div></div>
+        <div class="field full"><label>Main hero banner</label><div class="upload"><input type="file" id="heroUpload" accept="image/*"><p>Recommended wide image, around 1200 × 420 px.</p><img id="heroPreview" class="preview" alt="Hero banner preview" src="${storeSettings.hero||'assets/banner.svg'}"></div></div>
+        <div class="field"><label>Promotion banner 1</label><div class="upload"><input type="file" id="promo1Upload" accept="image/*"><img id="promo1Preview" class="preview" alt="Promotion 1 preview" src="${storeSettings.promo1||'assets/spices.svg'}"></div></div>
+        <div class="field"><label>Promotion banner 2</label><div class="upload"><input type="file" id="promo2Upload" accept="image/*"><img id="promo2Preview" class="preview" alt="Promotion 2 preview" src="${storeSettings.promo2||'assets/grains.svg'}"></div></div>
+        <div class="field full"><label>Deals Of The Day — Offer End Date &amp; Time</label><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input type="datetime-local" id="dealEndSetting" value="${getDealEndInputValue()}" style="max-width:240px"><button type="button" class="tiny" data-set-timer="1">24 Hours</button><button type="button" class="tiny" data-set-timer="3">3 Days</button><button type="button" class="tiny" data-set-timer="7">7 Days</button><button type="button" class="tiny" data-set-timer="30">30 Days</button></div><small style="color:#666">Controls the homepage Deals countdown. The seconds and minutes tick live.</small></div>
+        <div class="field"><label>Store name</label><input id="storeNameSetting" value="${esc(storeSettings.storeName||'Aastha')}"></div>
+        <div class="field"><label>Free delivery threshold (৳)</label><input id="deliverySetting" type="number" value="${storeSettings.freeDelivery||1000}"></div>
+        <div class="field full"><button class="primary" data-save-settings>Save Design &amp; Store Settings</button></div>
+      </div>
+      <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line)">
+        <h3 style="margin:0 0 6px 0">Admin Password Security</h3>
+        <p style="font-size:12px;color:#666;margin:0 0 14px 0">Change your master administrator password safely from this dashboard.</p>
+        <form id="adminPwForm" class="formgrid">
+          <div class="field"><label>New Password (min 8 characters)</label><input type="password" id="adminNewPw" required minlength="8" placeholder="••••••••"></div>
+          <div class="field"><label>Confirm New Password</label><input type="password" id="adminConfPw" required minlength="8" placeholder="••••••••"></div>
+          <div class="field full"><button class="primary" type="submit" id="adminPwBtn">Save New Password</button></div>
+        </form>
+      </div>
+      <div class="notice"><b>Saved Automatically:</b> All uploaded images, categories and store settings are permanently saved to the cloud.</div>
+    `;
+  }
+}
+
 function optimizeImage(file,maxW,maxH,quality,cb){if(!file)return;let reader=new FileReader();reader.onload=ev=>{let img=new Image();img.onload=()=>{let w=img.width,h=img.height;if(w>maxW||h>maxH){let ratio=Math.min(maxW/w,maxH/h);w=Math.max(1,Math.round(w*ratio));h=Math.max(1,Math.round(h*ratio))}let canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;let ctx=canvas.getContext('2d');let isPng=file.type==='image/png';if(!isPng){ctx.fillStyle='#ffffff';ctx.fillRect(0,0,w,h)}ctx.drawImage(img,0,0,w,h);let mime=isPng?'image/png':'image/jpeg';let dataUrl=canvas.toDataURL(mime,quality||0.8);cb(dataUrl)};img.onerror=()=>toast('Failed to load image');img.src=ev.target.result};reader.onerror=()=>toast('Failed to read file');reader.readAsDataURL(file)}
-document.addEventListener('change',e=>{if(e.target.id==='photo'){let f=e.target.files?.[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Choose an image file');return}optimizeImage(f,500,500,0.8,dataUrl=>{$('imagedata').value=dataUrl;$('preview').src=dataUrl;$('preview').classList.remove('hidden');$('preview').style.display='inline-block';toast('Product photo ready')})}});
-document.addEventListener('submit',async e=>{if(e.target.id==='productform'){e.preventDefault();let f=new FormData(e.target),id=editing||Date.now(),name=String(f.get('name')||'').trim(),category=String(f.get('category')||'Pantry'),price=Math.max(0,+f.get('price')||0),old=Math.max(0,+f.get('old')||price),discount=Math.max(0,Math.min(99,+f.get('discount')||0)),deal=f.get('deal')==='true',image=f.get('image')||makeImg('#68a96a',category),obj={id,name,category,price,old,discount,deal,image,color:'#68a96a',kind:'bag',updatedAt:new Date().toISOString()};if(editing)products=products.map(p=>p.id===editing?obj:p);else products.unshift(obj);editing=null;save();render();adminRender();toast('Product saved successfully!');try{await saveProductToFirestore(obj);}catch(err){console.error('Failed to save product to Firestore:',err);}}});
+document.addEventListener('change',e=>{
+  if(e.target.id==='photo'){
+    let f=e.target.files?.[0];
+    if(!f)return;
+    if(!f.type.startsWith('image/')){toast('Choose an image file');return}
+    optimizeImage(f,500,500,0.8,dataUrl=>{$('imagedata').value=dataUrl;$('preview').src=dataUrl;$('preview').classList.remove('hidden');$('preview').style.display='inline-block';toast('Product photo ready')});
+  }
+  if(e.target.id==='catPhotoFile'){
+    let f=e.target.files?.[0];
+    if(!f)return;
+    if(!f.type.startsWith('image/')){toast('Choose an image file');return}
+    toast('Processing category photo from gallery...');
+    optimizeImage(f,400,400,0.85,dataUrl=>{
+      $('catImageData').value=dataUrl;
+      let prev=$('catPhotoPreview');
+      if(prev){prev.src=dataUrl;prev.classList.remove('hidden');prev.style.display='inline-block'}
+      toast('Category photo ready!');
+    });
+  }
+  if(e.target.classList.contains('cat-quick-upload')){
+    let catId=e.target.dataset.quickCat;
+    let f=e.target.files?.[0];
+    if(!f)return;
+    if(!f.type.startsWith('image/')){toast('Choose an image file');return}
+    toast('Uploading photo from gallery...');
+    optimizeImage(f,400,400,0.85,async dataUrl=>{
+      let c=categories.find(x=>x.id===catId);
+      if(c){
+        c.image=dataUrl;
+        save();render();adminRender();
+        toast('Category photo updated from gallery!');
+        try{await saveCategoriesToFirestore(categories);}catch(err){console.error('Failed to sync category photo to cloud:',err);}
+      }
+    });
+  }
+  if(e.target.id==='adminProdCat'){
+    adminProductCategory=e.target.value;
+    adminRender();
+  }
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='adminProdSearch'){
+    adminProductSearch=e.target.value;
+    let el=document.querySelector('#admincontent');
+    if(tab==='products'){
+      let tableWrap=document.querySelector('#admincontent table, #admincontent .empty');
+      if(tableWrap){
+        let q=adminProductSearch.toLowerCase();
+        let rows=document.querySelectorAll('#admincontent table tbody tr');
+        rows.forEach(r=>{
+          let text=r.textContent.toLowerCase();
+          r.style.display=text.includes(q)?'':'none';
+        });
+      }
+    }
+  }
+});
+document.addEventListener('submit',async e=>{
+  if(e.target.id==='productform'){
+    e.preventDefault();
+    let f=new FormData(e.target),id=editing||Date.now(),name=String(f.get('name')||'').trim(),category=String(f.get('category')||'Pantry'),price=Math.max(0,+f.get('price')||0),old=Math.max(0,+f.get('old')||price),discount=Math.max(0,Math.min(99,+f.get('discount')||0)),deal=f.get('deal')==='true',image=f.get('image')||makeImg('#68a96a',category),obj={id,name,category,price,old,discount,deal,image,color:'#68a96a',kind:'bag',updatedAt:new Date().toISOString()};
+    if(editing)products=products.map(p=>p.id===editing?obj:p);
+    else products.unshift(obj);
+    editing=null;save();render();adminRender();toast('Product saved successfully!');
+    try{await saveProductToFirestore(obj);}catch(err){console.error('Failed to save product to Firestore:',err);}
+  }
+  if(e.target.id==='categoryform'){
+    e.preventDefault();
+    let name=$('catname').value.trim();
+    if(!name){toast('Please enter category name');return}
+    let color=$('catcolor').value||'#3da45b';
+    let image=$('catImageData').value||'';
+    if(editingCatId){
+      let c=categories.find(x=>x.id===editingCatId);
+      if(c){
+        c.name=name;c.color=color;
+        if(image)c.image=image;
+        c.slug=c.slug||name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+        toast('Category "'+name+'" updated!');
+      }
+      editingCatId=null;
+    }else{
+      let id='cat_'+Date.now();
+      let slug=name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+      let newCat={id,name,slug,color,image:image||makeImg(color,name)};
+      categories.push(newCat);
+      toast('New category "'+name+'" added!');
+    }
+    save();render();adminRender();
+    try{await saveCategoriesToFirestore(categories);}catch(err){console.error('Failed to save categories to cloud:',err);}
+  }
+  if(e.target.id==='adminPwForm'){
+    e.preventDefault();
+    let np=$('adminNewPw').value,cp=$('adminConfPw').value;
+    if(np.length<8){toast('Password must be at least 8 characters');return}
+    if(np!==cp){toast('Passwords do not match');return}
+    let btn=$('adminPwBtn');btn.disabled=true;btn.textContent='Updating...';
+    try{
+      let pHash=await hashPassword(np);
+      let u=adminAuthDoc?.username||'admin';
+      let updated=await saveAdminAuthToFirestore({username:u,passwordHash:pHash});
+      adminAuthDoc=updated;
+      try{localStorage.setItem('af_admin_auth',JSON.stringify(updated));}catch(err){}
+      toast('Admin password updated successfully!');
+      $('adminNewPw').value='';$('adminConfPw').value='';
+    }catch(err){
+      console.error(err);toast('Failed to update password');
+    }finally{
+      btn.disabled=false;btn.textContent='Save New Password';
+    }
+  }
+});
 document.addEventListener('click',e=>{if(e.target.closest('[data-cancel]')){editing=null;adminRender()}});
 
 function getDealEndInputValue(){let val=storeSettings.dealEnd||read('af_deal_end',null);let d=val?new Date(val):new Date(Date.now()+(29*24+23)*3600*1000+58*60*1000+16*1000);if(isNaN(d.getTime()))d=new Date(Date.now()+30*24*3600*1000);let p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`}
@@ -182,7 +660,7 @@ function accountRender(){
     let filtered=orders.filter(o=>o.phone===cust.phone);
     if(filtered.length)userOrders=filtered;
   }
-  let displayName=user.displayName||cust?.name||'Customer';
+  let displayName=(cust&&cust.name)?cust.name:(user&&user.displayName?user.displayName:'Customer');
   let headerHtml=`
     <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
       <div>
@@ -330,6 +808,7 @@ document.addEventListener('submit',async e=>{
     btn.textContent='Saving...';
     try{
       await updateUserProfile({name,phone});
+      if(auth.currentUser)firebaseUser=auth.currentUser;
       toast('Profile updated successfully!');
       accountRender();
     }catch(err){
@@ -417,6 +896,14 @@ async function initStoreFromFirestore(){
       save();
       if(document.querySelector('#page-admin.active'))adminRender();
     }
+
+    const remoteCategories=await getCategoriesFromFirestore();
+    if(Array.isArray(remoteCategories)&&remoteCategories.length>0){
+      categories=remoteCategories;
+      save();
+      render();
+      if(document.querySelector('#page-admin.active'))adminRender();
+    }
   }catch(err){
     console.warn('Cloud initial sync error:',err);
   }
@@ -459,6 +946,14 @@ subscribeAdminAuth(remoteAuth=>{
     adminAuthDoc=remoteAuth;
     try{localStorage.setItem('af_admin_auth',JSON.stringify(remoteAuth));}catch(e){}
     if(document.querySelector('#page-auth.active'))authRender();
+  }
+});
+subscribeCategories(remoteCategories=>{
+  if(Array.isArray(remoteCategories)&&remoteCategories.length>0){
+    categories=remoteCategories;
+    save();
+    render();
+    if(document.querySelector('#page-admin.active'))adminRender();
   }
 });
 initStoreFromFirestore();
