@@ -397,3 +397,73 @@ export function subscribeOrders(cb: (orders: OrderData[]) => void) {
     handleFirestoreError(err, OperationType.LIST, 'orders');
   });
 }
+
+export interface AdminAuthData {
+  registered: boolean;
+  username: string;
+  passwordHash: string;
+  updatedAt?: string;
+}
+
+export async function getAdminAuthFromFirestore(): Promise<AdminAuthData | null> {
+  const path = 'settings/admin_auth';
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'admin_auth'));
+    if (snap.exists()) {
+      return snap.data() as AdminAuthData;
+    }
+    return null;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+    return null;
+  }
+}
+
+export async function saveAdminAuthToFirestore(data: { username: string; passwordHash: string }): Promise<AdminAuthData> {
+  const path = 'settings/admin_auth';
+  try {
+    const payload: AdminAuthData = {
+      registered: true,
+      username: data.username,
+      passwordHash: data.passwordHash,
+      updatedAt: new Date().toISOString()
+    };
+    await setDoc(doc(db, 'settings', 'admin_auth'), payload);
+    return payload;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export function subscribeAdminAuth(cb: (authData: AdminAuthData | null) => void) {
+  return onSnapshot(doc(db, 'settings', 'admin_auth'), (snap) => {
+    if (snap.exists()) {
+      cb(snap.data() as AdminAuthData);
+    } else {
+      cb(null);
+    }
+  }, (err) => {
+    handleFirestoreError(err, OperationType.GET, 'settings/admin_auth');
+  });
+}
+
+export async function hashPassword(str: string): Promise<string> {
+  try {
+    if (typeof crypto !== 'undefined' && crypto.subtle) {
+      const enc = new TextEncoder();
+      const data = enc.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e) {
+    console.warn('Crypto subtle unavailable', e);
+  }
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return 'pw_' + Math.abs(hash).toString(16);
+}

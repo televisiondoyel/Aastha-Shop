@@ -12,7 +12,7 @@
 <div class="benefit"><span class="ico"><svg viewBox="0 0 32 32"><path d="M3 7h17v16H3zM20 13h5l4 5v5h-9"/><circle cx="9" cy="25" r="3"/><circle cx="24" cy="25" r="3"/></svg></span><div><b>Home Delivery</b><small>Free delivery to your home</small></div></div>
 <div class="benefit"><span class="ico"><svg viewBox="0 0 32 32"><rect x="3" y="6" width="26" height="20" rx="2"/><path d="M3 12h26M8 19h7"/></svg></span><div><b>Secure Payment</b><small>100% secure payments</small></div></div>
 <div class="benefit"><span class="ico"><svg viewBox="0 0 32 32"><path d="M5 22a10 10 0 1 1 4 3l-5 2Z"/><path d="M11 13h10M11 17h7"/></svg></span><div><b>24/7 Support</b><small>Dedicated support in 24h</small></div></div></div></div><div class="promos"><img src="assets/spices.svg" alt="Spices promotion"><img src="assets/grains.svg" alt="Grains promotion"></div></div>
-<div class="section"><div class="head"><div class="title">Deals Of The Day</div><div class="timer" id="dealtimer"><span>29<small>Days</small></span><span>23<small>Hrs</small></span><span>58<small>Min</small></span><span>16<small>Sec</small></span></div><button class="view" data-go="offers">View All</button></div><div class="products" id="deals"></div></div>
+<div class="section"><div class="head"><div class="title">Deals Of The Day</div><div class="timer" id="dealtimer"><span>--<small>Days</small></span><span>--<small>Hrs</small></span><span>--<small>Min</small></span><span>--<small>Sec</small></span></div><button class="view" data-go="offers">View All</button></div><div class="products" id="deals"></div></div>
 <div class="section"><div class="head"><div class="title">Shop By Category</div><button class="view" data-go="shop">View All</button></div><div class="categories" id="categories"></div></div>
 <div class="section"><div class="head"><div class="title">Featured Products</div><button class="view" data-go="shop">View All</button></div><div class="products" id="featured"></div></div></section>
 <section class="page" id="page-shop"><p class="crumb"><a href="#home" data-go="home">Home</a> / <span>Shop</span></p><div class="section"><div class="head"><div class="title">Shop Groceries</div></div><div class="tools"><input id="search" placeholder="Search products..."><select id="filter"><option value="">All categories</option></select><select id="sort"><option value="default">Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="name">Name: A-Z</option></select></div><div class="products" id="catalog"></div></div></section>
@@ -43,10 +43,15 @@ import {
   getOrdersFromFirestore,
   subscribeProducts,
   subscribeSettings,
-  subscribeOrders
+  subscribeOrders,
+  getAdminAuthFromFirestore,
+  saveAdminAuthToFirestore,
+  subscribeAdminAuth,
+  hashPassword
 } from './src/firebase.ts';
 testConnection();
 let firebaseUser = null;
+let adminAuthDoc = read('af_admin_auth', null);
 subscribeAuth((u, p) => {
   firebaseUser = u;
   if (p) localStorage.setItem('af_customer_profile', JSON.stringify(p));
@@ -54,13 +59,16 @@ subscribeAuth((u, p) => {
   if (act) accountRender();
 });
 const makeImg=(color,label,kind='bag')=>'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><rect width="240" height="240" fill="#fff"/><ellipse cx="120" cy="207" rx="60" ry="8" fill="#e7e9e6"/><path d="${kind==='bottle'?'M94 48h52l-5 20v15l15 20v88q0 10-10 10H94q-10 0-10-10v-88l15-20V68z':'M72 48L168 48l15 150H57z'}" fill="${color}" stroke="#d8ded8" stroke-width="3"/><rect x="88" y="25" width="64" height="28" rx="5" fill="#f5f0e3" stroke="#d7d6c9"/><rect x="69" y="104" width="102" height="57" rx="3" fill="#fffdf5"/><text x="120" y="127" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#277f43">Aastha Fresh</text><text x="120" y="143" text-anchor="middle" font-family="Arial" font-size="10" fill="#555">${label}</text><path d="M81 154h78" stroke="${color}" stroke-width="4"/></svg>`);
-const initial=[['Pure Mustard Oil 1 Ltr','Oil',330,350,6,'#c88a20','bottle',1],['Pure Mustard Oil 500 ml','Oil',170,180,6,'#d39a2e','bottle',1],['Alu Bokhara 100 gm','Spices',65,70,7,'#42b74d','bag',1],['Raisins (Kishmish) 100 gm','Spices',65,70,7,'#91c52f','bag',1],['Mace (Jaytree) 25 gm','Spices',85,90,5,'#9b303c','bag',1],['White Pepper 50 gm','Spices',65,75,13,'#7b4aa5','bag',1],['Premium Basmati Rice 1 kg','Packages',145,160,9,'#e5d6bd','bag',0],['Red Lentils 500 gm','Dal or Lentil',75,85,12,'#dc7041','bag',0],['Atta Flour 1 kg','Flour',60,65,8,'#d7c7a3','bag',0],['Turmeric Powder 100 gm','Spices',55,60,8,'#dfbb35','bag',0],['Chilli Powder 100 gm','Spices',58,65,10,'#d74b35','bag',0],['Family Grocery Package','Packages',1250,1400,11,'#60a96a','bag',0]];
 function read(k,d){try{let v=localStorage.getItem(k);if(v===null||v===undefined)return d;try{let p=JSON.parse(v);return p??d}catch{return v}}catch(e){return d}}
 let storeSettings={storeName:read('af_store_name','Aastha Fresh'),freeDelivery:Number(read('af_free_delivery',1000)),dealEnd:read('af_deal_end',''),logo:read('af_logo',''),favicon:read('af_favicon',''),hero:read('af_hero',''),promo1:read('af_promo1',''),promo2:read('af_promo2','')};
-let products=read('af_products',null);if(!products)products=initial.map((x,i)=>({id:i+1,name:x[0],category:x[1],price:x[2],old:x[3],discount:x[4],color:x[5],kind:x[6],deal:!!x[7],image:makeImg(x[5],x[1],x[6])}));else products=products.map(p=>({...p,image:p.image||makeImg(p.color||'#6ab06b',p.category)}));let cart=read('af_cart',[]),orders=read('af_orders',[]),editing=null,tab='overview';
+let cachedProducts=read('af_products',null);
+let isProductsLoaded=Array.isArray(cachedProducts)&&cachedProducts.length>0;
+let products=isProductsLoaded?cachedProducts.map(p=>({...p,image:p.image||makeImg(p.color||'#6ab06b',p.category)})):[];
+let cart=read('af_cart',[]),orders=read('af_orders',[]),editing=null,tab='overview';
 const $=id=>document.getElementById(id),money=n=>'৳ '+Number(n).toLocaleString('en-BD',{maximumFractionDigits:2}),save=()=>{try{localStorage.setItem('af_products',JSON.stringify(products));localStorage.setItem('af_cart',JSON.stringify(cart));localStorage.setItem('af_orders',JSON.stringify(orders))}catch(e){console.warn('Storage limit',e)}},esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),toast=s=>{let t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2400)};
+function skeletonGrid(count=6){return Array(count).fill(0).map(()=>`<article class="product skeleton-card"><div class="skeleton-img"></div><div class="skeleton-line" style="width:75%;height:14px;margin:10px 0 6px"></div><div class="skeleton-line" style="width:45%;height:14px;margin-bottom:10px"></div><div class="skeleton-btn"></div></article>`).join('')}
 function card(p){return `<article class="product"><span class="discount">-${p.discount||5}%</span><a href="#product-${p.id}" data-product="${p.id}"><img class="pimg" src="${p.image}" alt="${esc(p.name)}"></a><a class="pname" href="#product-${p.id}" data-product="${p.id}">${esc(p.name)}</a><div class="price">${money(p.price)} <span class="old">${money(p.old||p.price)}</span></div><button class="add" data-add="${p.id}">Add to Cart</button></article>`}
-function list(id,arr){if($(id))$(id).innerHTML=arr.length?arr.map(card).join(''):'<div class="empty">No products found.</div>'}
+function list(id,arr){let el=$(id);if(!el)return;if(!isProductsLoaded&&!arr.length){el.innerHTML=skeletonGrid(id==='catalog'?8:6);return}el.innerHTML=arr.length?arr.map(card).join(''):'<div class="empty">No products found.</div>'}
 function render(){list('deals',products.filter(p=>p.deal).slice(0,8));list('featured',products.slice(0,8));list('spiceslist',products.filter(p=>p.category==='Spices'));list('oillist',products.filter(p=>p.category==='Oil'));list('flourlist',products.filter(p=>p.category==='Flour'));list('lentillist',products.filter(p=>p.category==='Dal or Lentil'));list('packageslist',products.filter(p=>p.category==='Packages'));list('offerslist',products.filter(p=>p.discount));$('categories').innerHTML=[['Oil','#d9a82f'],['Spices','#b74a47'],['Flour','#d4c4a0'],['Dal or Lentil','#d66a37'],['Packages','#5da86b'],['Rice','#e5d8b9'],['Pantry','#6aa4be'],['Offers','#ef7454']].map(([n,c])=>`<a class="cat" href="#${n==='Dal or Lentil'?'lentils':n==='Offers'?'offers':n==='Packages'?'packages':n.toLowerCase()}"><img src="${makeImg(c,n)}" alt="${n}"><span>${n}</span></a>`).join('');fillFilter();catalog();count()}
 function fillFilter(){let f=$('filter'),old=f.value;f.innerHTML='<option value="">All categories</option>'+[...new Set(products.map(p=>p.category))].map(c=>`<option>${esc(c)}</option>`).join('');f.value=old}
 function catalog(){let q=$('search').value.toLowerCase(),cat=$('filter').value,s=$('sort').value,a=products.filter(p=>p.name.toLowerCase().includes(q)&&(!cat||p.category===cat));if(s==='low')a.sort((x,y)=>x.price-y.price);if(s==='high')a.sort((x,y)=>y.price-x.price);if(s==='name')a.sort((x,y)=>x.name.localeCompare(y.name));list('catalog',a)}
@@ -355,13 +363,28 @@ document.addEventListener('submit',async e=>{
 function applyBranding(s){if(s&&typeof s==='object'){storeSettings={...storeSettings,...s}}let logo=storeSettings.logo,favicon=storeSettings.favicon,hero=storeSettings.hero,p1=storeSettings.promo1,p2=storeSettings.promo2,name=storeSettings.storeName||'Aastha Fresh';let visual=$('brandvisual');if(visual){if(logo)visual.innerHTML=`<img src="${logo}" alt="Store logo">`;else visual.innerHTML='<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#087e6e"/><path d="M24 36S9 28 12 17c2-7 10-7 12 0 3-7 11-7 13 0 3 11-13 19-13 19Z" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M24 34V20" stroke="#fff" stroke-width="2"/></svg>';}let bt=document.querySelector('.brandtext b');if(bt)bt.textContent=name;let av=$('authbrandvisual');if(av&&visual)av.innerHTML=visual.innerHTML;if(favicon&&$('sitefavicon'))$('sitefavicon').href=favicon;let b=document.querySelector('.banner');if(b){if(hero)b.src=hero;else b.src='assets/banner.svg';}let promo=document.querySelectorAll('.promos img');if(promo[0])promo[0].src=p1||'assets/spices.svg';if(promo[1])promo[1].src=p2||'assets/grains.svg';document.title=name+' Grocery';}
 let logoClicks=0,logoClickTimer=null;
 $('brandmark').addEventListener('click',()=>{logoClicks++;clearTimeout(logoClickTimer);logoClickTimer=setTimeout(()=>logoClicks=0,2500);if(logoClicks>=7){logoClicks=0;location.hash='admin'}else{if(!location.hash||location.hash==='#home'||location.hash==='#'){go('home')}else{location.hash='home'}}});
-function authRender(){let registered=!!read('af_admin_user',null);$('authheading').textContent=registered?'Admin Login':'Admin Registration';$('authintro').textContent=registered?'Sign in to manage your store.':'Create the one-time administrator account.';$('authsubmit').textContent=registered?'Login':'Register Admin';$('confirmfield').style.display=registered?'none':'flex';$('authconfirm').required=!registered;$('authnote').textContent=registered?'Registration is closed. Use the username and password created earlier.':'Only one admin account can be registered on this browser. Save your credentials safely.';$('authuser').value='';$('authpass').value='';$('authconfirm').value='';}
-$('authform').addEventListener('submit',e=>{e.preventDefault();let u=$('authuser').value.trim(),pw=$('authpass').value,conf=$('authconfirm').value,existing=read('af_admin_user',null);if(!existing){if(pw.length<8){toast('Password must be at least 8 characters');return}if(pw!==conf){toast('Passwords do not match');return}localStorage.setItem('af_admin_user',JSON.stringify({username:u,password:pw}));sessionStorage.setItem('af_admin_session','1');toast('Admin account created');go('admin');return}if(existing.username===u&&existing.password===pw){sessionStorage.setItem('af_admin_session','1');toast('Login successful');go('admin')}else toast('Incorrect username or password')});
+function isMasterAdminRegistered(){if(adminAuthDoc&&adminAuthDoc.registered)return true;let c=read('af_admin_auth',null);if(c&&c.registered)return true;let l=read('af_admin_user',null);if(l&&l.username)return true;return false}
+function authRender(){let reg=isMasterAdminRegistered();$('authheading').textContent=reg?'Admin Login':'Admin Setup';$('authintro').textContent=reg?'Sign in with your master credentials to manage the store.':'Create the one-time master administrator account.';$('authsubmit').textContent=reg?'Sign In as Admin':'Create Master Admin Account';$('confirmfield').style.display=reg?'none':'flex';$('authconfirm').required=!reg;$('authnote').innerHTML=reg?'<b>Admin registration is closed globally.</b> Sign up is disabled. Only the master administrator can log in.':'<b>One-time setup:</b> Once this master administrator account is created, registration will be permanently closed across all browsers and devices.';$('authuser').value='';$('authpass').value='';$('authconfirm').value='';}
+$('authform').addEventListener('submit',async e=>{e.preventDefault();let u=$('authuser').value.trim(),pw=$('authpass').value,conf=$('authconfirm').value,btn=$('authsubmit'),reg=isMasterAdminRegistered();if(!reg){if(u.length<3){toast('Username must be at least 3 characters');return}if(pw.length<8){toast('Password must be at least 8 characters');return}if(pw!==conf){toast('Passwords do not match');return}btn.disabled=true;btn.textContent='Securing account...';try{let pHash=await hashPassword(pw);let newAuth=await saveAdminAuthToFirestore({username:u,passwordHash:pHash});adminAuthDoc=newAuth;try{localStorage.setItem('af_admin_auth',JSON.stringify(newAuth));localStorage.setItem('af_admin_user',JSON.stringify({username:u,password:pw}));}catch(err){}sessionStorage.setItem('af_admin_session','1');toast('Master admin created & registration closed!');go('admin');}catch(err){toast('Failed to save master credentials');console.error(err);}finally{btn.disabled=false;btn.textContent='Create Master Admin Account';}return;}btn.disabled=true;btn.textContent='Verifying...';try{if(!adminAuthDoc){adminAuthDoc=await getAdminAuthFromFirestore();}let targetUser=adminAuthDoc?.username,targetHash=adminAuthDoc?.passwordHash;let pHash=await hashPassword(pw);let isMatch=false;if(targetUser&&u.toLowerCase()===targetUser.toLowerCase()){if(targetHash&&targetHash===pHash){isMatch=true;}}if(!isMatch){let leg=read('af_admin_user',null);if(leg&&leg.username&&leg.username.toLowerCase()===u.toLowerCase()&&leg.password===pw){isMatch=true;try{adminAuthDoc=await saveAdminAuthToFirestore({username:u,passwordHash:pHash});localStorage.setItem('af_admin_auth',JSON.stringify(adminAuthDoc));}catch(migErr){}}}if(isMatch){sessionStorage.setItem('af_admin_session','1');toast('Welcome back, Admin!');go('admin');}else{toast('Incorrect username or password');}}catch(err){console.error('Login verification error:',err);toast('Error verifying credentials');}finally{btn.disabled=false;btn.textContent='Sign In as Admin';}});
 document.addEventListener('click',e=>{if(e.target.id==='adminlogout'){sessionStorage.removeItem('af_admin_session');location.hash='home';toast('Logged out')}});
-document.addEventListener('change',e=>{if(e.target.id==='dealEndSetting'){let dt=new Date(e.target.value);if(!isNaN(dt.getTime())){let iso=dt.toISOString();storeSettings.dealEnd=iso;try{localStorage.setItem('af_deal_end',iso)}catch(err){}startDealTimer();toast('Deals timer updated successfully!');saveSettingsToFirestore({dealEnd:iso}).catch(err=>console.error('Failed to save dealEnd to Firestore:',err));}}let map={logoUpload:['logo','logoPreview',300,300,0.8,'Website logo'],faviconUpload:['favicon','faviconPreview',128,128,0.8,'Favicon'],heroUpload:['hero','heroPreview',1200,420,0.75,'Main hero banner'],promo1Upload:['promo1','promo1Preview',600,350,0.75,'Promotion banner 1'],promo2Upload:['promo2','promo2Preview',600,350,0.75,'Promotion banner 2']};let item=map[e.target.id];if(item){let f=e.target.files&&e.target.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Please select an image file');return}toast('Processing '+item[5]+'...');optimizeImage(f,item[2],item[3],item[4],async dataUrl=>{storeSettings[item[0]]=dataUrl;try{localStorage.setItem('af_'+item[0],dataUrl);}catch(err){console.warn('Local storage limit',err);}let prev=$(item[1]);if(prev){prev.src=dataUrl;prev.style.display='inline-block';prev.classList.remove('hidden')}applyBranding();toast(item[5]+' uploaded and saved successfully!');try{await saveSettingsToFirestore({[item[0]]:dataUrl});}catch(err){console.error('Failed to save image to Firestore:',err);toast('Uploaded locally; cloud sync failed');}})}});
+document.addEventListener('change',e=>{if(e.target.id==='dealEndSetting'){let dt=new Date(e.target.value);if(!isNaN(dt.getTime())){let iso=dt.toISOString();storeSettings.dealEnd=iso;try{localStorage.setItem('af_deal_end',iso)}catch(err){}startDealTimer();toast('Deals timer updated successfully!');saveSettingsToFirestore({dealEnd:iso}).catch(err=>console.error('Failed to save dealEnd to cloud:',err));}}let map={logoUpload:['logo','logoPreview',300,300,0.8,'Website logo'],faviconUpload:['favicon','faviconPreview',128,128,0.8,'Favicon'],heroUpload:['hero','heroPreview',1200,420,0.75,'Main hero banner'],promo1Upload:['promo1','promo1Preview',600,350,0.75,'Promotion banner 1'],promo2Upload:['promo2','promo2Preview',600,350,0.75,'Promotion banner 2']};let item=map[e.target.id];if(item){let f=e.target.files&&e.target.files[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Please select an image file');return}toast('Processing '+item[5]+'...');optimizeImage(f,item[2],item[3],item[4],async dataUrl=>{storeSettings[item[0]]=dataUrl;try{localStorage.setItem('af_'+item[0],dataUrl);}catch(err){console.warn('Local storage limit',err);}let prev=$(item[1]);if(prev){prev.src=dataUrl;prev.style.display='inline-block';prev.classList.remove('hidden')}applyBranding();toast(item[5]+' uploaded and saved successfully!');try{await saveSettingsToFirestore({[item[0]]:dataUrl});}catch(err){console.error('Failed to save image to cloud:',err);toast('Uploaded locally; cloud sync failed');}})}});
 
 async function initStoreFromFirestore(){
   try{
+    const remoteAdminAuth=await getAdminAuthFromFirestore();
+    if(remoteAdminAuth&&remoteAdminAuth.registered){
+      adminAuthDoc=remoteAdminAuth;
+      try{localStorage.setItem('af_admin_auth',JSON.stringify(remoteAdminAuth));}catch(e){}
+    }else{
+      let leg=read('af_admin_user',null);
+      if(leg&&leg.username&&leg.password){
+        let pHash=await hashPassword(leg.password);
+        adminAuthDoc=await saveAdminAuthToFirestore({username:leg.username,passwordHash:pHash});
+        try{localStorage.setItem('af_admin_auth',JSON.stringify(adminAuthDoc));}catch(e){}
+      }
+    }
+    if(document.querySelector('#page-auth.active'))authRender();
+
     const remoteSettings=await getSettingsFromFirestore();
     if(remoteSettings&&typeof remoteSettings==='object'){
       applyBranding(remoteSettings);
@@ -378,16 +401,16 @@ async function initStoreFromFirestore(){
       }catch(e){}
     }
     const remoteProducts=await getProductsFromFirestore();
+    isProductsLoaded=true;
     if(Array.isArray(remoteProducts)&&remoteProducts.length>0){
       products=remoteProducts.sort((a,b)=>(b.id||0)-(a.id||0));
-      save();
-      render();
-      if(document.querySelector('#page-admin.active'))adminRender();
-    }else if(products&&products.length>0){
-      for(const p of products){
-        saveProductToFirestore(p).catch(err=>console.warn('Initial product seed error',err));
-      }
+    }else{
+      products=[];
     }
+    save();
+    render();
+    if(document.querySelector('#page-admin.active'))adminRender();
+
     const remoteOrders=await getOrdersFromFirestore();
     if(Array.isArray(remoteOrders)&&remoteOrders.length>0){
       orders=remoteOrders;
@@ -395,11 +418,12 @@ async function initStoreFromFirestore(){
       if(document.querySelector('#page-admin.active'))adminRender();
     }
   }catch(err){
-    console.warn('Firestore initial sync error:',err);
+    console.warn('Cloud initial sync error:',err);
   }
 }
 subscribeProducts(remoteProducts=>{
-  if(Array.isArray(remoteProducts)&&remoteProducts.length>0){
+  if(Array.isArray(remoteProducts)){
+    isProductsLoaded=true;
     products=remoteProducts.sort((a,b)=>(b.id||0)-(a.id||0));
     save();
     render();
@@ -428,6 +452,13 @@ subscribeOrders(remoteOrders=>{
     orders=remoteOrders;
     save();
     if(document.querySelector('#page-admin.active'))adminRender();
+  }
+});
+subscribeAdminAuth(remoteAuth=>{
+  if(remoteAuth&&remoteAuth.registered){
+    adminAuthDoc=remoteAuth;
+    try{localStorage.setItem('af_admin_auth',JSON.stringify(remoteAuth));}catch(e){}
+    if(document.querySelector('#page-auth.active'))authRender();
   }
 });
 initStoreFromFirestore();
