@@ -115,6 +115,7 @@ export interface ProductItem {
   discount: number;
   deal: boolean;
   image: string;
+  stock?: number;
   description?: string;
   color?: string;
   kind?: string;
@@ -124,6 +125,7 @@ export interface ProductItem {
 export interface StoreSettingsData {
   storeName?: string;
   freeDelivery?: number;
+  deliveryFee?: number;
   dealEnd?: string;
   logo?: string;
   favicon?: string;

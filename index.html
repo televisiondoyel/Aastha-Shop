@@ -63,7 +63,7 @@ subscribeAuth((u, p) => {
 });
 const makeImg=(color,label,kind='bag')=>'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240"><rect width="240" height="240" fill="#fff"/><ellipse cx="120" cy="207" rx="60" ry="8" fill="#e7e9e6"/><path d="${kind==='bottle'?'M94 48h52l-5 20v15l15 20v88q0 10-10 10H94q-10 0-10-10v-88l15-20V68z':'M72 48L168 48l15 150H57z'}" fill="${color}" stroke="#d8ded8" stroke-width="3"/><rect x="88" y="25" width="64" height="28" rx="5" fill="#f5f0e3" stroke="#d7d6c9"/><rect x="69" y="104" width="102" height="57" rx="3" fill="#fffdf5"/><text x="120" y="127" text-anchor="middle" font-family="Arial" font-size="14" font-weight="bold" fill="#277f43">Aastha</text><text x="120" y="143" text-anchor="middle" font-family="Arial" font-size="10" fill="#555">${label}</text><path d="M81 154h78" stroke="${color}" stroke-width="4"/></svg>`);
 function read(k,d){try{let v=localStorage.getItem(k);if(v===null||v===undefined)return d;try{let p=JSON.parse(v);return p??d}catch{return v}}catch(e){return d}}
-let storeSettings={storeName:read('af_store_name','Aastha'),freeDelivery:Number(read('af_free_delivery',1000)),dealEnd:read('af_deal_end',''),logo:read('af_logo',''),favicon:read('af_favicon',''),hero:read('af_hero',''),promo1:read('af_promo1',''),promo2:read('af_promo2','')};
+let storeSettings={storeName:read('af_store_name','Aastha'),freeDelivery:Number(read('af_free_delivery',1000)),deliveryFee:Number(read('af_delivery_fee',60)),dealEnd:read('af_deal_end',''),logo:read('af_logo',''),favicon:read('af_favicon',''),hero:read('af_hero',''),promo1:read('af_promo1',''),promo2:read('af_promo2','')};
 let cachedProducts=read('af_products',null);
 let isProductsLoaded=Array.isArray(cachedProducts)&&cachedProducts.length>0;
 let products=isProductsLoaded?cachedProducts.map(p=>({...p,image:p.image||makeImg(p.color||'#6ab06b',p.category)})):[];
@@ -110,7 +110,7 @@ function getActiveCategoryNames(){
   return names.length?names:['Oil','Spices','Flour','Dal or Lentil','Packages','Rice','Pantry','Offers'];
 }
 
-const $=id=>document.getElementById(id),money=n=>'৳ '+Number(n).toLocaleString('en-BD',{maximumFractionDigits:2}),save=()=>{try{localStorage.setItem('af_products',JSON.stringify(products));localStorage.setItem('af_cart',JSON.stringify(cart));localStorage.setItem('af_orders',JSON.stringify(orders));localStorage.setItem('af_categories',JSON.stringify(categories))}catch(e){console.warn('Storage limit',e)}},esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),toast=s=>{let t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2400)};
+const $=id=>document.getElementById(id),money=n=>'৳ '+Number(n).toLocaleString('en-BD',{maximumFractionDigits:2}),getDeliveryFee=s=>{let free=Number(storeSettings.freeDelivery??1000);if(free>0&&s>=free)return 0;return Math.max(0,Number(storeSettings.deliveryFee??60))},save=()=>{try{localStorage.setItem('af_products',JSON.stringify(products));localStorage.setItem('af_cart',JSON.stringify(cart));localStorage.setItem('af_orders',JSON.stringify(orders));localStorage.setItem('af_categories',JSON.stringify(categories))}catch(e){console.warn('Storage limit',e)}},esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),toast=s=>{let t=$('toast');t.textContent=s;t.classList.add('show');clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove('show'),2400)};
 function skeletonGrid(count=6){return Array(count).fill(0).map(()=>`<article class="product skeleton-card"><div class="skeleton-img"></div><div class="skeleton-line" style="width:75%;height:14px;margin:10px 0 6px"></div><div class="skeleton-line" style="width:45%;height:14px;margin-bottom:10px"></div><div class="skeleton-btn"></div></article>`).join('')}
 function card(p){let discBadge=(p.discount&&p.discount>0)?`<span class="discount">-${p.discount}%</span>`:'';let oldPrice=(p.old&&p.old>p.price)?`<span class="old">${money(p.old)}</span>`:'';return `<article class="product">${discBadge}<a href="#product-${p.id}" data-product="${p.id}"><img class="pimg" src="${p.image}" alt="${esc(p.name)}"></a><a class="pname" href="#product-${p.id}" data-product="${p.id}">${esc(p.name)}</a><div class="price">${money(p.price)} ${oldPrice}</div><button class="add" data-add="${p.id}">Add to Cart</button></article>`}
 function list(id,arr){let el=$(id);if(!el)return;if(!isProductsLoaded&&!arr.length){el.innerHTML=skeletonGrid(id==='catalog'?8:6);return}el.innerHTML=arr.length?arr.map(card).join(''):'<div class="empty">No products found.</div>'}
@@ -176,9 +176,9 @@ function go(page){
 function route(){let h=location.hash.slice(1)||'home';if(h.startsWith('product-')){showProduct(+h.split('-')[1]);return}go(h)}
 function showProduct(id){let p=products.find(x=>x.id===id);if(!p){go('shop');return}document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));$('page-product').classList.add('active');let catSlug=p.category==='Dal or Lentil'?'lentils':p.category==='Offers'?'offers':p.category==='Packages'?'packages':(categories.find(c=>c.name===p.category)?.slug||p.category.toLowerCase().replace(/[^a-z0-9]+/g,'-'));$('crumb').innerHTML=`<a href="#home" data-go="home">Home</a> / <a href="#${catSlug}" data-go="${catSlug}">${esc(p.category)}</a> / <span>${esc(p.name)}</span>`;let descText=p.description?esc(p.description):'Quality grocery essential for everyday use. Product details and photos can be updated in the admin panel.';let oldPrice=(p.old&&p.old>p.price)?`<span class="old">${money(p.old)}</span>`:'';let discBadge=(p.discount&&p.discount>0)?`<span class="discount" style="position:static;display:inline-block;margin-left:8px;vertical-align:middle">-${p.discount}%</span>`:'';$('detail').innerHTML=`<img src="${p.image}" alt="${esc(p.name)}"><div><p>${esc(p.category)}</p><h1>${esc(p.name)}</h1><p style="white-space:pre-line;line-height:1.6">${descText}</p><div class="bigprice">${money(p.price)} ${oldPrice} ${discBadge}</div><p style="color:#288847">In stock · Local delivery available</p><div class="qty"><button data-q="-1">−</button><input id="detailqty" type="number" min="1" value="1"><button data-q="1">+</button></div><button class="primary" data-add="${p.id}" data-detailadd>Add to Cart</button> <button class="secondary" data-go="cart">View Cart</button><p>Payment: Cash on Delivery</p></div>`;window.scrollTo(0,0)}
 function add(id,n=1){let p=products.find(p=>p.id===+id);if(!p)return;let i=cart.find(i=>i.id===p.id);if(i)i.qty+=n;else cart.push({id:p.id,qty:n});save();count();toast('Added to cart')}
-function cartRender(){let host=$('cartitems');if(!cart.length){host.innerHTML='<div class="empty">Your cart is empty. <p><button class="primary" data-go="shop">Start Shopping</button></p></div>';$('summary').innerHTML='';return}host.innerHTML=cart.map(i=>{let p=products.find(p=>p.id===i.id);return p?`<div class="cartrow"><img src="${p.image}" alt=""><div><b>${esc(p.name)}</b><div class="price">${money(p.price)}</div></div><div class="qty" style="margin:0"><button data-change="${p.id}" data-delta="-1">−</button><span>${i.qty}</span><button data-change="${p.id}" data-delta="1">+</button></div><div class="line-total">${money(p.price*i.qty)}</div><button class="tiny danger" data-remove="${p.id}">Remove</button></div>`:''}).join('');let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60;$('summary').innerHTML=`<div class="summary"><div class="sumrow"><span>Subtotal</span><b>${money(s)}</b></div><div class="sumrow"><span>Delivery</span><b>${d?money(d):'FREE'}</b></div><div class="sumrow total"><span>Total</span><b>${money(s+d)}</b></div><button class="primary" style="width:100%;margin-top:12px" data-go="checkout">Proceed to Checkout</button><p>Free delivery on orders of ৳1,000 or more.</p></div>`}
-function checkoutTotal(){let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60;$('checkouttotal').textContent='Order total: '+money(s+d)+' (Delivery: '+(d?money(d):'FREE')+')';let cp=read('af_customer_profile',null);if(cp){if(!$('name').value&&cp.name)$('name').value=cp.name;if(!$('phone').value&&cp.phone)$('phone').value=cp.phone;if(!$('address').value&&cp.address)$('address').value=cp.address;if(!$('area').value&&cp.area)$('area').value=cp.area;if(!$('note').value&&cp.note)$('note').value=cp.note;}}
-$('checkout').addEventListener('submit',e=>{e.preventDefault();if(!cart.length){toast('Your cart is empty');location.hash='shop';return}let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=s>=1000?0:60,o={id:'AF'+Date.now().toString().slice(-7),name:$('name').value,phone:$('phone').value,address:$('address').value,area:$('area').value,note:$('note').value,items:cart.map(i=>({...i})),total:s+d,status:'Pending',date:new Date().toLocaleString()};orders.unshift(o);let cp=read('af_customer_profile',null);if(!cp){localStorage.setItem('af_customer_profile',JSON.stringify({name:o.name,phone:o.phone,email:'',address:o.address,area:o.area,note:o.note}))}else{if(!cp.address)cp.address=o.address;if(!cp.area)cp.area=o.area;if(!cp.phone)cp.phone=o.phone;localStorage.setItem('af_customer_profile',JSON.stringify(cp))}cart=[];save();saveOrderToFirestore(o).catch(err=>console.error('Failed to save order to Firestore:',err));$('confirmation').textContent='Order '+o.id+' received. Total '+money(o.total)+'. Payment: Cash on Delivery.';location.hash='success';toast('Order placed')});
+function cartRender(){let host=$('cartitems');if(!cart.length){host.innerHTML='<div class="empty">Your cart is empty. <p><button class="primary" data-go="shop">Start Shopping</button></p></div>';$('summary').innerHTML='';return}host.innerHTML=cart.map(i=>{let p=products.find(p=>p.id===i.id);return p?`<div class="cartrow"><img src="${p.image}" alt=""><div><b>${esc(p.name)}</b><div class="price">${money(p.price)}</div></div><div class="qty" style="margin:0"><button data-change="${p.id}" data-delta="-1">−</button><span>${i.qty}</span><button data-change="${p.id}" data-delta="1">+</button></div><div class="line-total">${money(p.price*i.qty)}</div><button class="tiny danger" data-remove="${p.id}">Remove</button></div>`:''}).join('');let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=getDeliveryFee(s),freeThreshold=Number(storeSettings.freeDelivery??1000);$('summary').innerHTML=`<div class="summary"><div class="sumrow"><span>Subtotal</span><b>${money(s)}</b></div><div class="sumrow"><span>Delivery</span><b>${d?money(d):'FREE'}</b></div><div class="sumrow total"><span>Total</span><b>${money(s+d)}</b></div><button class="primary" style="width:100%;margin-top:12px" data-go="checkout">Proceed to Checkout</button>${freeThreshold>0?`<p>Free delivery on orders of ${money(freeThreshold)} or more.</p>`:''}</div>`}
+function checkoutTotal(){let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=getDeliveryFee(s);$('checkouttotal').textContent='Order total: '+money(s+d)+' (Delivery: '+(d?money(d):'FREE')+')';let cp=read('af_customer_profile',null);if(cp){if(!$('name').value&&cp.name)$('name').value=cp.name;if(!$('phone').value&&cp.phone)$('phone').value=cp.phone;if(!$('address').value&&cp.address)$('address').value=cp.address;if(!$('area').value&&cp.area)$('area').value=cp.area;if(!$('note').value&&cp.note)$('note').value=cp.note;}}
+$('checkout').addEventListener('submit',e=>{e.preventDefault();if(!cart.length){toast('Your cart is empty');location.hash='shop';return}let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=getDeliveryFee(s),o={id:'AF'+Date.now().toString().slice(-7),name:$('name').value,phone:$('phone').value,address:$('address').value,area:$('area').value,note:$('note').value,items:cart.map(i=>({...i})),total:s+d,status:'Pending',date:new Date().toLocaleString()};orders.unshift(o);let cp=read('af_customer_profile',null);if(!cp){localStorage.setItem('af_customer_profile',JSON.stringify({name:o.name,phone:o.phone,email:'',address:o.address,area:o.area,note:o.note}))}else{if(!cp.address)cp.address=o.address;if(!cp.area)cp.area=o.area;if(!cp.phone)cp.phone=o.phone;localStorage.setItem('af_customer_profile',JSON.stringify(cp))}cart=[];save();saveOrderToFirestore(o).catch(err=>console.error('Failed to save order to Firestore:',err));$('confirmation').textContent='Order '+o.id+' received. Total '+money(o.total)+'. Payment: Cash on Delivery.';location.hash='success';toast('Order placed')});
 $('contact').addEventListener('submit',e=>{e.preventDefault();toast('Message received in demo mode');e.target.reset()});$('topsearchbtn').addEventListener('click',()=>{location.hash='shop';setTimeout(()=>{$('search').value=$('topsearch').value;catalog();$('search').focus()},40)});$('topsearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('topsearchbtn').click()});$('search').addEventListener('input',catalog);$('filter').addEventListener('change',catalog);$('sort').addEventListener('change',catalog);
 document.addEventListener('click',e=>{
   let g=e.target.closest('[data-go]');
@@ -230,23 +230,35 @@ document.addEventListener('click',e=>{
     }
     return;
   }
+  let sf=e.target.closest('[data-set-fee]');
+  if(sf){
+    let fee=+sf.dataset.setFee;
+    let inp=$('deliveryFeeSetting');
+    if(inp)inp.value=fee;
+    storeSettings.deliveryFee=fee;
+    try{localStorage.setItem('af_delivery_fee',String(fee));}catch(err){}
+    toast('Delivery fee set to ৳ '+fee+'!');
+    saveSettingsToFirestore({deliveryFee:fee}).catch(err=>console.error('Failed to save deliveryFee to cloud:',err));
+    return;
+  }
   if(e.target.closest('[data-save-settings]')){
-    let sn=$('storeNameSetting'),dv=$('deliverySetting'),de=$('dealEndSetting');
+    let sn=$('storeNameSetting'),dv=$('deliverySetting'),df=$('deliveryFeeSetting'),de=$('dealEndSetting');
     let storeName=sn?(sn.value.trim()||'Aastha'):'Aastha';
     let freeDelivery=dv?Math.max(0,+dv.value||0):1000;
+    let deliveryFee=df?Math.max(0,+df.value||0):60;
     let dealEnd=storeSettings.dealEnd||'';
     if(de&&de.value){let dt=new Date(de.value);if(!isNaN(dt.getTime()))dealEnd=dt.toISOString();}
-    storeSettings.storeName=storeName;storeSettings.freeDelivery=freeDelivery;if(dealEnd)storeSettings.dealEnd=dealEnd;
-    try{localStorage.setItem('af_store_name',storeName);localStorage.setItem('af_free_delivery',String(freeDelivery));if(dealEnd)localStorage.setItem('af_deal_end',dealEnd);}catch(e){}
+    storeSettings.storeName=storeName;storeSettings.freeDelivery=freeDelivery;storeSettings.deliveryFee=deliveryFee;if(dealEnd)storeSettings.dealEnd=dealEnd;
+    try{localStorage.setItem('af_store_name',storeName);localStorage.setItem('af_free_delivery',String(freeDelivery));localStorage.setItem('af_delivery_fee',String(deliveryFee));if(dealEnd)localStorage.setItem('af_deal_end',dealEnd);}catch(e){}
     applyBranding();startDealTimer();toast('Store settings saved successfully');
-    let payload={storeName,freeDelivery,dealEnd:dealEnd||'',logo:storeSettings.logo||'',favicon:storeSettings.favicon||'',hero:storeSettings.hero||'',promo1:storeSettings.promo1||'',promo2:storeSettings.promo2||''};
+    let payload={storeName,freeDelivery,deliveryFee,dealEnd:dealEnd||'',logo:storeSettings.logo||'',favicon:storeSettings.favicon||'',hero:storeSettings.hero||'',promo1:storeSettings.promo1||'',promo2:storeSettings.promo2||''};
     saveSettingsToFirestore(payload).catch(err=>console.error('Failed to save settings to Firestore:',err));
   }
 });
 
 function productForm(){
   let p=products.find(p=>p.id===editing);
-  return `<form id="productform" class="formgrid"><div class="field"><label>Product name *</label><input name="name" required value="${esc(p?.name||'')}"></div><div class="field"><label>Category</label><select name="category">${getActiveCategoryNames().map(c=>`<option ${p?.category===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="field"><label>Price (৳) *</label><input name="price" type="number" min="0" required value="${p?.price??''}"></div><div class="field"><label>Old price (৳) (optional)</label><input name="old" type="number" min="0" value="${p?.old??''}" placeholder="Optional (0 if no old price)"></div><div class="field"><label>Discount (%) (optional)</label><input name="discount" type="number" min="0" max="99" value="${p?.discount??0}" placeholder="0 for no discount"></div><div class="field"><label>Deal of the Day</label><select name="deal"><option value="false" ${p?.deal?'':'selected'}>No</option><option value="true" ${p?.deal?'selected':''}>Yes</option></select></div><div class="field full"><label>Product description</label><textarea name="description" placeholder="Write product description, packet size, weight, ingredients, benefits, etc." style="min-height:90px">${esc(p?.description||'')}</textarea></div><div class="field full"><label>Product photo — upload from mobile gallery or computer</label><div class="upload"><input type="file" id="photo" accept="image/*"><p>Choose JPG, PNG or WebP from your mobile gallery.</p><img id="preview" class="preview ${p?'':'hidden'}" src="${p?.image||''}" alt="Preview"></div><input type="hidden" name="image" id="imagedata" value="${p?esc(p.image):''}"></div><div class="field full"><button class="primary">${p?'Update Product':'Add Product'}</button> ${p?'<button type="button" class="secondary" data-cancel>Cancel</button>':''}</div></form>`
+  return `<form id="productform" class="formgrid"><div class="field"><label>Product name *</label><input name="name" required value="${esc(p?.name||'')}"></div><div class="field"><label>Category</label><select name="category">${getActiveCategoryNames().map(c=>`<option ${p?.category===c?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="field"><label>Price (৳) *</label><input name="price" type="number" min="0" required value="${p?.price??''}"></div><div class="field"><label>Old price (৳) (optional)</label><input name="old" type="number" min="0" value="${p?.old??''}" placeholder="Optional (0 if no old price)"></div><div class="field"><label>Discount (%) (optional)</label><input name="discount" type="number" min="0" max="99" value="${p?.discount??0}" placeholder="0 for no discount"></div><div class="field"><label>Stock quantity</label><input name="stock" type="number" min="0" value="${p?.stock??50}" placeholder="e.g. 50"></div><div class="field"><label>Deal of the Day</label><select name="deal"><option value="false" ${p?.deal?'':'selected'}>No</option><option value="true" ${p?.deal?'selected':''}>Yes</option></select></div><div class="field full"><label>Product description</label><textarea name="description" placeholder="Write product description, packet size, weight, ingredients, benefits, etc." style="min-height:90px">${esc(p?.description||'')}</textarea></div><div class="field full"><label>Product photo — upload from mobile gallery or computer</label><div class="upload"><input type="file" id="photo" accept="image/*"><p>Choose JPG, PNG or WebP from your mobile gallery.</p><img id="preview" class="preview ${p?'':'hidden'}" src="${p?.image||''}" alt="Preview"></div><input type="hidden" name="image" id="imagedata" value="${p?esc(p.image):''}"></div><div class="field full"><button class="primary">${p?'Update Product':'Add Product'}</button> ${p?'<button type="button" class="secondary" data-cancel>Cancel</button>':''}</div></form>`
 }
 
 function productTable(){
@@ -264,7 +276,7 @@ function productTable(){
     ${!filtered.length?'<div class="empty">No products found matching filter.</div>':`
     <table class="table">
       <thead>
-        <tr><th>Photo</th><th>Product</th><th>Category</th><th>Price</th><th>Discount</th><th>Deal?</th><th>Actions</th></tr>
+        <tr><th>Photo</th><th>Product</th><th>Category</th><th>Price</th><th>Discount</th><th>Stock</th><th>Deal?</th><th>Actions</th></tr>
       </thead>
       <tbody>
         ${filtered.map(p=>`<tr>
@@ -273,6 +285,7 @@ function productTable(){
           <td>${esc(p.category)}</td>
           <td>${money(p.price)}</td>
           <td>${p.discount && p.discount > 0 ? `<b style="color:#ff4b0a">-${p.discount}%</b>` : '<span style="color:#999">0%</span>'}</td>
+          <td>${p.stock !== undefined ? (Number(p.stock) > 0 ? `<b style="color:#159447">${p.stock} pcs</b>` : '<b style="color:#c81e1e">Out of stock</b>') : '<span style="color:#159447">In stock</span>'}</td>
           <td>${p.deal?'<b style="color:#f12e24">Yes</b>':'No'}</td>
           <td><button class="tiny" data-edit="${p.id}">Edit</button> <button class="tiny danger" data-delete="${p.id}">Delete</button></td>
         </tr>`).join('')}
@@ -374,11 +387,16 @@ function orderTable(){
     </div>
     ${!filtered.length?'<div class="empty">No orders in this status.</div>':`
     <table class="table">
-      <tr><th>Order</th><th>Customer</th><th>Details</th><th>Total</th><th>Status</th><th>Update</th></tr>
+      <tr><th>Order</th><th>Customer</th><th>Delivery Area &amp; Address</th><th>Items</th><th>Total</th><th>Status</th><th>Update</th></tr>
       ${filtered.map(o=>`<tr>
         <td><strong>#${esc(o.id)}</strong><br><small style="color:#888">${esc(o.date)}</small></td>
-        <td><strong>${esc(o.name)}</strong><br><a href="tel:${esc(o.phone)}">${esc(o.phone)}</a></td>
-        <td><small>${esc(o.address)}</small><br><small style="color:#666">${(o.items||[]).length} items</small></td>
+        <td><strong>${esc(o.name)}</strong><br><a href="tel:${esc(o.phone)}" style="color:var(--gd);text-decoration:none">${esc(o.phone)}</a></td>
+        <td>
+          ${o.area ? `<span style="display:inline-block;background:#e8f5e9;color:#1e7e34;font-weight:700;font-size:11px;padding:2px 8px;border-radius:4px;margin-bottom:4px;border:1px solid #c8e6c9">📍 ${esc(o.area)}</span><br>` : ''}
+          <small style="color:#333;display:block;line-height:1.4">${esc(o.address)}</small>
+          ${o.note ? `<small style="color:#777;display:block;margin-top:2px"><em>Note: ${esc(o.note)}</em></small>` : ''}
+        </td>
+        <td><small style="color:#555">${(o.items||[]).map(i=>{let p=products.find(x=>x.id===i.id);return(p?esc(p.name):'Item #'+i.id)+' × '+i.qty}).join(', ')||(o.items||[]).length+' items'}</small></td>
         <td><strong>${money(o.total)}</strong></td>
         <td><span class="status ${o.status==='Cancelled'?'cancelled':''}" style="font-size:11px;padding:3px 8px">${esc(o.status)}</span></td>
         <td>
@@ -454,7 +472,8 @@ function adminRender(){
         <div class="field"><label>Promotion banner 2</label><div class="upload"><input type="file" id="promo2Upload" accept="image/*"><img id="promo2Preview" class="preview" alt="Promotion 2 preview" src="${storeSettings.promo2||'assets/grains.svg'}"></div></div>
         <div class="field full"><label>Deals Of The Day — Offer End Date &amp; Time</label><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input type="datetime-local" id="dealEndSetting" value="${getDealEndInputValue()}" style="max-width:240px"><button type="button" class="tiny" data-set-timer="1">24 Hours</button><button type="button" class="tiny" data-set-timer="3">3 Days</button><button type="button" class="tiny" data-set-timer="7">7 Days</button><button type="button" class="tiny" data-set-timer="30">30 Days</button></div><small style="color:#666">Controls the homepage Deals countdown. The seconds and minutes tick live.</small></div>
         <div class="field"><label>Store name</label><input id="storeNameSetting" value="${esc(storeSettings.storeName||'Aastha')}"></div>
-        <div class="field"><label>Free delivery threshold (৳)</label><input id="deliverySetting" type="number" value="${storeSettings.freeDelivery||1000}"></div>
+        <div class="field"><label>Delivery fee (৳)</label><div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><input id="deliveryFeeSetting" type="number" min="0" value="${storeSettings.deliveryFee??60}" style="max-width:130px"><button type="button" class="tiny" data-set-fee="40">৳ 40</button><button type="button" class="tiny" data-set-fee="50">৳ 50</button><button type="button" class="tiny" data-set-fee="60">৳ 60</button><button type="button" class="tiny" data-set-fee="80">৳ 80</button><button type="button" class="tiny" data-set-fee="100">৳ 100</button></div><small style="color:#666">Standard delivery fee charged to customers at checkout.</small></div>
+        <div class="field"><label>Free delivery threshold (৳)</label><input id="deliverySetting" type="number" min="0" value="${storeSettings.freeDelivery||1000}"><small style="color:#666">Orders of this amount or more get free delivery.</small></div>
         <div class="field full"><button class="primary" data-save-settings>Save Design &amp; Store Settings</button></div>
       </div>
       <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--line)">
@@ -532,7 +551,7 @@ document.addEventListener('input',e=>{
 document.addEventListener('submit',async e=>{
   if(e.target.id==='productform'){
     e.preventDefault();
-    let f=new FormData(e.target),id=editing||Date.now(),name=String(f.get('name')||'').trim(),category=String(f.get('category')||'Pantry'),price=Math.max(0,+f.get('price')||0),old=Math.max(0,+f.get('old')||price),discount=Math.max(0,Math.min(99,+f.get('discount')||0)),deal=f.get('deal')==='true',description=String(f.get('description')||'').trim(),image=f.get('image')||makeImg('#68a96a',category),obj={id,name,category,price,old,discount,deal,description,image,color:'#68a96a',kind:'bag',updatedAt:new Date().toISOString()};
+    let f=new FormData(e.target),id=editing||Date.now(),name=String(f.get('name')||'').trim(),category=String(f.get('category')||'Pantry'),price=Math.max(0,+f.get('price')||0),old=Math.max(0,+f.get('old')||price),discount=Math.max(0,Math.min(99,+f.get('discount')||0)),deal=f.get('deal')==='true',stock=f.get('stock')!==null&&f.get('stock')!==''?Math.max(0,+f.get('stock')||0):50,description=String(f.get('description')||'').trim(),image=f.get('image')||makeImg('#68a96a',category),obj={id,name,category,price,old,discount,deal,stock,description,image,color:'#68a96a',kind:'bag',updatedAt:new Date().toISOString()};
     if(editing)products=products.map(p=>p.id===editing?obj:p);
     else products.unshift(obj);
     editing=null;save();render();adminRender();toast('Product saved successfully!');
@@ -896,6 +915,7 @@ async function initStoreFromFirestore(){
       try{
         if(remoteSettings.storeName)localStorage.setItem('af_store_name',remoteSettings.storeName);
         if(remoteSettings.freeDelivery!==undefined)localStorage.setItem('af_free_delivery',String(remoteSettings.freeDelivery));
+        if(remoteSettings.deliveryFee!==undefined)localStorage.setItem('af_delivery_fee',String(remoteSettings.deliveryFee));
         if(remoteSettings.dealEnd)localStorage.setItem('af_deal_end',remoteSettings.dealEnd);
         if(remoteSettings.logo)localStorage.setItem('af_logo',remoteSettings.logo);
         if(remoteSettings.favicon)localStorage.setItem('af_favicon',remoteSettings.favicon);
@@ -949,6 +969,7 @@ subscribeSettings(remoteSettings=>{
     try{
       if(remoteSettings.storeName)localStorage.setItem('af_store_name',remoteSettings.storeName);
       if(remoteSettings.freeDelivery!==undefined)localStorage.setItem('af_free_delivery',String(remoteSettings.freeDelivery));
+      if(remoteSettings.deliveryFee!==undefined)localStorage.setItem('af_delivery_fee',String(remoteSettings.deliveryFee));
       if(remoteSettings.dealEnd)localStorage.setItem('af_deal_end',remoteSettings.dealEnd);
       if(remoteSettings.logo)localStorage.setItem('af_logo',remoteSettings.logo);
       if(remoteSettings.favicon)localStorage.setItem('af_favicon',remoteSettings.favicon);
