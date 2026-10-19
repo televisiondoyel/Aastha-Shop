@@ -327,7 +327,7 @@ function getCustomer() {
     phone: '',
     email: '',
     address: '',
-    area: 'Inside city',
+    area: 'Gachhua',
     note: ''
   });
 }
@@ -424,7 +424,7 @@ window.handleSignUp = async function(e) {
   btn.disabled = true;
   btn.textContent = 'Creating account...';
   try {
-    let prof = await registerWithFirebase(name, em, pass, phone, addr, 'Inside city');
+    let prof = await registerWithFirebase(name, em, pass, phone, addr, 'Gachhua');
     currentUser = auth.currentUser;
     showMessage('Account created successfully!');
     updateUI();
@@ -670,8 +670,22 @@ function renderTab() {
           <div class="field">
             <label>Delivery Area *</label>
             <select id="profArea" required>
-              <option value="Inside city" ${cust.area === 'Inside city' ? 'selected' : ''}>Inside city</option>
-              <option value="Outside city" ${cust.area === 'Outside city' ? 'selected' : ''}>Outside city</option>
+              ${[
+                'Gachhua',
+                'Santoshpur',
+                'Dirghapar',
+                'Kalapania',
+                'Harishpur',
+                'Bauria',
+                'Muchapur',
+                'Rahmatpur',
+                'Azimpur',
+                'Maitbhanga',
+                'Sarikait',
+                'Mogdhara',
+                'Haramia',
+                'Amanullah'
+              ].map(a => `<option value="${a}" ${(cust.area || 'Gachhua') === a ? 'selected' : ''}>${a}</option>`).join('')}
             </select>
           </div>
           <div class="field">

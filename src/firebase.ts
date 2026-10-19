@@ -115,6 +115,7 @@ export interface ProductItem {
   discount: number;
   deal: boolean;
   image: string;
+  description?: string;
   color?: string;
   kind?: string;
   updatedAt?: string;
@@ -151,6 +152,23 @@ export interface OrderData {
   createdAt?: string;
 }
 
+export const DELIVERY_AREAS = [
+  'Gachhua',
+  'Santoshpur',
+  'Dirghapar',
+  'Kalapania',
+  'Harishpur',
+  'Bauria',
+  'Muchapur',
+  'Rahmatpur',
+  'Azimpur',
+  'Maitbhanga',
+  'Sarikait',
+  'Mogdhara',
+  'Haramia',
+  'Amanullah'
+];
+
 export async function registerWithFirebase(
   name: string,
   email: string,
@@ -170,7 +188,7 @@ export async function registerWithFirebase(
       email: cred.user.email || email,
       phone: phone || '',
       address: address || '',
-      area: area || 'Inside city',
+      area: area || 'Gachhua',
       createdAt: new Date().toISOString()
     };
     try {
@@ -192,7 +210,7 @@ export async function loginWithFirebase(email: string, pass: string) {
     email: cred.user.email || email,
     phone: '',
     address: '',
-    area: 'Inside city'
+    area: 'Gachhua'
   };
   try {
     const snap = await getDoc(doc(db, 'users', cred.user.uid));
@@ -251,7 +269,7 @@ export function subscribeAuth(callback: (user: FirebaseUser | null, profile: Use
         email: u.email || '',
         phone: '',
         address: '',
-        area: 'Inside city'
+        area: 'Gachhua'
       };
       try {
         const snap = await getDoc(doc(db, 'users', u.uid));
