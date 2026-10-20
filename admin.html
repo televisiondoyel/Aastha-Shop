@@ -379,29 +379,16 @@ const seed = {
     {id:4, name:'Turmeric Powder', sku:'AST-SP-004', category:'Spices', brand:'Pran', price:95, old:105, discount:0, stock:18, unit:'pack', status:'Active', deal:false, description:'Pure grounded turmeric powder without artificial coloring for authentic flavor.', image:''},
     {id:5, name:'Atta Whole Wheat Flour', sku:'AST-FL-005', category:'Flour', brand:'Teer', price:65, old:70, discount:0, stock:8, unit:'kg', status:'Active', deal:false, description:'100% whole wheat flour rich in fiber for soft rotis and parathas.', image:''}
   ],
-  orders: [
-    {id:'AST-1048', customer:'Nusrat Jahan', phone:'01712345678', address:'Sandwip Town', area:'Gachhua', items:2, total:865, status:'Pending', payment:'Pending', date:'2026-10-19', delivery:'Unassigned', itemsDetail:[{name:'Premium Miniket Rice',qty:5,unit:'kg',price:390,image:''},{name:'Pure Mustard Oil',qty:2,unit:'litre',price:370,image:''}]},
-    {id:'AST-1047', customer:'Rahim Uddin', phone:'01812345678', address:'Harishpur Bazar', area:'Harishpur', items:3, total:1420, status:'Shipped', payment:'Pending', date:'2026-10-19', delivery:'Abdul Karim', itemsDetail:[{name:'Pure Mustard Oil',qty:4,unit:'litre',price:740,image:''},{name:'Red Lentils (Masoor Dal)',qty:3,unit:'kg',price:354,image:''}]},
-    {id:'AST-1046', customer:'Samia Akter', phone:'01912345678', address:'Gachhua Road', area:'Santoshpur', items:1, total:540, status:'Delivered', payment:'Collected', date:'2026-10-18', delivery:'Mohammad Hasan', itemsDetail:[{name:'Premium Miniket Rice',qty:5,unit:'kg',price:390,image:''}]},
-    {id:'AST-1045', customer:'Imran Hossain', phone:'01612345678', address:'Maitbhanga High School', area:'Maitbhanga', items:2, total:320, status:'Cancelled', payment:'Failed', date:'2026-10-18', delivery:'Unassigned', itemsDetail:[{name:'Turmeric Powder',qty:2,unit:'pack',price:190,image:''}]}
-  ],
-  customers: [
-    {id:1, name:'Nusrat Jahan', phone:'01712345678', email:'nusrat@example.com', address:'Town Market, Sandwip', area:'Gachhua', orders:6, spent:4850, status:'Active', joined:'2026-09-12'},
-    {id:2, name:'Rahim Uddin', phone:'01812345678', email:'rahim@example.com', address:'Harishpur, Sandwip', area:'Harishpur', orders:12, spent:12750, status:'Active', joined:'2026-08-21'},
-    {id:3, name:'Samia Akter', phone:'01912345678', email:'samia@example.com', address:'Gachhua, Sandwip', area:'Santoshpur', orders:4, spent:2860, status:'Active', joined:'2026-10-02'},
-    {id:4, name:'Imran Hossain', phone:'01612345678', email:'imran@example.com', address:'Maitbhanga, Sandwip', area:'Maitbhanga', orders:1, spent:320, status:'Suspended', joined:'2026-10-11'}
-  ],
+  orders: [],
+  customers: [],
   categories: ['Oil','Spices','Flour','Dal or Lentil','Packages','Rice','Pantry','Offers'],
   categoryImages: {},
   brands: ['Aastha Select', 'Fresh', 'Teer', 'Pran', 'Radhuni', 'Local Farm'],
   coupons: [
-    {id:1, code:'AASTHA10', type:'Percentage', value:10, min:500, limit:100, used:24, start:'2026-10-01', end:'2026-12-31', active:true},
-    {id:2, code:'SAVE50', type:'Fixed', value:50, min:800, limit:50, used:50, start:'2026-09-01', end:'2026-10-15', active:false}
+    {id:1, code:'AASTHA10', type:'Percentage', value:10, min:500, limit:100, used:0, start:'2026-10-01', end:'2026-12-31', active:true},
+    {id:2, code:'SAVE50', type:'Fixed', value:50, min:800, limit:50, used:0, start:'2026-09-01', end:'2026-10-15', active:false}
   ],
-  deliveries: [
-    {order:'AST-1047', customer:'Rahim Uddin', area:'Harishpur', partner:'Abdul Karim', phone:'01800000001', status:'Shipped', tracking:''},
-    {order:'AST-1048', customer:'Nusrat Jahan', area:'Gachhua', partner:'Unassigned', phone:'', status:'Pending', tracking:''}
-  ],
+  deliveries: [],
   staff: [
     {id:1, name:'Aastha Owner', email:'admin@aastha.example', role:'Super Admin', status:'Active'},
     {id:2, name:'Order Manager', email:'orders@aastha.example', role:'Order Manager', status:'Active'},
