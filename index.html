@@ -142,7 +142,14 @@ function catalog(){let q=$('search').value.toLowerCase(),cat=$('filter').value,s
 function count(){let n=cart.reduce((s,i)=>s+i.qty,0);$('cartcount').textContent=n;$('headcartcount').textContent=n}
 function go(page){
   if(page==='profile')page='account';
-  if(page==='admin'){window.location.href='admin.html';return;}
+  if(page==='admin'){
+    if(!sessionStorage.getItem('af_admin_session')){
+      page='auth';
+    }else{
+      window.location.href='admin.html';
+      return;
+    }
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   let el=$('page-'+page);
   if(!el){

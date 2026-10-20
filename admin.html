@@ -261,6 +261,7 @@ tbody tr:hover{background:#fafdface}
     <button data-page="staff"><span class="ico" data-i="shield"></span>Staff &amp; Permissions</button>
     <button data-page="settings"><span class="ico" data-i="settings"></span>Store Settings</button>
     <button data-page="back_to_store" style="color:#8fe3b1;margin-top:8px"><span class="ico" data-i="store"></span>Back to Store</button>
+    <button data-page="logout" style="color:#ff8a80;margin-top:2px"><span class="ico" data-i="logout"></span>Log out</button>
   </nav>
 
   <div class="footer"></div>
@@ -296,6 +297,11 @@ tbody tr:hover{background:#fafdface}
 <div id="toastroot"></div>
 
 <script type="module">
+// Enforce admin login authentication
+if (!sessionStorage.getItem('af_admin_session')) {
+  window.location.replace('index.html#admin');
+}
+
 import {
   db as firestoreDb,
   saveProductToFirestore,
@@ -335,7 +341,8 @@ const icons = {
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   download: '<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
-  store: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'
+  store: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'
 };
 
 function renderIcons() {
@@ -580,6 +587,11 @@ document.getElementById('nav').onclick = e => {
     let target = b.dataset.page;
     if (target === 'back_to_store') {
       window.location.href = 'index.html#home';
+      return;
+    }
+    if (target === 'logout') {
+      sessionStorage.removeItem('af_admin_session');
+      window.location.href = 'index.html#admin';
       return;
     }
     renderPage(target);
