@@ -142,7 +142,7 @@ function catalog(){let q=$('search').value.toLowerCase(),cat=$('filter').value,s
 function count(){let n=cart.reduce((s,i)=>s+i.qty,0);$('cartcount').textContent=n;$('headcartcount').textContent=n}
 function go(page){
   if(page==='profile')page='account';
-  if(page==='admin'&&!sessionStorage.getItem('af_admin_session'))page='auth';
+  if(page==='admin'){window.location.href='admin.html';return;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   let el=$('page-'+page);
   if(!el){
@@ -392,7 +392,7 @@ function orderTable(){
         <td><strong>#${esc(o.id)}</strong><br><small style="color:#888">${esc(o.date)}</small></td>
         <td><strong>${esc(o.name)}</strong><br><a href="tel:${esc(o.phone)}" style="color:var(--gd);text-decoration:none">${esc(o.phone)}</a></td>
         <td>
-          ${o.area ? `<span style="display:inline-block;background:#e8f5e9;color:#1e7e34;font-weight:700;font-size:11px;padding:2px 8px;border-radius:4px;margin-bottom:4px;border:1px solid #c8e6c9">📍 ${esc(o.area)}</span><br>` : ''}
+          ${o.area ? `<b style="color:#1e7e34;font-size:11px;display:block;margin-bottom:2px">${esc(o.area)}</b>` : ''}
           <small style="color:#333;display:block;line-height:1.4">${esc(o.address)}</small>
           ${o.note ? `<small style="color:#777;display:block;margin-top:2px"><em>Note: ${esc(o.note)}</em></small>` : ''}
         </td>

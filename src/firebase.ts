@@ -132,6 +132,8 @@ export interface StoreSettingsData {
   hero?: string;
   promo1?: string;
   promo2?: string;
+  adminAvatar?: string;
+  adminName?: string;
   updatedAt?: string;
 }
 

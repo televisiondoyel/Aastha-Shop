@@ -1,1 +1,2676 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=index.html#admin"><title>Aastha Admin</title></head><body><p>Opening admin panel… <a href="index.html#admin">Click here</a></p></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aastha Admin Dashboard</title>
+<style>
+:root{
+  --g:#16864b;
+  --g2:#32a45e;
+  --sage:#eaf7ef;
+  --bg:#f4f7f5;
+  --line:#e1e9e4;
+  --muted:#718078;
+  --text:#20352a;
+}
+*,*::before,*::after{box-sizing:border-box;border-radius:0!important}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:13px Arial,Helvetica,sans-serif;
+  line-height:1.45;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+
+/* Side navigation */
+.side{
+  position:fixed;
+  inset:0 auto 0 0;
+  width:238px;
+  height:100vh;
+  background:#173e32;
+  color:#d9e8df;
+  padding:18px 12px;
+  overflow-y:auto;
+  z-index:25;
+  transition:transform .2s ease;
+}
+.brand{
+  display:flex;
+  gap:11px;
+  align-items:center;
+  padding:4px 6px 18px;
+  border-bottom:1px solid #ffffff1a;
+}
+.mark{
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:38px;
+  background:#e3efe6;
+  color:var(--g);
+  font-weight:900;
+  font-size:19px;
+}
+.brand b{display:block;color:#fff;font-size:17px;letter-spacing:-.3px}
+.brand small{color:#a9c6b6;text-transform:uppercase;letter-spacing:1.4px;font-size:9px}
+.label{font-size:10px;color:#91b6a2;letter-spacing:1.4px;text-transform:uppercase;margin:20px 8px 7px;font-weight:700}
+.nav{display:grid;gap:3px}
+.nav button{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  padding:9px 10px;
+  border:0;
+  background:none;
+  color:#c9ddd1;
+  text-align:left;
+  font-size:12px;
+}
+.nav button:hover{background:#ffffff12;color:#fff}
+.nav button.active{background:#249c56;color:#fff;font-weight:700}
+.nav button.active .ico svg{stroke:#fff}
+.ico{width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.ico svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Main content */
+.main{margin-left:238px;min-height:100vh;display:flex;flex-direction:column}
+.top{
+  height:60px;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  position:sticky;
+  top:0;
+  z-index:15;
+}
+.crumb{font-size:11px;color:var(--muted)}
+.top h3{margin:2px 0 0;font-size:15px;color:var(--text);font-weight:700}
+.topright{display:flex;align-items:center;gap:10px}
+.search{border:1px solid var(--line);padding:8px 12px;width:240px;background:#f9fbfa;outline:none;font-size:12px}
+.search:focus{border-color:var(--g2);background:#fff}
+.avatar{background:#e5f6eb;color:var(--g);width:36px;height:36px;display:grid;place-items:center;font-weight:800;font-size:12px;border:1px solid #c9decb;overflow:hidden;cursor:pointer;flex-shrink:0}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.brand-logo-wrap{position:relative;cursor:pointer;flex-shrink:0}
+.brand-logo-img{max-height:38px;max-width:54px;object-fit:contain;background:#fff;padding:2px;display:block;border:1px solid #ffffff33}
+.brand-logo-wrap:hover{opacity:.9}
+.content{padding:22px 24px;max-width:1600px;width:100%;margin:0 auto;flex:1}
+.heading{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.heading h1{font-size:22px;margin:0 0 4px;color:#213b2c;letter-spacing:-.4px}
+.heading p{margin:0;color:var(--muted);font-size:12px}
+.btn{border:1px solid var(--line);background:#fff;padding:8px 13px;font-weight:600;font-size:12px;color:#34483b}
+.btn:hover{background:#f3f7f4}
+.primary{background:var(--g);border-color:var(--g);color:#fff}
+.primary:hover{background:#137340}
+
+/* Grid & Cards */
+.grid{display:grid;gap:14px}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:15px}
+.card{background:#fff;border:1px solid var(--line);padding:16px;min-width:0}
+.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:11px;font-weight:700}
+.symbol{width:34px;height:34px;background:#eaf7ef;color:var(--g);display:grid;place-items:center}
+.value{font-size:24px;font-weight:800;letter-spacing:-.5px;margin:10px 0 2px;color:#183e2c}
+.small{font-size:11px;color:var(--muted)}
+.cols{grid-template-columns:minmax(0,1.4fr) minmax(280px,1fr);margin-bottom:15px}
+.cardhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;gap:10px}
+.cardhead h2{font-size:14px;margin:0;color:#203b2c;font-weight:700}
+.cardhead p{font-size:11px;color:var(--muted);margin:2px 0 0}
+.chart{height:190px}
+.chart svg{width:100%;height:100%}
+.days{display:flex;justify-content:space-between;color:#8a978f;font-size:10px;padding:4px 6px 0}
+.progress{display:grid;gap:14px}
+.prow{display:grid;grid-template-columns:1fr auto;gap:5px;font-size:11px}
+.bar{height:6px;background:#edf2ee;grid-column:1/-1;overflow:hidden}
+.bar span{height:100%;display:block;background:var(--g2)}
+
+/* Tables */
+.tablecard{padding:0;overflow:hidden}
+.tablecard .cardhead{padding:15px 16px 0}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;white-space:nowrap}
+th{background:#f6f9f7;color:#65786c;font-size:10px;text-transform:uppercase;letter-spacing:.6px;text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);font-weight:700}
+td{font-size:12px;padding:11px 14px;border-bottom:1px solid #edf2ee;vertical-align:middle}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:hover{background:#fafdface}
+
+/* Clean status pills - no borders, no rounded pill boxes, plain color indicators */
+.pill,.status,.status-badge,.badge,.tag,[class*="status"]{
+  background:transparent!important;
+  border:0!important;
+  outline:0!important;
+  box-shadow:none!important;
+  padding:0!important;
+  display:inline!important;
+  font-weight:700!important;
+  color:#1b7b43!important;
+  font-size:11px!important;
+}
+.pill.warn{color:#a86111!important}
+.pill.bad{color:#b73232!important}
+.pill.blue{color:#29659b!important}
+
+.product{display:flex;align-items:center;gap:10px}
+.product-photo{width:46px!important;height:46px!important;min-width:46px;object-fit:contain;background:#fff;border:1px solid #e1e9e3!important;padding:2px}
+.thumb{width:46px;height:46px;min-width:46px;background:#edf5ef;color:#356e4c;display:grid;place-items:center;font-size:12px;font-weight:800;border:1px solid #e1e9e3}
+.link{border:0;background:none;color:var(--g2);font-size:11px;font-weight:700;padding:2px 5px}
+.link:hover{text-decoration:underline}
+
+/* Low stock alert list */
+.alertlist{display:grid;gap:10px}
+.alertrow{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid #f0f4f1}
+.alertrow:last-child{border-bottom:0}
+.alertico{width:32px;height:32px;background:#fff4e7;color:#a86519;display:grid;place-items:center;flex-shrink:0}
+.alertrow strong{display:block;font-size:12px;color:#22362a}
+.alertrow small{font-size:11px;color:var(--muted)}
+.alertrow .right{margin-left:auto;text-align:right;font-size:11px;font-weight:700}
+
+/* Toolbars & Forms */
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.toolbar input,.toolbar select,.field input,.field select,.field textarea{border:1px solid #dce5df;padding:9px 11px;background:#fff;color:var(--text);outline:none;font-size:12px}
+.toolbar input:focus,.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g2);box-shadow:0 0 0 1px #32a45e22}
+.toolbar input{min-width:210px}
+.field{display:grid;gap:5px;margin-bottom:12px}
+.field label{font-size:11px;font-weight:700;color:#2c4033}
+.field input,.field select,.field textarea{width:100%}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.full{grid-column:1/-1}
+.notice{background:#eff6f0;color:#2f6942;padding:11px 14px;font-size:12px;margin-bottom:14px;border-left:3px solid var(--g)}
+
+/* Modal & Toast */
+.modalbg{position:fixed;inset:0;background:#0d241977;z-index:40;display:grid;place-items:center;padding:14px}
+.modal{width:min(640px,100%);max-height:92vh;overflow-y:auto;background:#fff;border:1px solid #c7d8cd;box-shadow:0 10px 40px #0b241630}
+.modalhead,.modalfoot{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.modalhead b{font-size:14px;color:#1e3829}
+.modalfoot{border-bottom:0;border-top:1px solid var(--line);justify-content:flex-end;gap:8px}
+.modalbody{padding:18px}
+.toast{position:fixed;right:20px;bottom:20px;background:#173e32;color:#fff;padding:11px 16px;z-index:50;box-shadow:0 6px 20px #0003;font-size:12px;font-weight:600}
+.empty{text-align:center;padding:26px;color:var(--muted);font-size:12px}
+.menu{display:none}
+.footer{padding:14px 0 6px;font-size:11px;color:var(--muted)}
+.overlay{display:none}
+.upload-preview{max-width:140px;max-height:140px;object-fit:contain;border:1px solid var(--line);margin-top:7px;display:block;background:#fff;padding:2px}
+.category-photo{width:48px;height:42px;object-fit:contain;background:#f4f8f5;display:block;margin-bottom:4px;border:1px solid #dfe9e2}
+.file-mini{font-size:10px;max-width:130px}
+.setting-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:11px 0;border-bottom:1px solid #edf2ee}
+.setting-row:last-child{border-bottom:0}
+.invoice-total{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--line);margin-top:12px;font-size:15px}
+
+/* Mobile responsive */
+@media(max-width:1050px){
+  .side{width:210px}
+  .main{margin-left:210px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .cols{grid-template-columns:1fr}
+  .content{padding:18px}
+}
+@media(max-width:720px){
+  .side{width:250px;transform:translateX(-100%);z-index:35}
+  .side.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .menu{display:inline-flex}
+  .overlay.show{display:block;position:fixed;inset:0;background:#0d241977;z-index:30}
+  .top{padding:0 12px;height:56px}
+  .search{display:none}
+  .content{padding:14px 10px}
+  .stats{gap:8px}
+  .card{padding:12px}
+  .value{font-size:20px}
+  .heading h1{font-size:19px}
+  .formgrid{grid-template-columns:1fr}
+  .full{grid-column:auto}
+  td,th{padding:9px 10px}
+}
+</style>
+</head>
+<body>
+<div id="overlay" class="overlay" onclick="toggleNav(false)"></div>
+
+<aside class="side" id="side">
+  <div class="brand">
+    <div class="brand-logo-wrap" id="brandLogoWrap" onclick="openLogoUploadModal()" title="Upload or change store logo">
+      <div class="mark">A</div>
+    </div>
+    <div style="flex:1;min-width:0;cursor:pointer" onclick="openLogoUploadModal()" title="Upload or change store logo">
+      <b>Aastha</b>
+      <small>Admin Dashboard</small>
+    </div>
+  </div>
+
+  <div class="label">Workspace</div>
+  <nav class="nav" id="nav">
+    <button class="active" data-page="dashboard"><span class="ico" data-i="dashboard"></span>Dashboard</button>
+    <button data-page="products"><span class="ico" data-i="box"></span>Products</button>
+    <button data-page="orders"><span class="ico" data-i="cart"></span>Orders</button>
+    <button data-page="customers"><span class="ico" data-i="users"></span>Customers</button>
+    <button data-page="inventory"><span class="ico" data-i="layers"></span>Inventory</button>
+    <button data-page="delivery"><span class="ico" data-i="truck"></span>Delivery</button>
+    <button data-page="categories"><span class="ico" data-i="folder"></span>Categories &amp; Brands</button>
+    <button data-page="coupons"><span class="ico" data-i="ticket"></span>Coupons &amp; Discounts</button>
+    <button data-page="payments"><span class="ico" data-i="wallet"></span>Payments (COD)</button>
+
+    <div class="label">Management</div>
+    <button data-page="reports"><span class="ico" data-i="chart"></span>Reports &amp; Analytics</button>
+    <button data-page="staff"><span class="ico" data-i="shield"></span>Staff &amp; Permissions</button>
+    <button data-page="settings"><span class="ico" data-i="settings"></span>Store Settings</button>
+    <button data-page="back_to_store" style="color:#8fe3b1;margin-top:8px"><span class="ico" data-i="store"></span>Back to Store</button>
+  </nav>
+
+  <div class="footer"></div>
+</aside>
+
+<main class="main">
+  <header class="top">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="btn menu" onclick="toggleNav(true)" aria-label="Open menu">
+        <span class="ico" data-i="menu"></span>
+      </button>
+      <div>
+        <div class="crumb">Aastha / <span id="crumb">Dashboard</span></div>
+        <h3 id="topTitle">Dashboard Overview</h3>
+      </div>
+    </div>
+    <div class="topright">
+      <input class="search" id="globalSearch" placeholder="Search products...">
+      <button class="btn" onclick="notify('No new notifications.')" aria-label="Notifications" title="Notifications">
+        <span class="ico" data-i="bell"></span>
+      </button>
+      <a href="index.html#home" class="btn" title="View customer storefront" style="display:inline-flex;align-items:center;gap:5px">
+        <span class="ico" data-i="store"></span> Storefront
+      </a>
+      <div class="avatar" id="topAdminAvatar" onclick="openAdminProfileModal()" title="Admin Profile &amp; Photo Upload">SA</div>
+    </div>
+  </header>
+
+  <section class="content" id="content"></section>
+</main>
+
+<div id="modalroot"></div>
+<div id="toastroot"></div>
+
+<script type="module">
+import {
+  db as firestoreDb,
+  saveProductToFirestore,
+  deleteProductFromFirestore,
+  getProductsFromFirestore,
+  subscribeProducts,
+  saveOrderToFirestore,
+  updateOrderStatusInFirestore,
+  getOrdersFromFirestore,
+  subscribeOrders,
+  saveSettingsToFirestore,
+  getSettingsFromFirestore,
+  subscribeSettings,
+  saveCategoriesToFirestore,
+  getCategoriesFromFirestore,
+  subscribeCategories
+} from './src/firebase.ts';
+
+// Pure SVG Icons - Absolutely ZERO emojis anywhere in the system
+const icons = {
+  dashboard: '<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="14" width="7" height="7"/>',
+  box: '<path d="m12 3 9 5-9 5-9-5 9-5ZM3 8v9l9 5 9-5V8M3 8l9 5 9-5M12 13v9"/>',
+  cart: '<circle cx="9" cy="20" r="1.5"/><circle cx="19" cy="20" r="1.5"/><path d="M2 3h2l2.6 12.2a2 2 0 0 0 2 1.6h9.8a2 2 0 0 0 2-1.6L22 8H5"/>',
+  users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  layers: '<path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/>',
+  truck: '<path d="M3 6h12v12H3zM15 10h4l3 4v4h-7z"/><circle cx="7.5" cy="19" r="2"/><circle cx="18.5" cy="19" r="2"/>',
+  folder: '<path d="M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  ticket: '<path d="M2 9a3 3 0 0 0 0 6v4h20v-4a3 3 0 0 1 0-6V5H2zM13 5v2M13 11v2M13 17v2"/>',
+  wallet: '<rect x="3" y="5" width="18" height="15"/><path d="M3 8h18M16 14h2M6 5V3h12v2"/>',
+  chart: '<path d="M3 3v18h18M7 14l4-4 4 3 6-7"/>',
+  shield: '<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19 15a8 8 0 0 0 0-6l1.5-1.1-1.4-2.4-1.7.6a8 8 0 0 0-1.6-.9L15.5 3h-3l-.3 2.2a8 8 0 0 0-1.6.9l-1.7-.6-1.4 2.4L9 9a8 8 0 0 0 0 6l-1.5 1.1 1.4 2.4 1.7-.6a8 8 0 0 0 1.6.9l.3 2.2h3l.3-2.2a8 8 0 0 0 1.6-.9l1.7.6 1.4-2.4Z"/>',
+  bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  alert: '<path d="m12 3 10 18H2L12 3ZM12 9v4M12 17h.01"/>',
+  check: '<path d="m5 12 4 4L19 6"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  download: '<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
+  menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+  store: '<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'
+};
+
+function renderIcons() {
+  document.querySelectorAll('[data-i]').forEach(e => {
+    e.innerHTML = '<svg viewBox="0 0 24 24">' + (icons[e.dataset.i] || icons.box) + '</svg>';
+  });
+}
+const ic = k => '<span class="ico"><svg viewBox="0 0 24 24">' + (icons[k] || icons.box) + '</svg></span>';
+
+// The 14 official delivery areas in Sandwip
+const DELIVERY_AREAS = [
+  'Gachhua',
+  'Santoshpur',
+  'Dirghapar',
+  'Kalapania',
+  'Harishpur',
+  'Bauria',
+  'Muchapur',
+  'Rahmatpur',
+  'Azimpur',
+  'Maitbhanga',
+  'Sarikait',
+  'Mogdhara',
+  'Haramia',
+  'Amanullah'
+];
+
+// Seed fallback data
+const seed = {
+  products: [
+    {id:1, name:'Premium Miniket Rice', sku:'AST-RC-001', category:'Rice', brand:'Aastha Select', price:78, old:85, discount:0, stock:42, unit:'kg', status:'Active', deal:false, description:'Fine grain premium aromatic miniket rice carefully cleaned and packed for daily family cooking.', image:''},
+    {id:2, name:'Pure Mustard Oil', sku:'AST-OL-002', category:'Oil', brand:'Fresh', price:185, old:200, discount:0, stock:24, unit:'litre', status:'Active', deal:true, description:'100% natural cold-pressed mustard oil with authentic pungent aroma and flavor.', image:''},
+    {id:3, name:'Red Lentils (Masoor Dal)', sku:'AST-DL-003', category:'Dal or Lentil', brand:'Aastha Select', price:118, old:130, discount:0, stock:35, unit:'kg', status:'Active', deal:false, description:'Selected polished red lentils rich in protein, quick cooking and delicious taste.', image:''},
+    {id:4, name:'Turmeric Powder', sku:'AST-SP-004', category:'Spices', brand:'Pran', price:95, old:105, discount:0, stock:18, unit:'pack', status:'Active', deal:false, description:'Pure grounded turmeric powder without artificial coloring for authentic flavor.', image:''},
+    {id:5, name:'Atta Whole Wheat Flour', sku:'AST-FL-005', category:'Flour', brand:'Teer', price:65, old:70, discount:0, stock:8, unit:'kg', status:'Active', deal:false, description:'100% whole wheat flour rich in fiber for soft rotis and parathas.', image:''}
+  ],
+  orders: [
+    {id:'AST-1048', customer:'Nusrat Jahan', phone:'01712345678', address:'Sandwip Town', area:'Gachhua', items:2, total:865, status:'Pending', payment:'Pending', date:'2026-10-19', delivery:'Unassigned', itemsDetail:[{name:'Premium Miniket Rice',qty:5,unit:'kg',price:390,image:''},{name:'Pure Mustard Oil',qty:2,unit:'litre',price:370,image:''}]},
+    {id:'AST-1047', customer:'Rahim Uddin', phone:'01812345678', address:'Harishpur Bazar', area:'Harishpur', items:3, total:1420, status:'Shipped', payment:'Pending', date:'2026-10-19', delivery:'Abdul Karim', itemsDetail:[{name:'Pure Mustard Oil',qty:4,unit:'litre',price:740,image:''},{name:'Red Lentils (Masoor Dal)',qty:3,unit:'kg',price:354,image:''}]},
+    {id:'AST-1046', customer:'Samia Akter', phone:'01912345678', address:'Gachhua Road', area:'Santoshpur', items:1, total:540, status:'Delivered', payment:'Collected', date:'2026-10-18', delivery:'Mohammad Hasan', itemsDetail:[{name:'Premium Miniket Rice',qty:5,unit:'kg',price:390,image:''}]},
+    {id:'AST-1045', customer:'Imran Hossain', phone:'01612345678', address:'Maitbhanga High School', area:'Maitbhanga', items:2, total:320, status:'Cancelled', payment:'Failed', date:'2026-10-18', delivery:'Unassigned', itemsDetail:[{name:'Turmeric Powder',qty:2,unit:'pack',price:190,image:''}]}
+  ],
+  customers: [
+    {id:1, name:'Nusrat Jahan', phone:'01712345678', email:'nusrat@example.com', address:'Town Market, Sandwip', area:'Gachhua', orders:6, spent:4850, status:'Active', joined:'2026-09-12'},
+    {id:2, name:'Rahim Uddin', phone:'01812345678', email:'rahim@example.com', address:'Harishpur, Sandwip', area:'Harishpur', orders:12, spent:12750, status:'Active', joined:'2026-08-21'},
+    {id:3, name:'Samia Akter', phone:'01912345678', email:'samia@example.com', address:'Gachhua, Sandwip', area:'Santoshpur', orders:4, spent:2860, status:'Active', joined:'2026-10-02'},
+    {id:4, name:'Imran Hossain', phone:'01612345678', email:'imran@example.com', address:'Maitbhanga, Sandwip', area:'Maitbhanga', orders:1, spent:320, status:'Suspended', joined:'2026-10-11'}
+  ],
+  categories: ['Oil','Spices','Flour','Dal or Lentil','Packages','Rice','Pantry','Offers'],
+  categoryImages: {},
+  brands: ['Aastha Select', 'Fresh', 'Teer', 'Pran', 'Radhuni', 'Local Farm'],
+  coupons: [
+    {id:1, code:'AASTHA10', type:'Percentage', value:10, min:500, limit:100, used:24, start:'2026-10-01', end:'2026-12-31', active:true},
+    {id:2, code:'SAVE50', type:'Fixed', value:50, min:800, limit:50, used:50, start:'2026-09-01', end:'2026-10-15', active:false}
+  ],
+  deliveries: [
+    {order:'AST-1047', customer:'Rahim Uddin', area:'Harishpur', partner:'Abdul Karim', phone:'01800000001', status:'Shipped', tracking:''},
+    {order:'AST-1048', customer:'Nusrat Jahan', area:'Gachhua', partner:'Unassigned', phone:'', status:'Pending', tracking:''}
+  ],
+  staff: [
+    {id:1, name:'Aastha Owner', email:'admin@aastha.example', role:'Super Admin', status:'Active'},
+    {id:2, name:'Order Manager', email:'orders@aastha.example', role:'Order Manager', status:'Active'},
+    {id:3, name:'Inventory Manager', email:'stock@aastha.example', role:'Inventory Manager', status:'Active'}
+  ],
+  settings: {
+    name: 'Aastha',
+    address: 'Sandwip, Chattogram, Bangladesh',
+    phone: '01800000000',
+    email: 'hello@aastha.example',
+    currency: 'BDT (৳)',
+    tax: 0,
+    lowStock: 10,
+    deliveryCharge: 60,
+    freeDelivery: 1000,
+    dealEnd: '',
+    logo: '',
+    favicon: '',
+    hero: '',
+    promo1: '',
+    promo2: ''
+  }
+};
+
+function clone(x) {
+  try { return JSON.parse(JSON.stringify(x)); } catch(e) { return x; }
+}
+
+function loadLocal() {
+  let dbObj = clone(seed);
+  try {
+    let prods = localStorage.getItem('af_products');
+    if (prods) {
+      let parsed = JSON.parse(prods);
+      if (Array.isArray(parsed) && parsed.length > 0) dbObj.products = parsed;
+    }
+    let ords = localStorage.getItem('af_orders');
+    if (ords) {
+      let parsed = JSON.parse(ords);
+      if (Array.isArray(parsed) && parsed.length > 0) dbObj.orders = parsed;
+    }
+    let cats = localStorage.getItem('af_categories');
+    if (cats) {
+      let parsed = JSON.parse(cats);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        dbObj.categories = parsed.map(c => typeof c === 'string' ? c : c.name);
+        parsed.forEach(c => {
+          if (c && c.name && c.image) dbObj.categoryImages[c.name] = c.image;
+        });
+      }
+    }
+    let storeName = localStorage.getItem('af_store_name');
+    if (storeName) dbObj.settings.name = storeName;
+    let delFee = localStorage.getItem('af_delivery_fee');
+    if (delFee !== null) dbObj.settings.deliveryCharge = +delFee;
+    let freeDel = localStorage.getItem('af_free_delivery');
+    if (freeDel !== null) dbObj.settings.freeDelivery = +freeDel;
+    let dealEnd = localStorage.getItem('af_deal_end');
+    if (dealEnd) dbObj.settings.dealEnd = dealEnd;
+    let logo = localStorage.getItem('af_logo');
+    if (logo) dbObj.settings.logo = logo;
+  } catch(e) {
+    console.warn('Storage read warning', e);
+  }
+  return dbObj;
+}
+
+let db = loadLocal();
+let page = 'dashboard';
+let editId = null;
+
+// Ensure orders and products have complete structures
+function normalizeData() {
+  db.products.forEach(p => {
+    if (typeof p.image !== 'string') p.image = '';
+    if (typeof p.sku !== 'string') p.sku = 'AST-PROD-' + String(p.id).padStart(3, '0');
+    if (typeof p.brand !== 'string') p.brand = 'Aastha Select';
+    if (p.stock === undefined || p.stock === null) p.stock = 50;
+    if (typeof p.unit !== 'string') p.unit = 'kg';
+    if (typeof p.status !== 'string') p.status = 'Active';
+    if (p.discount === undefined || p.discount === null) p.discount = 0;
+    if (typeof p.description !== 'string') p.description = '';
+  });
+  db.orders.forEach(o => {
+    if (!o.customer && o.name) o.customer = o.name;
+    if (!o.area) o.area = 'Sandwip';
+    if (!o.payment) o.payment = o.status === 'Delivered' ? 'Collected' : 'Pending';
+    ensureOrderItems(o);
+  });
+  // Extract real customers from orders if available
+  let custMap = new Map();
+  db.customers.forEach(c => custMap.set(c.phone, c));
+  db.orders.forEach(o => {
+    if (o.phone) {
+      let existing = custMap.get(o.phone);
+      if (existing) {
+        existing.orders = (existing.orders || 1) + 1;
+        existing.spent = (existing.spent || 0) + (o.total || 0);
+        if (o.area && !existing.area) existing.area = o.area;
+      } else {
+        let newC = {
+          id: custMap.size + 1,
+          name: o.customer || 'Customer',
+          phone: o.phone,
+          email: '',
+          address: o.address || '',
+          area: o.area || 'Sandwip',
+          orders: 1,
+          spent: o.total || 0,
+          status: 'Active',
+          joined: (o.date || new Date().toISOString().slice(0, 10))
+        };
+        custMap.set(o.phone, newC);
+      }
+    }
+  });
+  db.customers = Array.from(custMap.values());
+}
+normalizeData();
+
+function saveLocal() {
+  try {
+    localStorage.setItem('af_products', JSON.stringify(db.products));
+    localStorage.setItem('af_orders', JSON.stringify(db.orders));
+    let catObjs = db.categories.map(c => ({
+      name: c,
+      image: db.categoryImages[c] || '',
+      color: '#16864b'
+    }));
+    localStorage.setItem('af_categories', JSON.stringify(catObjs));
+    if (db.settings.name) localStorage.setItem('af_store_name', db.settings.name);
+    if (db.settings.deliveryCharge !== undefined) localStorage.setItem('af_delivery_fee', String(db.settings.deliveryCharge));
+    if (db.settings.freeDelivery !== undefined) localStorage.setItem('af_free_delivery', String(db.settings.freeDelivery));
+    if (db.settings.dealEnd) localStorage.setItem('af_deal_end', db.settings.dealEnd);
+    if (db.settings.logo) localStorage.setItem('af_logo', db.settings.logo);
+    let sEl = document.getElementById('saved');
+    if (sEl) sEl.textContent = 'Saved in this browser & Cloud';
+  } catch(e) {
+    let sEl = document.getElementById('saved');
+    if (sEl) sEl.textContent = 'Storage sync in progress';
+  }
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function money(n) {
+  return '৳ ' + Number(n || 0).toLocaleString('en-BD', { maximumFractionDigits: 2 });
+}
+function notify(s) {
+  let root = document.getElementById('toastroot');
+  if (root) {
+    root.innerHTML = '<div class="toast">' + esc(s) + '</div>';
+    clearTimeout(window.adminToastTimer);
+    window.adminToastTimer = setTimeout(() => { root.innerHTML = ''; }, 2600);
+  }
+}
+window.notify = notify;
+
+// Clean status pills - no borders, no boxes
+function pill(s) {
+  let c = ['Pending','Processing','Assigned','Suspended'].includes(s) ? 'warn' :
+          ['Cancelled','Failed','Blocked','Out of Stock'].includes(s) ? 'bad' :
+          ['Shipped','Out for Delivery'].includes(s) ? 'blue' : '';
+  return `<span class="pill ${c}">${esc(s)}</span>`;
+}
+
+function heading(t, d, a = '') {
+  return `<div class="heading"><div><h1>${t}</h1><p>${d}</p></div>${a}</div>`;
+}
+function stat(t, v, d, k) {
+  return `<div class="card"><div class="stat-top"><span>${t}</span><span class="symbol">${ic(k)}</span></div><div class="value">${v}</div><div class="small">${d}</div></div>`;
+}
+
+window.toggleNav = function(v) {
+  document.getElementById('side').classList.toggle('open', v);
+  document.getElementById('overlay').classList.toggle('show', v);
+};
+
+document.getElementById('nav').onclick = e => {
+  let b = e.target.closest('[data-page]');
+  if (b) {
+    let target = b.dataset.page;
+    if (target === 'back_to_store') {
+      window.location.href = 'index.html#home';
+      return;
+    }
+    renderPage(target);
+    window.toggleNav(false);
+  }
+};
+
+function renderPage(p) {
+  page = p;
+  let names = {
+    dashboard: 'Dashboard Overview',
+    products: 'Product Management',
+    orders: 'Order Management',
+    customers: 'Customer Management',
+    inventory: 'Inventory Management',
+    delivery: 'Delivery Management',
+    categories: 'Category & Brand Management',
+    coupons: 'Coupon & Discount Management',
+    payments: 'Payments · Cash on Delivery',
+    reports: 'Reports & Analytics',
+    staff: 'Staff & Permissions',
+    settings: 'Store Settings'
+  };
+  let crumb = document.getElementById('crumb');
+  let topTitle = document.getElementById('topTitle');
+  if (crumb) crumb.textContent = (names[p] || 'Dashboard').replace(' Management', '');
+  if (topTitle) topTitle.textContent = names[p] || 'Dashboard Overview';
+  document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === p));
+  let pages = {
+    dashboard, products, orders, customers, inventory, delivery, categories, coupons, payments, reports, staff, settings
+  };
+  let container = document.getElementById('content');
+  if (container && pages[p]) {
+    container.innerHTML = pages[p]();
+    bind();
+    renderIcons();
+    if (p === 'dashboard' || p === 'reports') drawChart(p === 'dashboard' ? 'chart1' : 'chart2');
+  }
+}
+
+// =================== DASHBOARD ===================
+function dashboard() {
+  let sales = db.orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
+  let lowStockCount = db.products.filter(p => Number(p.stock) <= (db.settings.lowStock || 10)).length;
+  return heading('Good day, Admin', 'Here is what is happening with your store today.',
+    `<button class="btn primary" onclick="openProduct()">Add Product</button>`) +
+    `<div class="grid stats">
+      ${stat('Sales Summary', money(sales), 'From delivered orders', 'chart')}
+      ${stat('Total Orders', db.orders.length, 'Across all statuses', 'cart')}
+      ${stat('Active Deliveries', db.orders.filter(o => ['Shipped','Processing','Out for Delivery'].includes(o.status)).length, 'Orders in progress', 'truck')}
+      ${stat('New Customers', db.customers.length, 'Customer records in database', 'users')}
+    </div>
+    <div class="grid cols">
+      <div class="card">
+        <div class="cardhead">
+          <div><h2>Sales Overview</h2><p>Weekly sales trend</p></div>
+          <span class="pill">This week</span>
+        </div>
+        <div class="chart"><svg id="chart1" viewBox="0 0 600 220" preserveAspectRatio="none"></svg></div>
+        <div class="days"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      </div>
+      <div class="card">
+        <div class="cardhead">
+          <div><h2>Low Stock Alerts</h2><p>Products needing attention</p></div>
+          <button class="link" onclick="renderPage('inventory')">View all</button>
+        </div>
+        <div class="alertlist">
+          ${db.products.filter(p => Number(p.stock) <= (db.settings.lowStock || 10)).map(p => `
+            <div class="alertrow">
+              <div class="alertico">${ic('alert')}</div>
+              <div>
+                <strong>${esc(p.name)}</strong>
+                <small>${esc(p.category)} · ${esc(p.sku)}</small>
+              </div>
+              <div class="right">${p.stock === 0 ? '<span style="color:#b43c3c">Out of stock</span>' : p.stock + ' ' + esc(p.unit) + ' left'}</div>
+            </div>
+          `).join('') || '<div class="empty">All products well stocked. No low stock alerts.</div>'}
+        </div>
+      </div>
+    </div>
+    <div class="grid cols">
+      <div class="card tablecard">
+        <div class="cardhead">
+          <div><h2>Recent Orders</h2><p>Latest customer order activity</p></div>
+          <button class="link" onclick="renderPage('orders')">View all orders</button>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr><th>Order</th><th>Customer</th><th>Area</th><th>Total</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              ${db.orders.slice(0, 6).map(o => `
+                <tr>
+                  <td><b>${esc(o.id)}</b><div class="small">${esc(o.date)}</div></td>
+                  <td>${esc(o.customer)}<div class="small">${esc(o.phone)}</div></td>
+                  <td><b>${esc(o.area || 'Sandwip')}</b></td>
+                  <td><b>${money(o.total)}</b></td>
+                  <td>${pill(o.status)}</td>
+                </tr>
+              `).join('') || '<tr><td colspan="5"><div class="empty">No customer orders yet.</div></td></tr>'}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="cardhead">
+          <div><h2>Order Status Distribution</h2><p>Current orders breakdown</p></div>
+        </div>
+        <div class="progress">
+          ${['Pending','Confirmed','Processing','Shipped','Delivered','Cancelled'].map(s => {
+            let n = db.orders.filter(o => o.status === s).length;
+            let pct = db.orders.length ? Math.round((n / db.orders.length) * 100) : 0;
+            return `
+              <div class="prow">
+                <span>${s}</span>
+                <b>${n} (${pct}%)</b>
+                <div class="bar"><span style="width:${pct}%"></span></div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="footer">Sales and activity overview synchronized live with Firestore.</div>`;
+}
+
+// =================== PRODUCTS ===================
+function products() {
+  return heading('Products', 'Manage product listings, prices, images, stock and descriptions.',
+    `<button class="btn primary" onclick="openProduct()">Add New Product</button>`) +
+    `<div class="toolbar">
+      <input id="qprod" placeholder="Search product name, category or SKU">
+      <select id="fprod">
+        <option value="All">All Statuses</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+        <option value="Out of Stock">Out of Stock</option>
+      </select>
+      <select id="fcat">
+        <option value="All">All Categories (${db.categories.length})</option>
+        ${db.categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('')}
+      </select>
+      <button class="btn" onclick="exportCSV('products')">${ic('download')} Export CSV</button>
+    </div>
+    <div class="card tablecard">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Category &amp; Brand</th>
+              <th>Price</th>
+              <th>Discount</th>
+              <th>Stock</th>
+              <th>Deal?</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="prows">${productRows(db.products)}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function productRows(arr) {
+  return arr.map(p => {
+    let imgTag = p.image ?
+      `<img class="product-photo" src="${p.image}" alt="${esc(p.name)}">` :
+      `<div class="thumb">${esc(p.name.slice(0, 2).toUpperCase())}</div>`;
+    let discDisplay = (p.discount && Number(p.discount) > 0) ?
+      `<b style="color:#d94816">-${p.discount}%</b>` :
+      `<span style="color:#888">0%</span>`;
+    let stockDisplay = Number(p.stock) === 0 ?
+      '<b style="color:#c81e1e">Out of Stock</b>' :
+      `<b>${p.stock}</b> <span class="small">${esc(p.unit || 'kg')}</span>`;
+    return `
+      <tr>
+        <td>
+          <div class="product">
+            ${imgTag}
+            <div>
+              <b>${esc(p.name)}</b>
+              <div class="small">${esc(p.sku)}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <b>${esc(p.category)}</b>
+          <div class="small">${esc(p.brand || 'Aastha Select')}</div>
+        </td>
+        <td>
+          <b>${money(p.price)}</b>
+          ${p.old && p.old > p.price ? `<div class="small" style="text-decoration:line-through">${money(p.old)}</div>` : ''}
+        </td>
+        <td>${discDisplay}</td>
+        <td>${stockDisplay}</td>
+        <td>${p.deal ? '<b style="color:#d94816">Yes</b>' : 'No'}</td>
+        <td>${pill(Number(p.stock) === 0 ? 'Out of Stock' : (p.status || 'Active'))}</td>
+        <td>
+          <button class="link" onclick="openProduct(${p.id})">Edit</button>
+          <button class="link" style="color:#b43c3c" onclick="deleteProduct(${p.id})">Delete</button>
+        </td>
+      </tr>
+    `;
+  }).join('') || '<tr><td colspan="8"><div class="empty">No products found.</div></td></tr>';
+}
+
+window.openProduct = function(id = null) {
+  editId = id;
+  let p = id ? db.products.find(x => x.id === id) : {
+    name: '', sku: 'AST-' + Date.now().toString().slice(-5), category: db.categories[0] || 'Oil',
+    brand: db.brands[0] || 'Aastha Select', price: '', old: '', discount: 0, stock: 50,
+    unit: 'kg', status: 'Active', deal: false, description: '', image: ''
+  };
+  modal(id ? 'Edit Product: ' + esc(p.name) : 'Add New Product', `
+    <form id="productForm">
+      <div class="formgrid">
+        <div class="field full">
+          <label>Product name *</label>
+          <input name="name" required value="${esc(p.name)}" placeholder="e.g. Miniket Rice, Pure Mustard Oil...">
+        </div>
+        <div class="field">
+          <label>SKU / Product Code *</label>
+          <input name="sku" required value="${esc(p.sku)}" placeholder="e.g. AST-RC-001">
+        </div>
+        <div class="field">
+          <label>Category *</label>
+          <select name="category">
+            ${db.categories.map(x => `<option ${x === p.category ? 'selected' : ''}>${esc(x)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Brand</label>
+          <select name="brand">
+            ${db.brands.map(x => `<option ${x === p.brand ? 'selected' : ''}>${esc(x)}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Price (৳) *</label>
+          <input name="price" type="number" min="0" required value="${p.price ?? ''}" placeholder="Selling price">
+        </div>
+        <div class="field">
+          <label>Old price (৳) (optional)</label>
+          <input name="old" type="number" min="0" value="${p.old ?? ''}" placeholder="0 if no old price">
+        </div>
+        <div class="field">
+          <label>Discount (%) (optional)</label>
+          <input name="discount" type="number" min="0" max="99" value="${p.discount ?? 0}" placeholder="0 for no discount">
+          <small class="small">Enter 0 if no discount. No badge will show if 0.</small>
+        </div>
+        <div class="field">
+          <label>Stock quantity *</label>
+          <input name="stock" type="number" min="0" required value="${p.stock ?? 50}" placeholder="e.g. 50">
+        </div>
+        <div class="field">
+          <label>Unit</label>
+          <select name="unit">
+            ${['kg','g','litre','ml','piece','pack','dozen','box'].map(x => `<option ${x === p.unit ? 'selected' : ''}>${x}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Deal of the Day</label>
+          <select name="deal">
+            <option value="false" ${!p.deal ? 'selected' : ''}>No</option>
+            <option value="true" ${p.deal ? 'selected' : ''}>Yes</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select name="status">
+            ${['Active','Inactive'].map(x => `<option ${x === p.status ? 'selected' : ''}>${x}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field full">
+          <label>Product description * (Admin written description)</label>
+          <textarea name="description" placeholder="Write detailed product description, packet size, weight, purity, ingredients, usage and benefits..." style="min-height:95px">${esc(p.description || '')}</textarea>
+        </div>
+        <div class="field full">
+          <label>Product photo — upload from mobile phone gallery or computer</label>
+          <input id="productImageFile" type="file" accept="image/*">
+          <input type="hidden" name="image" id="productImageData" value="${esc(p.image || '')}">
+          <p class="small" style="margin:4px 0 0">Select any JPG, PNG or WebP image from your phone gallery.</p>
+          <img id="productImagePreview" class="upload-preview" src="${esc(p.image || '')}" alt="Product preview" style="${p.image ? '' : 'display:none;'}">
+        </div>
+      </div>
+    </form>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveProduct()">Save Product</button>`);
+
+  // Bind image upload
+  let inp = document.getElementById('productImageFile');
+  if (inp) {
+    inp.onchange = e => {
+      let f = e.target.files && e.target.files[0];
+      if (!f) return;
+      compressImage(f, data => {
+        let hidden = document.getElementById('productImageData');
+        let prev = document.getElementById('productImagePreview');
+        if (hidden) hidden.value = data;
+        if (prev) { prev.src = data; prev.style.display = 'block'; }
+        notify('Photo loaded from device gallery!');
+      });
+    };
+  }
+};
+
+window.saveProduct = async function() {
+  let f = document.getElementById('productForm');
+  if (!f || !f.reportValidity()) return;
+  let formEntries = Object.fromEntries(new FormData(f).entries());
+  let name = String(formEntries.name || '').trim();
+  let sku = String(formEntries.sku || '').trim();
+  let price = Math.max(0, +formEntries.price || 0);
+  let old = Math.max(0, +formEntries.old || price);
+  let discount = Math.max(0, Math.min(99, +formEntries.discount || 0));
+  let stock = Math.max(0, +formEntries.stock || 0);
+  let deal = formEntries.deal === 'true';
+  let description = String(formEntries.description || '').trim();
+  let image = formEntries.image || '';
+
+  let obj = {
+    id: editId || Date.now(),
+    name,
+    sku,
+    category: formEntries.category || 'Pantry',
+    brand: formEntries.brand || 'Aastha Select',
+    price,
+    old,
+    discount,
+    stock,
+    unit: formEntries.unit || 'kg',
+    deal,
+    status: stock === 0 ? 'Out of Stock' : (formEntries.status || 'Active'),
+    description,
+    image,
+    updatedAt: new Date().toISOString()
+  };
+
+  if (editId) {
+    db.products = db.products.map(p => p.id === editId ? obj : p);
+  } else {
+    db.products.unshift(obj);
+  }
+  saveLocal();
+  closeModal();
+  renderPage(page);
+  notify(editId ? 'Product updated successfully.' : 'Product added successfully.');
+
+  try {
+    await saveProductToFirestore(obj);
+  } catch(err) {
+    console.error('Failed to save product to Firestore:', err);
+  }
+};
+
+window.deleteProduct = async function(id) {
+  let p = db.products.find(x => x.id === id);
+  if (p && confirm('Are you sure you want to delete "' + p.name + '"?')) {
+    db.products = db.products.filter(x => x.id !== id);
+    saveLocal();
+    renderPage('products');
+    notify('Product deleted.');
+    try {
+      await deleteProductFromFirestore(id);
+    } catch(err) {
+      console.error('Failed to delete product from Firestore:', err);
+    }
+  }
+};
+
+// =================== ORDERS ===================
+function orders() {
+  return heading('Orders', 'Review customer orders, delivery areas, items and update fulfillment status.') +
+    `<div class="toolbar">
+      <input id="qorder" placeholder="Search order ID, customer name or phone">
+      <select id="forder">
+        <option value="All">All Statuses</option>
+        ${['Pending','Confirmed','Processing','Shipped','Out for Delivery','Delivered','Cancelled'].map(s => `<option value="${s}">${s}</option>`).join('')}
+      </select>
+      <select id="farea">
+        <option value="All">All Delivery Areas</option>
+        ${DELIVERY_AREAS.map(a => `<option value="${a}">${a}</option>`).join('')}
+      </select>
+      <button class="btn" onclick="exportCSV('orders')">${ic('download')} Export CSV</button>
+    </div>
+    <div class="card tablecard">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Delivery Area</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Status</th>
+              <th>Update Status</th>
+              <th>Order Details</th>
+              <th>Invoice</th>
+            </tr>
+          </thead>
+          <tbody id="orows">${orderRows(db.orders)}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function orderRows(arr) {
+  return arr.map(o => `
+    <tr>
+      <td><b>${esc(o.id)}</b><div class="small">${esc(o.date)}</div></td>
+      <td>${esc(o.customer)}<div class="small">${esc(o.phone)}</div></td>
+      <td><b style="color:#18733f">${esc(o.area || 'Sandwip')}</b></td>
+      <td>${o.items || (o.itemsDetail ? o.itemsDetail.length : 1)}</td>
+      <td><b>${money(o.total)}</b></td>
+      <td>${pill(o.payment || 'Pending')}</td>
+      <td>${pill(o.status)}</td>
+      <td>
+        <select onchange="window.updateOrderStatus('${esc(o.id)}', this.value)" style="padding:4px 6px;font-size:11px">
+          ${['Pending','Confirmed','Processing','Shipped','Out for Delivery','Delivered','Cancelled'].map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td><button class="link" onclick="viewOrder('${esc(o.id)}')">View items</button></td>
+      <td><button class="link" onclick="downloadInvoice('${esc(o.id)}')">Download</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="10"><div class="empty">No orders found.</div></td></tr>';
+}
+
+window.updateOrderStatus = async function(id, newStatus) {
+  let o = db.orders.find(x => x.id === id);
+  if (!o) return;
+  let previousStatus = o.status;
+  o.status = newStatus;
+
+  // If status is changed to Delivered, automatically deduct stock from products
+  if (newStatus === 'Delivered' && previousStatus !== 'Delivered') {
+    let items = ensureOrderItems(o);
+    items.forEach(item => {
+      let p = db.products.find(prod => prod.name.toLowerCase() === item.name.toLowerCase() || prod.id === item.id);
+      if (p && p.stock !== undefined) {
+        let deductQty = Number(item.qty || 1);
+        p.stock = Math.max(0, p.stock - deductQty);
+        if (p.stock === 0) p.status = 'Out of Stock';
+        saveProductToFirestore(p).catch(e => console.error('Error updating stock in cloud:', e));
+      }
+    });
+    o.payment = 'Collected';
+    notify('Order marked Delivered! Stock automatically deducted.');
+  } else {
+    notify('Order status updated to ' + newStatus);
+  }
+
+  // Delivery partner link
+  if (['Shipped','Out for Delivery','Delivered'].includes(newStatus)) {
+    let d = db.deliveries.find(x => x.order === id);
+    if (!d) {
+      db.deliveries.push({
+        order: id,
+        customer: o.customer,
+        area: o.area || 'Sandwip',
+        partner: o.delivery || 'Unassigned',
+        phone: '',
+        status: newStatus,
+        tracking: ''
+      });
+    } else {
+      d.status = newStatus;
+    }
+  }
+
+  saveLocal();
+  renderPage('orders');
+  try {
+    await updateOrderStatusInFirestore(o.id, newStatus);
+  } catch(err) {
+    console.error('Failed to update status in Firestore:', err);
+  }
+};
+
+function ensureOrderItems(o) {
+  if (Array.isArray(o.itemsDetail) && o.itemsDetail.length) {
+    o.itemsDetail = o.itemsDetail.map(x => {
+      let p = db.products.find(prod => prod.name === x.name || prod.id === x.id);
+      return { ...x, image: x.image || (p && p.image) || '' };
+    });
+    return o.itemsDetail;
+  }
+  let n = Math.max(1, Math.min(6, Number(o.items) || 1));
+  let chosen = [];
+  for (let i = 0; i < n; i++) {
+    let p = db.products[i % Math.max(1, db.products.length)] || { name: 'Grocery item', price: 0, unit: 'kg' };
+    chosen.push({ name: p.name, qty: 1, unit: p.unit || 'kg', price: 0, image: p.image || '' });
+  }
+  let each = Math.floor((Number(o.total) || 0) / n);
+  let sum = 0;
+  chosen.forEach((x, i) => {
+    x.price = i === chosen.length - 1 ? (Number(o.total) || 0) - sum : each;
+    sum += x.price;
+  });
+  o.itemsDetail = chosen;
+  return chosen;
+}
+
+window.viewOrder = function(id) {
+  let o = db.orders.find(x => x.id === id);
+  if (!o) return;
+  let items = ensureOrderItems(o);
+  saveLocal();
+  modal('Order Details · ' + o.id, `
+    <div class="setting-row">
+      <div>
+        <b>Customer: ${esc(o.customer)}</b>
+        <div class="small">Contact: ${esc(o.phone)}</div>
+        <div class="small">Delivery Address: ${esc(o.address || 'Address not recorded')}</div>
+        <div class="small">Delivery Area: <b style="color:#16864b">${esc(o.area || 'Sandwip')}</b></div>
+      </div>
+      <div>${pill(o.status)}</div>
+    </div>
+    <div class="setting-row">
+      <div>
+        <b>Order Date: ${esc(o.date)}</b>
+        <div class="small">Payment Method: Cash on Delivery</div>
+      </div>
+      <div><b>Payment:</b> ${pill(o.payment || 'Pending')}</div>
+    </div>
+    <h3 style="margin:16px 0 8px 0;font-size:13px">Products Ordered</h3>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Product</th><th>Qty</th><th>Amount</th></tr>
+        </thead>
+        <tbody>
+          ${items.map(x => `
+            <tr>
+              <td>
+                <div class="product">
+                  ${x.image ? `<img class="product-photo" src="${x.image}" alt="">` : `<div class="thumb">${esc(x.name.slice(0, 2).toUpperCase())}</div>`}
+                  <b>${esc(x.name)}</b>
+                </div>
+              </td>
+              <td>${esc(x.qty)} ${esc(x.unit || 'kg')}</td>
+              <td><b>${money(x.price)}</b></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="invoice-total">
+      <span>Order Total (Cash on Delivery)</span>
+      <b style="color:#18733f">${money(o.total)}</b>
+    </div>
+  `, `<button class="btn" onclick="closeModal()">Close</button><button class="btn primary" onclick="downloadInvoice('${esc(o.id)}')">Download Invoice</button>`);
+};
+
+window.downloadInvoice = function(id) {
+  let o = db.orders.find(x => x.id === id);
+  if (!o) return;
+  let items = ensureOrderItems(o);
+  let rows = items.map(x => `
+    <tr>
+      <td>${esc(x.name)}</td>
+      <td>${esc(x.qty)} ${esc(x.unit || 'kg')}</td>
+      <td>${money(x.price)}</td>
+    </tr>
+  `).join('');
+  let html = `<!doctype html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <title>Invoice ${esc(o.id)}</title>
+    <style>
+      body{font:14px Arial,sans-serif;color:#203328;max-width:800px;margin:30px auto;padding:24px}
+      h1{color:#15864a;margin-bottom:2px}
+      .muted{color:#687b70}
+      table{width:100%;border-collapse:collapse;margin-top:20px}
+      th,td{text-align:left;padding:11px;border-bottom:1px solid #ddd}
+      th{background:#f1f7f3}
+      .total{text-align:right;font-size:18px;font-weight:bold;margin-top:20px;color:#18733f}
+      .actions{margin-top:24px}
+      @media print{.actions{display:none}}
+    </style>
+  </head>
+  <body>
+    <h1>Aastha Grocery</h1>
+    <p class="muted">Customer Invoice · ${esc(o.id)}</p>
+    <hr>
+    <p>
+      <b>Customer:</b> ${esc(o.customer)}<br>
+      <b>Phone:</b> ${esc(o.phone)}<br>
+      <b>Delivery Address:</b> ${esc(o.address || 'Sandwip')}<br>
+      <b>Delivery Area:</b> ${esc(o.area || 'Sandwip')}<br>
+      <b>Order Date:</b> ${esc(o.date)}<br>
+      <b>Order Status:</b> ${esc(o.status)}<br>
+      <b>Payment:</b> Cash on Delivery (${esc(o.payment || 'Pending')})
+    </p>
+    <table>
+      <thead>
+        <tr><th>Product</th><th>Quantity</th><th>Amount</th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="total">Total Amount: ${money(o.total)}</div>
+    <div class="actions">
+      <button onclick="window.print()" style="padding:8px 16px;background:#15864a;color:#fff;border:0;cursor:pointer">Print / Save PDF</button>
+    </div>
+    <p class="muted" style="margin-top:24px;font-size:12px">Thank you for ordering with Aastha Grocery.</p>
+  </body>
+  </html>`;
+
+  let blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  let url = URL.createObjectURL(blob);
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = 'Aastha-Invoice-' + o.id + '.html';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  notify('Invoice generated and downloaded.');
+};
+
+// =================== CUSTOMERS ===================
+function customers() {
+  return heading('Customers', 'Manage customer profiles, delivery areas and order histories.') +
+    `<div class="toolbar">
+      <input id="qcustomer" placeholder="Search customer name, phone or delivery area">
+      <select id="fcustomer">
+        <option value="All">All Statuses</option>
+        <option value="Active">Active</option>
+        <option value="Suspended">Suspended</option>
+        <option value="Blocked">Blocked</option>
+      </select>
+      <button class="btn" onclick="exportCSV('customers')">${ic('download')} Export CSV</button>
+    </div>
+    <div class="card tablecard">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Contact</th>
+              <th>Delivery Area</th>
+              <th>Orders</th>
+              <th>Total Spent</th>
+              <th>Joined</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="crows">${customerRows(db.customers)}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function customerRows(arr) {
+  return arr.map(c => `
+    <tr>
+      <td><b>${esc(c.name)}</b><div class="small">${esc(c.email || 'No email')}</div></td>
+      <td>${esc(c.phone)}<div class="small">${esc(c.address || '')}</div></td>
+      <td><b>${esc(c.area || 'Sandwip')}</b></td>
+      <td><b>${c.orders || 1}</b></td>
+      <td><b>${money(c.spent)}</b></td>
+      <td>${esc(c.joined)}</td>
+      <td>${pill(c.status)}</td>
+      <td>
+        <button class="link" onclick="viewCustomer(${c.id})">View History</button>
+        <button class="link" onclick="suspendCustomer(${c.id})">${c.status === 'Active' ? 'Suspend' : 'Activate'}</button>
+        <button class="link" style="color:#b43c3c" onclick="blockCustomer(${c.id})">${c.status === 'Blocked' ? 'Unblock' : 'Block'}</button>
+      </td>
+    </tr>
+  `).join('') || '<tr><td colspan="8"><div class="empty">No customer records found.</div></td></tr>';
+}
+
+window.viewCustomer = function(id) {
+  let c = db.customers.find(x => x.id === id);
+  if (!c) return;
+  let matches = db.orders.filter(o => o.phone === c.phone || (o.customer && o.customer.toLowerCase() === c.name.toLowerCase()));
+  modal('Customer Profile: ' + esc(c.name), `
+    <b>${esc(c.name)}</b>
+    <p>${esc(c.email || 'No email')} · Contact: <b>${esc(c.phone)}</b></p>
+    <p>Delivery Area: <b style="color:#18733f">${esc(c.area || 'Sandwip')}</b></p>
+    <p>Address: ${esc(c.address || 'Not specified')}</p>
+    <div class="setting-row">
+      <div>Total orders: <b>${matches.length || c.orders || 1}</b></div>
+      <div>Total spent: <b>${money(c.spent)}</b></div>
+    </div>
+    <h3 style="margin:14px 0 8px 0;font-size:13px">Order History</h3>
+    ${matches.length ? matches.map(o => `
+      <div class="setting-row">
+        <div><b>${esc(o.id)}</b><div class="small">${esc(o.date)} · ${esc(o.status)}</div></div>
+        <b>${money(o.total)}</b>
+      </div>
+    `).join('') : '<p class="small">No matching order details in database.</p>'}
+  `, `<button class="btn" onclick="closeModal()">Close</button>`);
+};
+
+window.suspendCustomer = function(id) {
+  let c = db.customers.find(x => x.id === id);
+  if (!c) return;
+  c.status = c.status === 'Active' ? 'Suspended' : 'Active';
+  saveLocal();
+  renderPage('customers');
+  notify('Customer status updated to ' + c.status);
+};
+
+window.blockCustomer = function(id) {
+  let c = db.customers.find(x => x.id === id);
+  if (!c) return;
+  if (confirm((c.status === 'Blocked' ? 'Unblock ' : 'Block ') + c.name + '?')) {
+    c.status = c.status === 'Blocked' ? 'Active' : 'Blocked';
+    saveLocal();
+    renderPage('customers');
+    notify('Customer marked ' + c.status);
+  }
+};
+
+// =================== INVENTORY ===================
+function inventory() {
+  let lowLimit = db.settings.lowStock || 10;
+  let tracked = db.products.length;
+  let low = db.products.filter(p => Number(p.stock) > 0 && Number(p.stock) <= lowLimit).length;
+  let out = db.products.filter(p => Number(p.stock) === 0).length;
+  let restock = db.products.filter(p => Number(p.stock) <= lowLimit).length;
+
+  return heading('Inventory Management', 'Track stock levels, monitor low quantities and restock products.') +
+    `<div class="grid stats">
+      ${stat('Tracked Products', tracked, 'Catalog items', 'box')}
+      ${stat('Low Stock', low, 'At or below alert level', 'alert')}
+      ${stat('Out of Stock', out, 'Unavailable products', 'layers')}
+      ${stat('Restock Needed', restock, 'Review these products', 'clock')}
+    </div>
+    <div class="toolbar">
+      <input id="qstock" placeholder="Search product name or SKU">
+      <button class="btn primary" onclick="stockModal()">Adjust Stock</button>
+    </div>
+    <div class="card tablecard">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>SKU</th>
+              <th>Current Stock</th>
+              <th>Alert Level</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="stockrows">${stockRows(db.products)}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function stockRows(arr) {
+  let limit = db.settings.lowStock || 10;
+  return arr.map(p => `
+    <tr>
+      <td>
+        <div class="product">
+          ${p.image ? `<img class="product-photo" src="${p.image}" alt="">` : `<div class="thumb">${esc(p.name.slice(0, 2).toUpperCase())}</div>`}
+          <div><b>${esc(p.name)}</b><div class="small">${esc(p.category)}</div></div>
+        </div>
+      </td>
+      <td>${esc(p.sku)}</td>
+      <td><b>${p.stock}</b> <span class="small">${esc(p.unit || 'kg')}</span></td>
+      <td>${limit} <span class="small">${esc(p.unit || 'kg')}</span></td>
+      <td>${pill(Number(p.stock) === 0 ? 'Out of Stock' : (Number(p.stock) <= limit ? 'Low Stock' : 'In Stock'))}</td>
+      <td><button class="link" onclick="stockModal(${p.id})">Adjust stock</button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="6"><div class="empty">No products found.</div></td></tr>';
+}
+
+window.stockModal = function(id = null) {
+  let p = id ? db.products.find(x => x.id === id) : db.products[0];
+  if (!p) return notify('Please add a product first.');
+  modal('Adjust Inventory Stock', `
+    <form id="stockForm">
+      <div class="field">
+        <label>Select Product</label>
+        <select name="id">
+          ${db.products.map(x => `<option value="${x.id}" ${x.id === p.id ? 'selected' : ''}>${esc(x.name)} (Current: ${x.stock} ${esc(x.unit)})</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Adjustment Action</label>
+        <select name="mode">
+          <option value="add">Add stock (+)</option>
+          <option value="set">Set exact stock level (=)</option>
+          <option value="remove">Reduce stock (-)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Quantity *</label>
+        <input name="qty" type="number" min="0" required placeholder="Enter quantity">
+      </div>
+    </form>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveStock()">Save Stock</button>`);
+};
+
+window.saveStock = async function() {
+  let f = document.getElementById('stockForm');
+  if (!f || !f.reportValidity()) return;
+  let d = Object.fromEntries(new FormData(f).entries());
+  let p = db.products.find(x => x.id === +d.id);
+  if (!p) return;
+  let q = Math.max(0, +d.qty || 0);
+
+  if (d.mode === 'add') p.stock = (p.stock || 0) + q;
+  else if (d.mode === 'remove') p.stock = Math.max(0, (p.stock || 0) - q);
+  else p.stock = q;
+
+  if (p.stock === 0) p.status = 'Out of Stock';
+  else if (p.status === 'Out of Stock') p.status = 'Active';
+
+  saveLocal();
+  closeModal();
+  renderPage('inventory');
+  notify('Stock updated for ' + p.name);
+
+  try {
+    await saveProductToFirestore(p);
+  } catch(e) {
+    console.error('Failed to sync stock to cloud:', e);
+  }
+};
+
+// =================== DELIVERY ===================
+function delivery() {
+  let activeCount = db.deliveries.filter(d => !['Delivered','Cancelled'].includes(d.status)).length;
+  let partnersCount = new Set(db.deliveries.map(d => d.partner).filter(x => x && x !== 'Unassigned')).size;
+  let unassignedCount = db.deliveries.filter(d => d.partner === 'Unassigned').length;
+  let deliveredCount = db.orders.filter(o => o.status === 'Delivered').length;
+
+  return heading('Delivery Management', 'Assign delivery partners, track Sandwip delivery areas and update links.',
+    `<button class="btn primary" onclick="deliveryModal()">Assign Delivery</button>`) +
+    `<div class="grid stats">
+      ${stat('Active Deliveries', activeCount, 'Orders in transit', 'truck')}
+      ${stat('Delivery Partners', partnersCount, 'Assigned riders/partners', 'users')}
+      ${stat('Needs Assignment', unassignedCount, 'Awaiting partner', 'clock')}
+      ${stat('Delivered Orders', deliveredCount, 'Completed deliveries', 'check')}
+    </div>
+    <div class="card tablecard">
+      <div class="cardhead">
+        <div><h2>Delivery Assignments</h2><p>Track delivery partners and Sandwip areas</p></div>
+      </div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Delivery Area</th>
+              <th>Partner</th>
+              <th>Status</th>
+              <th>Tracking Link</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${db.deliveries.map((d, i) => `
+              <tr>
+                <td><b>${esc(d.order)}</b></td>
+                <td>${esc(d.customer)}</td>
+                <td><b style="color:#18733f">${esc(d.area || 'Sandwip')}</b></td>
+                <td><b>${esc(d.partner)}</b><div class="small">${esc(d.phone || 'No phone')}</div></td>
+                <td>${pill(d.status)}</td>
+                <td>
+                  ${d.tracking ? `<a class="link" href="${esc(d.tracking)}" target="_blank" rel="noopener">Open link</a>` : '<span class="small">Not provided</span>'}
+                </td>
+                <td>
+                  <button class="link" onclick="deliveryModal(${i})">Edit</button>
+                  <button class="link" style="color:#b43c3c" onclick="removeDelivery(${i})">Remove</button>
+                </td>
+              </tr>
+            `).join('') || '<tr><td colspan="7"><div class="empty">No delivery assignments recorded.</div></td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <div class="cardhead"><h2>Supported Delivery Areas in Sandwip</h2></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;padding-top:6px">
+        ${DELIVERY_AREAS.map(a => `<span style="padding:6px 12px;background:#edf5ef;color:#18733f;font-weight:700;font-size:12px">${a}</span>`).join('')}
+      </div>
+    </div>`;
+}
+
+window.deliveryModal = function(i = null) {
+  let d = i === null ? {
+    order: db.orders.find(o => !db.deliveries.some(x => x.order === o.id))?.id || db.orders[0]?.id,
+    partner: '', phone: '', status: 'Assigned', tracking: ''
+  } : db.deliveries[i];
+
+  if (!d.order && !db.orders.length) return notify('Please create or wait for customer orders first.');
+
+  modal(i === null ? 'Assign Delivery Partner' : 'Edit Delivery Assignment', `
+    <form id="deliveryForm">
+      <input type="hidden" name="idx" value="${i === null ? '' : i}">
+      <div class="field">
+        <label>Select Order</label>
+        <select name="order">
+          ${db.orders.map(o => `<option ${o.id === d.order ? 'selected' : ''} value="${o.id}">${esc(o.id)} — ${esc(o.customer)} (${esc(o.area || 'Sandwip')})</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Delivery Partner Name *</label>
+        <input name="partner" required value="${esc(d.partner === 'Unassigned' ? '' : d.partner)}" placeholder="e.g. Abdul Karim">
+      </div>
+      <div class="field">
+        <label>Partner Contact Phone</label>
+        <input name="phone" value="${esc(d.phone)}" placeholder="01800000000">
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select name="status">
+          ${['Assigned','Shipped','Out for Delivery','Delivered','Failed'].map(s => `<option ${s === d.status ? 'selected' : ''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Tracking Link (optional URL)</label>
+        <input name="tracking" type="url" value="${esc(d.tracking)}" placeholder="https://...">
+      </div>
+    </form>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveDelivery()">Save Assignment</button>`);
+};
+
+window.saveDelivery = function() {
+  let f = document.getElementById('deliveryForm');
+  if (!f || !f.reportValidity()) return;
+  let d = Object.fromEntries(new FormData(f).entries());
+  let o = db.orders.find(x => x.id === d.order);
+  let record = {
+    order: d.order,
+    customer: o ? o.customer : 'Customer',
+    area: o ? (o.area || 'Sandwip') : 'Sandwip',
+    partner: d.partner || 'Unassigned',
+    phone: d.phone || '',
+    status: d.status,
+    tracking: d.tracking || ''
+  };
+
+  if (d.idx === '') db.deliveries.push(record);
+  else db.deliveries[+d.idx] = record;
+
+  if (o) {
+    o.delivery = record.partner;
+    if (['Shipped','Out for Delivery','Delivered'].includes(record.status)) {
+      o.status = record.status;
+      updateOrderStatusInFirestore(o.id, o.status).catch(e => console.error(e));
+    }
+  }
+
+  saveLocal();
+  closeModal();
+  renderPage('delivery');
+  notify('Delivery partner assignment saved.');
+};
+
+window.removeDelivery = function(i) {
+  if (confirm('Remove delivery assignment?')) {
+    db.deliveries.splice(i, 1);
+    saveLocal();
+    renderPage('delivery');
+  }
+};
+
+// =================== CATEGORIES & BRANDS ===================
+function categories() {
+  return heading('Categories & Brands', 'Organize products into categories and brands with mobile gallery photos.') +
+    `<div class="grid cols">
+      <div class="card">
+        <div class="cardhead">
+          <h2>Store Categories</h2>
+          <button class="btn primary" onclick="addCategoryModal()">Add Category</button>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr><th>Photo</th><th>Category</th><th>Products</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              ${db.categories.map((c, i) => {
+                let img = db.categoryImages[c] || '';
+                return `
+                  <tr>
+                    <td>
+                      ${img ? `<img class="category-photo" src="${img}" alt="${esc(c)}">` : '<div class="thumb">IMG</div>'}
+                      <input class="file-mini" type="file" accept="image/*" onchange="uploadCatImage(event, ${i})">
+                    </td>
+                    <td><b>${esc(c)}</b></td>
+                    <td><b>${db.products.filter(p => p.category === c).length}</b></td>
+                    <td>
+                      <button class="link" onclick="editCategory(${i})">Edit</button>
+                      <button class="link" style="color:#b43c3c" onclick="deleteCategory(${i})">Delete</button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="cardhead">
+          <h2>Product Brands</h2>
+          <button class="btn primary" onclick="addBrandModal()">Add Brand</button>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead>
+              <tr><th>Brand</th><th>Products</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+              ${db.brands.map((b, i) => `
+                <tr>
+                  <td><b>${esc(b)}</b></td>
+                  <td><b>${db.products.filter(p => p.brand === b).length}</b></td>
+                  <td>
+                    <button class="link" onclick="editBrand(${i})">Edit</button>
+                    <button class="link" style="color:#b43c3c" onclick="deleteBrand(${i})">Delete</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+}
+
+window.uploadCatImage = function(e, idx) {
+  let f = e.target.files && e.target.files[0];
+  let catName = db.categories[idx];
+  if (!f || !catName) return;
+  compressImage(f, data => {
+    db.categoryImages[catName] = data;
+    saveLocal();
+    renderPage('categories');
+    notify('Category photo updated from gallery!');
+    let catObjs = db.categories.map(c => ({
+      name: c,
+      image: db.categoryImages[c] || '',
+      color: '#16864b'
+    }));
+    saveCategoriesToFirestore(catObjs).catch(err => console.error(err));
+  });
+};
+
+window.addCategoryModal = function() {
+  modal('Add New Category', `
+    <div class="field">
+      <label>Category Name *</label>
+      <input id="newCatName" required placeholder="e.g. Vegetables, Dairy, Bakery...">
+    </div>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveCatBtn">Save Category</button>`);
+  document.getElementById('saveCatBtn').onclick = () => {
+    let val = document.getElementById('newCatName').value.trim();
+    if (!val) return notify('Please enter a name.');
+    if (db.categories.some(x => x.toLowerCase() === val.toLowerCase())) return notify('Category already exists.');
+    db.categories.push(val);
+    saveLocal();
+    closeModal();
+    renderPage('categories');
+    notify('Category "' + val + '" added.');
+    let catObjs = db.categories.map(c => ({ name: c, image: db.categoryImages[c] || '', color: '#16864b' }));
+    saveCategoriesToFirestore(catObjs).catch(e => console.error(e));
+  };
+};
+
+window.editCategory = function(idx) {
+  let oldName = db.categories[idx];
+  modal('Edit Category: ' + esc(oldName), `
+    <div class="field">
+      <label>Category Name *</label>
+      <input id="editCatName" value="${esc(oldName)}" required>
+    </div>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="updateCatBtn">Update</button>`);
+  document.getElementById('updateCatBtn').onclick = () => {
+    let val = document.getElementById('editCatName').value.trim();
+    if (!val) return;
+    db.categories[idx] = val;
+    if (db.categoryImages[oldName]) {
+      db.categoryImages[val] = db.categoryImages[oldName];
+      delete db.categoryImages[oldName];
+    }
+    db.products.forEach(p => { if (p.category === oldName) p.category = val; });
+    saveLocal();
+    closeModal();
+    renderPage('categories');
+    notify('Category updated to "' + val + '".');
+    let catObjs = db.categories.map(c => ({ name: c, image: db.categoryImages[c] || '', color: '#16864b' }));
+    saveCategoriesToFirestore(catObjs).catch(e => console.error(e));
+  };
+};
+
+window.deleteCategory = function(idx) {
+  let catName = db.categories[idx];
+  if (confirm('Delete category "' + catName + '"?')) {
+    db.categories.splice(idx, 1);
+    delete db.categoryImages[catName];
+    saveLocal();
+    renderPage('categories');
+    notify('Category deleted.');
+    let catObjs = db.categories.map(c => ({ name: c, image: db.categoryImages[c] || '', color: '#16864b' }));
+    saveCategoriesToFirestore(catObjs).catch(e => console.error(e));
+  }
+};
+
+window.addBrandModal = function() {
+  modal('Add New Brand', `
+    <div class="field">
+      <label>Brand Name *</label>
+      <input id="newBrandName" required placeholder="e.g. Radhuni, Teer, Fresh...">
+    </div>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveBrandBtn">Save Brand</button>`);
+  document.getElementById('saveBrandBtn').onclick = () => {
+    let val = document.getElementById('newBrandName').value.trim();
+    if (!val) return;
+    if (db.brands.some(b => b.toLowerCase() === val.toLowerCase())) return notify('Brand already exists.');
+    db.brands.push(val);
+    saveLocal();
+    closeModal();
+    renderPage('categories');
+    notify('Brand added.');
+  };
+};
+
+window.editBrand = function(idx) {
+  let oldBrand = db.brands[idx];
+  modal('Edit Brand', `
+    <div class="field">
+      <label>Brand Name *</label>
+      <input id="editBrandVal" value="${esc(oldBrand)}" required>
+    </div>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" id="saveEditBrandBtn">Update</button>`);
+  document.getElementById('saveEditBrandBtn').onclick = () => {
+    let val = document.getElementById('editBrandVal').value.trim();
+    if (!val) return;
+    db.brands[idx] = val;
+    db.products.forEach(p => { if (p.brand === oldBrand) p.brand = val; });
+    saveLocal();
+    closeModal();
+    renderPage('categories');
+    notify('Brand updated.');
+  };
+};
+
+window.deleteBrand = function(idx) {
+  let b = db.brands[idx];
+  if (confirm('Delete brand "' + b + '"?')) {
+    db.brands.splice(idx, 1);
+    saveLocal();
+    renderPage('categories');
+  }
+};
+
+// =================== COUPONS ===================
+function coupons() {
+  let totalCoupons = db.coupons.length;
+  let activeCoupons = db.coupons.filter(c => c.active && c.end >= new Date().toISOString().slice(0, 10)).length;
+  let totalUses = db.coupons.reduce((s, c) => s + (c.used || 0), 0);
+  let expiredCoupons = db.coupons.filter(c => !c.active || c.end < new Date().toISOString().slice(0, 10)).length;
+
+  return heading('Coupons & Discounts', 'Create discount promo codes and control validity and usage limits.',
+    `<button class="btn primary" onclick="couponModal()">Create Coupon</button>`) +
+    `<div class="grid stats">
+      ${stat('Total Coupons', totalCoupons, 'All coupon records', 'ticket')}
+      ${stat('Active Coupons', activeCoupons, 'Currently enabled', 'check')}
+      ${stat('Total Uses', totalUses, 'Customer redemption count', 'chart')}
+      ${stat('Expired / Disabled', expiredCoupons, 'Not currently usable', 'clock')}
+    </div>
+    <div class="card tablecard">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Coupon Code</th>
+              <th>Discount</th>
+              <th>Min. Order</th>
+              <th>Usage</th>
+              <th>Validity Period</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${db.coupons.map(c => `
+              <tr>
+                <td><b>${esc(c.code)}</b></td>
+                <td><b>${c.type === 'Percentage' ? c.value + '%' : money(c.value)}</b></td>
+                <td>${money(c.min)}</td>
+                <td>${c.used} / ${c.limit}</td>
+                <td>${esc(c.start)} <div class="small">to ${esc(c.end)}</div></td>
+                <td>${pill(c.active && c.end >= new Date().toISOString().slice(0, 10) ? 'Active' : 'Expired')}</td>
+                <td>
+                  <button class="link" onclick="toggleCoupon(${c.id})">${c.active ? 'Disable' : 'Enable'}</button>
+                  <button class="link" style="color:#b43c3c" onclick="deleteCoupon(${c.id})">Delete</button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+window.couponModal = function() {
+  modal('Create New Discount Coupon', `
+    <form id="couponForm">
+      <div class="formgrid">
+        <div class="field">
+          <label>Coupon Code *</label>
+          <input name="code" required placeholder="e.g. EID2026, SUMMER10">
+        </div>
+        <div class="field">
+          <label>Discount Type</label>
+          <select name="type">
+            <option value="Percentage">Percentage (%)</option>
+            <option value="Fixed">Fixed Amount (৳)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Discount Value *</label>
+          <input name="value" type="number" min="1" required placeholder="e.g. 10 for 10% or 50 for ৳50">
+        </div>
+        <div class="field">
+          <label>Minimum Order (৳)</label>
+          <input name="min" type="number" min="0" value="0" placeholder="0 for any amount">
+        </div>
+        <div class="field">
+          <label>Usage Limit *</label>
+          <input name="limit" type="number" min="1" value="100" required>
+        </div>
+        <div class="field">
+          <label>Start Date</label>
+          <input name="start" type="date" required value="${new Date().toISOString().slice(0, 10)}">
+        </div>
+        <div class="field full">
+          <label>Expiry Date *</label>
+          <input name="end" type="date" required>
+        </div>
+      </div>
+    </form>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveCoupon()">Create Coupon</button>`);
+};
+
+window.saveCoupon = function() {
+  let f = document.getElementById('couponForm');
+  if (!f || !f.reportValidity()) return;
+  let d = Object.fromEntries(new FormData(f).entries());
+  d.code = d.code.trim().toUpperCase();
+  if (d.end < d.start) return notify('Expiry date must be after start date.');
+  if (db.coupons.some(c => c.code === d.code)) return notify('Coupon code already exists.');
+
+  Object.assign(d, {
+    id: Date.now(),
+    value: +d.value,
+    min: +d.min,
+    limit: +d.limit,
+    used: 0,
+    active: true
+  });
+  db.coupons.unshift(d);
+  saveLocal();
+  closeModal();
+  renderPage('coupons');
+  notify('Coupon ' + d.code + ' created successfully.');
+};
+
+window.toggleCoupon = function(id) {
+  let c = db.coupons.find(x => x.id === id);
+  if (!c) return;
+  c.active = !c.active;
+  saveLocal();
+  renderPage('coupons');
+  notify('Coupon ' + c.code + ' is now ' + (c.active ? 'Active' : 'Disabled'));
+};
+
+window.deleteCoupon = function(id) {
+  if (confirm('Delete this coupon?')) {
+    db.coupons = db.coupons.filter(c => c.id !== id);
+    saveLocal();
+    renderPage('coupons');
+  }
+};
+
+// =================== PAYMENTS (COD) ===================
+function payments() {
+  let collected = db.orders.filter(o => o.payment === 'Collected').reduce((s, o) => s + (o.total || 0), 0);
+  let pending = db.orders.filter(o => o.payment === 'Pending').reduce((s, o) => s + (o.total || 0), 0);
+  let collectedOrders = db.orders.filter(o => o.payment === 'Collected').length;
+  let failedOrders = db.orders.filter(o => o.payment === 'Failed' || o.status === 'Cancelled').length;
+
+  return heading('Payments · Cash on Delivery', 'Cash on Delivery management. No online gateway required.') +
+    `<div class="notice">Cash on Delivery (COD) is the active store payment method for Sandwip customers.</div>
+    <div class="grid stats">
+      ${stat('COD Collected', money(collected), 'Confirmed collections', 'wallet')}
+      ${stat('COD Pending', money(pending), 'Awaiting rider collection', 'clock')}
+      ${stat('Collected Orders', collectedOrders, 'Payment received', 'check')}
+      ${stat('Failed / Cancelled', failedOrders, 'Payment not received', 'alert')}
+    </div>
+    <div class="card tablecard">
+      <div class="cardhead"><h2>COD Order Collection Status</h2></div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Area</th>
+              <th>Total Amount</th>
+              <th>Order Status</th>
+              <th>Payment Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${db.orders.map(o => `
+              <tr>
+                <td><b>${esc(o.id)}</b></td>
+                <td>${esc(o.customer)}<div class="small">${esc(o.phone)}</div></td>
+                <td><b>${esc(o.area || 'Sandwip')}</b></td>
+                <td><b>${money(o.total)}</b></td>
+                <td>${pill(o.status)}</td>
+                <td>${pill(o.payment || 'Pending')}</td>
+                <td>
+                  <button class="btn" ${o.payment === 'Collected' ? 'disabled' : ''} onclick="collectCOD('${esc(o.id)}')">
+                    ${o.payment === 'Collected' ? 'Collected' : 'Confirm Collected'}
+                  </button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+window.collectCOD = function(id) {
+  let o = db.orders.find(x => x.id === id);
+  if (!o) return;
+  o.payment = 'Collected';
+  saveLocal();
+  renderPage('payments');
+  notify('COD collection confirmed for ' + o.id);
+  updateOrderStatusInFirestore(o.id, o.status).catch(e => console.error(e));
+};
+
+// =================== REPORTS & ANALYTICS ===================
+function reports() {
+  let gross = db.orders.reduce((s, o) => s + (o.total || 0), 0);
+  let deliveredSales = db.orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
+
+  return heading('Reports & Analytics', 'Store performance, sales trends, popular products and customer statistics.') +
+    `<div class="toolbar">
+      <select id="daterange"><option>All records</option><option>Today</option><option>Last 7 days</option><option>Last 30 days</option></select>
+      <button class="btn" onclick="exportCSV('orders')">${ic('download')} Export Orders CSV</button>
+    </div>
+    <div class="grid stats">
+      ${stat('Gross Order Value', money(gross), 'All customer orders', 'chart')}
+      ${stat('Delivered Sales', money(deliveredSales), 'Completed revenue', 'check')}
+      ${stat('Total Orders', db.orders.length, 'All order statuses', 'cart')}
+      ${stat('Active Customers', db.customers.length, 'Registered customers', 'users')}
+    </div>
+    <div class="grid cols">
+      <div class="card">
+        <div class="cardhead"><h2>Sales Trend</h2></div>
+        <div class="chart"><svg id="chart2" viewBox="0 0 600 220" preserveAspectRatio="none"></svg></div>
+        <div class="days"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div>
+      </div>
+      <div class="card">
+        <div class="cardhead"><h2>Popular Catalog Products</h2></div>
+        <div class="progress">
+          ${db.products.slice(0, 5).map((p, i) => `
+            <div class="prow">
+              <span>${esc(p.name)}</span>
+              <b>${esc(p.category)}</b>
+              <div class="bar"><span style="width:${100 - i * 15}%"></span></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="card tablecard">
+      <div class="cardhead"><h2>Customer Purchase Activity</h2></div>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Customer</th><th>Area</th><th>Orders</th><th>Total Spent</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            ${db.customers.map(c => `
+              <tr>
+                <td><b>${esc(c.name)}</b><div class="small">${esc(c.phone)}</div></td>
+                <td><b>${esc(c.area || 'Sandwip')}</b></td>
+                <td><b>${c.orders || 1}</b></td>
+                <td><b>${money(c.spent)}</b></td>
+                <td>${pill(c.status)}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// =================== STAFF & PERMISSIONS ===================
+function staff() {
+  return heading('Staff & Permissions', 'Manage admin users, roles and dashboard permissions.',
+    `<button class="btn primary" onclick="staffModal()">Add Staff</button>`) +
+    `<div class="card tablecard">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Staff Member</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Access Level</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${db.staff.map(s => `
+              <tr>
+                <td><b>${esc(s.name)}</b><div class="small">${esc(s.email)}</div></td>
+                <td><b>${esc(s.role)}</b></td>
+                <td>${pill(s.status)}</td>
+                <td>${s.role === 'Super Admin' ? 'Full access' : s.role === 'Admin' ? 'Store & Orders' : 'Assigned module'}</td>
+                <td>
+                  <button class="link" onclick="staffModal(${s.id})">Edit</button>
+                  <button class="link" onclick="toggleStaff(${s.id})">${s.status === 'Active' ? 'Deactivate' : 'Activate'}</button>
+                  ${s.role === 'Super Admin' ? '' : `<button class="link" style="color:#b43c3c" onclick="deleteStaff(${s.id})">Delete</button>`}
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+window.staffModal = function(id = null) {
+  let s = id ? db.staff.find(x => x.id === id) : { name: '', email: '', role: 'Order Manager', status: 'Active' };
+  modal(id ? 'Edit Staff Member' : 'Add Staff Member', `
+    <form id="staffForm">
+      <div class="field">
+        <label>Name *</label>
+        <input name="name" required value="${esc(s.name)}" placeholder="e.g. Tareq Hasan">
+      </div>
+      <div class="field">
+        <label>Email *</label>
+        <input name="email" type="email" required value="${esc(s.email)}" placeholder="staff@aastha.example">
+      </div>
+      <div class="field">
+        <label>Role</label>
+        <select name="role">
+          ${['Super Admin','Admin','Order Manager','Inventory Manager'].map(r => `<option ${r === s.role ? 'selected' : ''}>${r}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field">
+        <label>Status</label>
+        <select name="status">
+          ${['Active','Inactive'].map(st => `<option ${st === s.status ? 'selected' : ''}>${st}</option>`).join('')}
+        </select>
+      </div>
+    </form>
+  `, `<button class="btn" onclick="closeModal()">Cancel</button><button class="btn primary" onclick="saveStaff(${id === null ? 'null' : id})">Save</button>`);
+};
+
+window.saveStaff = function(id) {
+  let f = document.getElementById('staffForm');
+  if (!f || !f.reportValidity()) return;
+  let d = Object.fromEntries(new FormData(f).entries());
+  if (db.staff.some(s => s.email.toLowerCase() === d.email.toLowerCase() && s.id !== id)) return notify('Email already in use.');
+
+  if (id === null) {
+    d.id = Date.now();
+    db.staff.push(d);
+  } else {
+    Object.assign(db.staff.find(s => s.id === id), d);
+  }
+  saveLocal();
+  closeModal();
+  renderPage('staff');
+  notify('Staff record saved.');
+};
+
+window.toggleStaff = function(id) {
+  let s = db.staff.find(x => x.id === id);
+  if (!s) return;
+  if (s.role === 'Super Admin') return notify('Super Admin cannot be deactivated.');
+  s.status = s.status === 'Active' ? 'Inactive' : 'Active';
+  saveLocal();
+  renderPage('staff');
+};
+
+window.deleteStaff = function(id) {
+  let s = db.staff.find(x => x.id === id);
+  if (!s || s.role === 'Super Admin') return;
+  if (confirm('Delete ' + s.name + '?')) {
+    db.staff = db.staff.filter(x => x.id !== id);
+    saveLocal();
+    renderPage('staff');
+  }
+};
+
+// =================== STORE SETTINGS ===================
+function settings() {
+  let s = db.settings;
+  return heading('Store Settings', 'Manage business information, delivery fees and operational preferences.') +
+    `<div class="grid cols">
+      <div class="card">
+        <div class="cardhead"><h2>Business Information</h2></div>
+        <form id="settingsForm">
+          <div class="field">
+            <label>Store Name</label>
+            <input name="name" required value="${esc(s.name || 'Aastha')}">
+          </div>
+          <div class="field">
+            <label>Store Address</label>
+            <textarea name="address" required>${esc(s.address || 'Sandwip, Chattogram, Bangladesh')}</textarea>
+          </div>
+          <div class="field">
+            <label>Contact Phone</label>
+            <input name="phone" value="${esc(s.phone || '01800000000')}">
+          </div>
+          <div class="field">
+            <label>Contact Email</label>
+            <input name="email" type="email" value="${esc(s.email || 'hello@aastha.example')}">
+          </div>
+          <div class="field">
+            <label>Store Logo (upload from device gallery)</label>
+            <input id="logoFile" type="file" accept="image/*">
+            <input type="hidden" name="logo" id="logoData" value="${esc(s.logo || '')}">
+            <img id="logoPreview" class="upload-preview" src="${esc(s.logo || '')}" alt="Logo preview" style="${s.logo ? '' : 'display:none;'}">
+          </div>
+          <button class="btn primary" style="margin-top:10px">Save Store Information</button>
+        </form>
+      </div>
+
+      <div class="card">
+        <div class="cardhead"><h2>Delivery &amp; Store Preferences</h2></div>
+        <form id="prefForm">
+          <div class="field">
+            <label>Currency</label>
+            <select name="currency"><option>BDT (৳)</option></select>
+          </div>
+          <div class="field">
+            <label>Delivery Fee (৳) — Selected by Admin</label>
+            <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
+              <input name="deliveryCharge" id="delChargeInp" type="number" min="0" value="${s.deliveryCharge ?? 60}" style="max-width:140px">
+              <button type="button" class="btn" onclick="setFee(40)">৳ 40</button>
+              <button type="button" class="btn" onclick="setFee(50)">৳ 50</button>
+              <button type="button" class="btn" onclick="setFee(60)">৳ 60</button>
+              <button type="button" class="btn" onclick="setFee(80)">৳ 80</button>
+              <button type="button" class="btn" onclick="setFee(100)">৳ 100</button>
+            </div>
+            <small class="small">This fee is automatically applied to customer checkout.</small>
+          </div>
+          <div class="field">
+            <label>Free Delivery Minimum Order Threshold (৳)</label>
+            <input name="freeDelivery" type="number" min="0" value="${s.freeDelivery ?? 1000}">
+            <small class="small">Orders at or above this amount get free delivery.</small>
+          </div>
+          <div class="field">
+            <label>Low Stock Alert Level (quantity)</label>
+            <input name="lowStock" type="number" min="0" value="${s.lowStock ?? 10}">
+          </div>
+          <button class="btn primary" style="margin-top:10px">Save Delivery &amp; Preferences</button>
+        </form>
+
+        <div class="setting-row" style="margin-top:16px">
+          <div>
+            <b>Deals Of The Day Countdown</b>
+            <div class="small">Quickly set deals offer expiry duration</div>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap">
+            <button class="btn" onclick="setDealTimer(1)">24h</button>
+            <button class="btn" onclick="setDealTimer(3)">3 Days</button>
+            <button class="btn" onclick="setDealTimer(7)">7 Days</button>
+            <button class="btn" onclick="setDealTimer(30)">30 Days</button>
+          </div>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <b>Backup Data</b>
+            <div class="small">Download a complete JSON backup</div>
+          </div>
+          <button class="btn" onclick="backup()">Export Backup</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+window.setFee = function(amt) {
+  let inp = document.getElementById('delChargeInp');
+  if (inp) inp.value = amt;
+  db.settings.deliveryCharge = amt;
+  saveLocal();
+  notify('Delivery fee set to ৳ ' + amt + '!');
+  saveSettingsToFirestore({ deliveryFee: amt }).catch(e => console.error(e));
+};
+
+window.setDealTimer = function(days) {
+  let newDate = new Date(Date.now() + days * 24 * 3600 * 1000);
+  let iso = newDate.toISOString();
+  db.settings.dealEnd = iso;
+  saveLocal();
+  notify('Deals countdown timer set to ' + days + (days === 1 ? ' day' : ' days') + '!');
+  saveSettingsToFirestore({ dealEnd: iso }).catch(e => console.error(e));
+};
+
+// =================== HELPERS, MODALS & CHARTS ===================
+function modal(t, b, foot) {
+  let root = document.getElementById('modalroot');
+  if (!root) return;
+  root.innerHTML = `
+    <div class="modalbg" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modalhead">
+          <b>${t}</b>
+          <button class="btn" onclick="closeModal()">Close</button>
+        </div>
+        <div class="modalbody">${b}</div>
+        <div class="modalfoot">${foot}</div>
+      </div>
+    </div>
+  `;
+}
+window.closeModal = function() {
+  let root = document.getElementById('modalroot');
+  if (root) root.innerHTML = '';
+};
+
+function compressImage(file, cb) {
+  if (!file || !file.type.startsWith('image/')) return notify('Please select an image file.');
+  let reader = new FileReader();
+  reader.onload = () => {
+    let im = new Image();
+    im.onload = () => {
+      let max = 650;
+      let scale = Math.min(1, max / Math.max(im.width, im.height));
+      let c = document.createElement('canvas');
+      c.width = Math.round(im.width * scale);
+      c.height = Math.round(im.height * scale);
+      let ctx = c.getContext('2d');
+      ctx.drawImage(im, 0, 0, c.width, c.height);
+      cb(c.toDataURL('image/jpeg', 0.8));
+    };
+    im.onerror = () => notify('Unable to process this image.');
+    im.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function bind() {
+  let qprod = document.getElementById('qprod');
+  let fprod = document.getElementById('fprod');
+  let fcat = document.getElementById('fcat');
+  let filterP = () => {
+    let q = (qprod?.value || '').toLowerCase();
+    let f = fprod?.value || 'All';
+    let c = fcat?.value || 'All';
+    let filtered = db.products.filter(p => {
+      let matchesQ = (p.name + ' ' + (p.sku || '') + ' ' + (p.category || '')).toLowerCase().includes(q);
+      let matchesF = f === 'All' || (f === 'Out of Stock' ? Number(p.stock) === 0 : (p.status || 'Active') === f);
+      let matchesC = c === 'All' || p.category === c;
+      return matchesQ && matchesF && matchesC;
+    });
+    let prows = document.getElementById('prows');
+    if (prows) prows.innerHTML = productRows(filtered);
+  };
+  if (qprod) qprod.oninput = filterP;
+  if (fprod) fprod.onchange = filterP;
+  if (fcat) fcat.onchange = filterP;
+
+  let qorder = document.getElementById('qorder');
+  let forder = document.getElementById('forder');
+  let farea = document.getElementById('farea');
+  let filterO = () => {
+    let q = (qorder?.value || '').toLowerCase();
+    let f = forder?.value || 'All';
+    let a = farea?.value || 'All';
+    let filtered = db.orders.filter(o => {
+      let matchesQ = (o.id + ' ' + (o.customer || '') + ' ' + (o.phone || '')).toLowerCase().includes(q);
+      let matchesF = f === 'All' || o.status === f;
+      let matchesA = a === 'All' || o.area === a;
+      return matchesQ && matchesF && matchesA;
+    });
+    let orows = document.getElementById('orows');
+    if (orows) orows.innerHTML = orderRows(filtered);
+  };
+  if (qorder) qorder.oninput = filterO;
+  if (forder) forder.onchange = filterO;
+  if (farea) farea.onchange = filterO;
+
+  let qcustomer = document.getElementById('qcustomer');
+  let fcustomer = document.getElementById('fcustomer');
+  let filterC = () => {
+    let q = (qcustomer?.value || '').toLowerCase();
+    let f = fcustomer?.value || 'All';
+    let filtered = db.customers.filter(c => {
+      let matchesQ = (c.name + ' ' + (c.phone || '') + ' ' + (c.area || '')).toLowerCase().includes(q);
+      let matchesF = f === 'All' || c.status === f;
+      return matchesQ && matchesF;
+    });
+    let crows = document.getElementById('crows');
+    if (crows) crows.innerHTML = customerRows(filtered);
+  };
+  if (qcustomer) qcustomer.oninput = filterC;
+  if (fcustomer) fcustomer.onchange = filterC;
+
+  let qstock = document.getElementById('qstock');
+  if (qstock) {
+    qstock.oninput = () => {
+      let q = qstock.value.toLowerCase();
+      let srows = document.getElementById('stockrows');
+      if (srows) {
+        srows.innerHTML = stockRows(db.products.filter(p => (p.name + ' ' + (p.sku || '')).toLowerCase().includes(q)));
+      }
+    };
+  }
+
+  let sForm = document.getElementById('settingsForm');
+  if (sForm) {
+    sForm.onsubmit = async e => {
+      e.preventDefault();
+      let d = Object.fromEntries(new FormData(e.target).entries());
+      Object.assign(db.settings, {
+        name: d.name,
+        address: d.address,
+        phone: d.phone,
+        email: d.email,
+        logo: d.logo || db.settings.logo || ''
+      });
+      saveLocal();
+      notify('Store business information saved.');
+      try {
+        await saveSettingsToFirestore({
+          storeName: d.name,
+          logo: db.settings.logo || ''
+        });
+      } catch(err) {
+        console.error(err);
+      }
+    };
+  }
+
+  let pForm = document.getElementById('prefForm');
+  if (pForm) {
+    pForm.onsubmit = async e => {
+      e.preventDefault();
+      let d = Object.fromEntries(new FormData(e.target).entries());
+      Object.assign(db.settings, {
+        currency: d.currency,
+        deliveryCharge: +d.deliveryCharge,
+        freeDelivery: +d.freeDelivery,
+        lowStock: +d.lowStock
+      });
+      saveLocal();
+      renderPage('settings');
+      notify('Store preferences saved.');
+      try {
+        await saveSettingsToFirestore({
+          deliveryFee: +d.deliveryCharge,
+          freeDelivery: +d.freeDelivery
+        });
+      } catch(err) {
+        console.error(err);
+      }
+    };
+  }
+
+  let logoInp = document.getElementById('logoFile');
+  if (logoInp) {
+    logoInp.onchange = e => {
+      let f = e.target.files && e.target.files[0];
+      if (!f) return;
+      compressImage(f, data => {
+        db.settings.logo = data;
+        let prev = document.getElementById('logoPreview');
+        let hidden = document.getElementById('logoData');
+        if (prev) { prev.src = data; prev.style.display = 'block'; }
+        if (hidden) hidden.value = data;
+        saveLocal();
+        notify('Store logo updated from gallery.');
+        saveSettingsToFirestore({ logo: data }).catch(err => console.error(err));
+      });
+    };
+  }
+}
+
+window.exportCSV = function(type) {
+  let rows = db[type] || [];
+  if (!rows.length) return notify('No records to export.');
+  let keys = Object.keys(rows[0]).filter(k => k !== 'image' && k !== 'itemsDetail');
+  let text = [
+    keys.join(','),
+    ...rows.map(r => keys.map(k => '"' + String(r[k] ?? '').replace(/"/g, '""') + '"').join(','))
+  ].join('\r\n');
+  let url = URL.createObjectURL(new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8;' }));
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = 'aastha-' + type + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  notify('CSV exported successfully.');
+};
+
+window.backup = function() {
+  let data = clone(db);
+  let url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+  let a = document.createElement('a');
+  a.href = url;
+  a.download = 'aastha-admin-backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  notify('Complete store backup downloaded.');
+};
+
+function drawChart(id) {
+  let el = document.getElementById(id);
+  if (!el) return;
+  let v = [38, 56, 45, 78, 62, 94, 76];
+  el.innerHTML = `
+    <defs>
+      <linearGradient id="fillGrad" x1="0" x2="0" y1="0" y2="1">
+        <stop offset="0%" stop-color="#32a45e" stop-opacity=".25"/>
+        <stop offset="100%" stop-color="#32a45e" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    ${[0,1,2,3].map(i => `<line x1="30" y1="${20 + i * 50}" x2="575" y2="${20 + i * 50}" stroke="#edf2ee" stroke-dasharray="4 4"/>`).join('')}
+    <path d="M ${v.map((n, i) => `${35 + i * 90},${190 - n * 1.6}`).join(' L ')} L 575 200 L 35 200 Z" fill="url(#fillGrad)"/>
+    <polyline points="${v.map((n, i) => `${35 + i * 90},${190 - n * 1.6}`).join(' ')}" fill="none" stroke="#248a50" stroke-width="2.5" stroke-linecap="round"/>
+    ${v.map((n, i) => `<circle cx="${35 + i * 90}" cy="${190 - n * 1.6}" r="3.5" fill="#fff" stroke="#248a50" stroke-width="2"/>`).join('')}
+  `;
+}
+
+// Global search
+document.getElementById('globalSearch').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim()) {
+    renderPage('products');
+    let q = document.getElementById('qprod');
+    if (q) {
+      q.value = e.target.value.trim();
+      q.dispatchEvent(new Event('input'));
+    }
+  }
+});
+
+// Real-time Firestore synchronizers
+subscribeProducts(remoteProducts => {
+  if (Array.isArray(remoteProducts) && remoteProducts.length > 0) {
+    db.products = remoteProducts.sort((a, b) => (b.id || 0) - (a.id || 0));
+    normalizeData();
+    saveLocal();
+    if (['dashboard','products','inventory'].includes(page)) renderPage(page);
+  }
+});
+
+subscribeOrders(remoteOrders => {
+  if (Array.isArray(remoteOrders) && remoteOrders.length > 0) {
+    db.orders = remoteOrders;
+    normalizeData();
+    saveLocal();
+    if (['dashboard','orders','customers','payments','reports'].includes(page)) renderPage(page);
+  }
+});
+
+subscribeCategories(remoteCats => {
+  if (Array.isArray(remoteCats) && remoteCats.length > 0) {
+    db.categories = remoteCats.map(c => typeof c === 'string' ? c : c.name);
+    remoteCats.forEach(c => {
+      if (c && c.name && c.image) db.categoryImages[c.name] = c.image;
+    });
+    saveLocal();
+    if (['categories','products'].includes(page)) renderPage(page);
+  }
+});
+
+// =================== LOGO & ADMIN PROFILE PHOTO UPLOAD ===================
+function renderBrandLogo() {
+  let wrap = document.getElementById('brandLogoWrap');
+  if (!wrap) return;
+  let logo = db.settings.logo || localStorage.getItem('af_logo');
+  if (logo) {
+    wrap.innerHTML = `<img src="${logo}" alt="Aastha Logo" class="brand-logo-img">`;
+  } else {
+    wrap.innerHTML = `<div class="mark" title="Click to upload logo">A</div>`;
+  }
+}
+window.renderBrandLogo = renderBrandLogo;
+
+window.openLogoUploadModal = function() {
+  let currentLogo = db.settings.logo || localStorage.getItem('af_logo') || '';
+  modal('Store Logo — Upload or Change', `
+    <div style="margin-bottom:14px">
+      <p class="small" style="margin:0 0 10px">Upload the official store logo from your mobile phone gallery or computer. It will display in the Admin Dashboard header and website.</p>
+      <div style="text-align:center;padding:16px;background:#f6f9f7;border:1px dashed #c0d5c6;margin-bottom:14px">
+        <div id="modalLogoPreviewWrap">
+          ${currentLogo ? `<img id="modalLogoPreview" src="${currentLogo}" alt="Logo" style="max-height:80px;max-width:180px;object-fit:contain;background:#fff;padding:4px">` : `<div style="color:var(--muted);font-size:12px">No custom logo uploaded yet. Upload an image to replace the plain 'A' icon.</div>`}
+        </div>
+      </div>
+      <div class="field">
+        <label>Select Logo File (PNG, JPG, WebP)</label>
+        <input type="file" id="modalLogoFileInput" accept="image/*">
+        <input type="hidden" id="modalLogoData" value="${esc(currentLogo)}">
+      </div>
+    </div>
+  `, `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    ${currentLogo ? `<button class="btn" style="color:#b43c3c" onclick="removeLogo()">Remove Logo</button>` : ''}
+    <button class="btn primary" onclick="saveLogoFromModal()">Save Logo</button>
+  `);
+
+  let fileInp = document.getElementById('modalLogoFileInput');
+  if (fileInp) {
+    fileInp.onchange = e => {
+      let f = e.target.files && e.target.files[0];
+      if (!f) return;
+      compressImage(f, dataUrl => {
+        let hidden = document.getElementById('modalLogoData');
+        let wrap = document.getElementById('modalLogoPreviewWrap');
+        if (hidden) hidden.value = dataUrl;
+        if (wrap) wrap.innerHTML = `<img id="modalLogoPreview" src="${dataUrl}" alt="Logo" style="max-height:80px;max-width:180px;object-fit:contain;background:#fff;padding:4px">`;
+        notify('Logo photo selected from device!');
+      });
+    };
+  }
+};
+
+window.saveLogoFromModal = async function() {
+  let hidden = document.getElementById('modalLogoData');
+  let dataUrl = hidden ? hidden.value : '';
+  if (!dataUrl) return notify('Please select a logo image file.');
+  db.settings.logo = dataUrl;
+  try { localStorage.setItem('af_logo', dataUrl); } catch(e) {}
+  saveLocal();
+  renderBrandLogo();
+  closeModal();
+  notify('Store logo saved and updated successfully!');
+  try {
+    await saveSettingsToFirestore({ logo: dataUrl });
+  } catch(err) {
+    console.error('Failed to save logo to Firestore:', err);
+  }
+};
+
+window.removeLogo = async function() {
+  if (confirm('Remove custom logo and revert to default icon?')) {
+    db.settings.logo = '';
+    try { localStorage.removeItem('af_logo'); } catch(e) {}
+    saveLocal();
+    renderBrandLogo();
+    closeModal();
+    notify('Logo removed.');
+    try {
+      await saveSettingsToFirestore({ logo: '' });
+    } catch(err) {
+      console.error(err);
+    }
+  }
+};
+
+function renderAdminAvatar() {
+  let el = document.getElementById('topAdminAvatar');
+  if (!el) return;
+  let avatar = localStorage.getItem('af_admin_avatar') || db.settings.adminAvatar || '';
+  if (avatar) {
+    el.innerHTML = `<img src="${avatar}" alt="Admin Photo">`;
+  } else {
+    el.textContent = 'SA';
+  }
+}
+window.renderAdminAvatar = renderAdminAvatar;
+
+window.openAdminProfileModal = function() {
+  let currentAvatar = localStorage.getItem('af_admin_avatar') || db.settings.adminAvatar || '';
+  let adminName = localStorage.getItem('af_admin_name') || db.settings.adminName || 'Super Admin';
+  modal('Admin Profile &amp; Photo', `
+    <div style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding:12px;background:#f6f9f7;border:1px solid #dce8df">
+        <div id="modalAvatarPreviewWrap" style="width:68px;height:68px;background:#e5f6eb;color:var(--g);display:grid;place-items:center;font-weight:800;font-size:20px;overflow:hidden;flex-shrink:0;border:1px solid #cadcd0">
+          ${currentAvatar ? `<img src="${currentAvatar}" alt="Avatar" style="width:100%;height:100%;object-fit:cover">` : 'SA'}
+        </div>
+        <div>
+          <b style="font-size:14px;display:block">${esc(adminName)}</b>
+          <span class="small" style="color:var(--muted)">Store Administrator</span>
+          <p class="small" style="margin:4px 0 0;color:#2b6f48">Upload your profile photo from your mobile gallery or computer.</p>
+        </div>
+      </div>
+      <div class="field">
+        <label>Admin Display Name</label>
+        <input id="modalAdminNameInp" value="${esc(adminName)}" placeholder="e.g. Super Admin or Your Name">
+      </div>
+      <div class="field">
+        <label>Upload Profile Picture (JPG, PNG, WebP)</label>
+        <input type="file" id="modalAdminPhotoFile" accept="image/*">
+        <input type="hidden" id="modalAdminPhotoData" value="${esc(currentAvatar)}">
+        <small class="small">Select any photo from your mobile gallery. It will appear on your top-bar avatar.</small>
+      </div>
+    </div>
+  `, `
+    <button class="btn" onclick="closeModal()">Cancel</button>
+    ${currentAvatar ? `<button class="btn" style="color:#b43c3c" onclick="removeAdminPhoto()">Remove Photo</button>` : ''}
+    <button class="btn primary" onclick="saveAdminProfile()">Save Profile &amp; Photo</button>
+  `);
+
+  let photoInp = document.getElementById('modalAdminPhotoFile');
+  if (photoInp) {
+    photoInp.onchange = e => {
+      let f = e.target.files && e.target.files[0];
+      if (!f) return;
+      compressImage(f, dataUrl => {
+        let hidden = document.getElementById('modalAdminPhotoData');
+        let wrap = document.getElementById('modalAvatarPreviewWrap');
+        if (hidden) hidden.value = dataUrl;
+        if (wrap) wrap.innerHTML = `<img src="${dataUrl}" alt="Avatar" style="width:100%;height:100%;object-fit:cover">`;
+        notify('Profile picture selected from gallery!');
+      });
+    };
+  }
+};
+
+window.saveAdminProfile = async function() {
+  let nameInp = document.getElementById('modalAdminNameInp');
+  let photoData = document.getElementById('modalAdminPhotoData');
+  let name = nameInp ? nameInp.value.trim() : 'Super Admin';
+  let avatar = photoData ? photoData.value : '';
+
+  try {
+    localStorage.setItem('af_admin_name', name || 'Super Admin');
+    if (avatar) localStorage.setItem('af_admin_avatar', avatar);
+    db.settings.adminAvatar = avatar;
+    db.settings.adminName = name;
+  } catch(e) {}
+
+  renderAdminAvatar();
+  closeModal();
+  notify('Admin profile photo and details saved successfully!');
+
+  try {
+    await saveSettingsToFirestore({
+      adminAvatar: avatar || '',
+      adminName: name || 'Super Admin'
+    });
+  } catch(err) {
+    console.error('Failed to sync admin profile to Firestore:', err);
+  }
+};
+
+window.removeAdminPhoto = async function() {
+  if (confirm('Remove admin profile photo?')) {
+    try {
+      localStorage.removeItem('af_admin_avatar');
+      db.settings.adminAvatar = '';
+    } catch(e) {}
+    renderAdminAvatar();
+    closeModal();
+    notify('Profile photo removed.');
+    try {
+      await saveSettingsToFirestore({ adminAvatar: '' });
+    } catch(err) {
+      console.error(err);
+    }
+  }
+};
+
+subscribeSettings(remoteSettings => {
+  if (remoteSettings && typeof remoteSettings === 'object') {
+    if (remoteSettings.storeName) db.settings.name = remoteSettings.storeName;
+    if (remoteSettings.deliveryFee !== undefined) db.settings.deliveryCharge = remoteSettings.deliveryFee;
+    if (remoteSettings.freeDelivery !== undefined) db.settings.freeDelivery = remoteSettings.freeDelivery;
+    if (remoteSettings.dealEnd) db.settings.dealEnd = remoteSettings.dealEnd;
+    if (remoteSettings.logo) { db.settings.logo = remoteSettings.logo; renderBrandLogo(); }
+    if (remoteSettings.adminAvatar) { db.settings.adminAvatar = remoteSettings.adminAvatar; renderAdminAvatar(); }
+    saveLocal();
+    if (page === 'settings') renderPage('settings');
+  }
+});
+
+// Initial boot
+renderBrandLogo();
+renderAdminAvatar();
+renderPage('dashboard');
+</script>
+</body>
+</html>
