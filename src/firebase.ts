@@ -138,22 +138,33 @@ export interface StoreSettingsData {
 }
 
 export interface OrderItem {
-  id: number;
+  id: number | string;
   qty: number;
+  name?: string;
+  price?: number;
+  unit?: string;
+  image?: string;
 }
 
 export interface OrderData {
   id: string;
   name: string;
+  customer?: string;
   phone: string;
   address: string;
   area: string;
   note?: string;
   items: OrderItem[];
+  itemsDetail?: OrderItem[];
+  subtotal?: number;
+  deliveryFee?: number;
   total: number;
   status: string;
+  payment?: string;
+  paymentMethod?: string;
   date: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 export const DELIVERY_AREAS = [
