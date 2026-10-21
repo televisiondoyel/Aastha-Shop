@@ -302,6 +302,22 @@ tbody tr:hover{background:#fafdface}
   margin-top:4px;
 }
 
+/* Banner & Promotion Management */
+.banner-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;margin-bottom:18px}
+.banner-card{background:#fff;border:1px solid #dce5df;padding:16px;display:flex;flex-direction:column;gap:12px}
+.banner-box{width:100%;background:#f5f8f5;border:1px dashed #c0d4c7;border-radius:6px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
+.banner-box img{width:100%;height:100%;object-fit:cover;display:block}
+.banner-meta{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.banner-meta b{font-size:13px;color:#1e3829}
+.banner-meta .tag{font-size:10px;font-weight:700;background:#eaf5ee;color:#18733f;padding:2px 8px;border-radius:4px}
+.banner-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.storefront-mock{background:#f8faf8;border:1px solid #d8e4db;padding:14px;border-radius:8px;display:grid;grid-template-columns:2fr 1fr;gap:10px}
+@media(max-width:768px){.storefront-mock{grid-template-columns:1fr}}
+.storefront-mock .mock-hero{aspect-ratio:1200/360;border-radius:6px;overflow:hidden;background:#e9f2eb;display:flex}
+.storefront-mock .mock-promos{display:grid;gap:8px}
+.storefront-mock .mock-promo{aspect-ratio:600/350;border-radius:6px;overflow:hidden;background:#e9f2eb;display:flex}
+.storefront-mock img{width:100%;height:100%;object-fit:cover}
+
 /* Mobile responsive */
 @media(max-width:1050px){
   .side{width:210px}
@@ -356,6 +372,7 @@ tbody tr:hover{background:#fafdface}
     <button data-page="payments"><span class="ico" data-i="wallet"></span>Payments (COD)</button>
 
     <div class="label">Management</div>
+    <button data-page="banners"><span class="ico" data-i="image"></span>Banners &amp; Promotions</button>
     <button data-page="reports"><span class="ico" data-i="chart"></span>Reports &amp; Analytics</button>
     <button data-page="staff"><span class="ico" data-i="shield"></span>Staff &amp; Permissions</button>
     <button data-page="settings"><span class="ico" data-i="settings"></span>Store Settings</button>
@@ -564,6 +581,37 @@ function loadLocal() {
     if (dealEnd) dbObj.settings.dealEnd = dealEnd;
     let logo = localStorage.getItem('af_logo');
     if (logo) dbObj.settings.logo = logo;
+    let hero = localStorage.getItem('af_hero');
+    if (hero) dbObj.settings.hero = hero;
+    let promo1 = localStorage.getItem('af_promo1');
+    if (promo1) dbObj.settings.promo1 = promo1;
+    let promo2 = localStorage.getItem('af_promo2');
+    if (promo2) dbObj.settings.promo2 = promo2;
+    let custs = localStorage.getItem('af_customers');
+    if (custs) {
+      let parsed = JSON.parse(custs);
+      if (Array.isArray(parsed) && parsed.length > 0) dbObj.customers = parsed;
+    }
+    let brands = localStorage.getItem('af_brands');
+    if (brands) {
+      let parsed = JSON.parse(brands);
+      if (Array.isArray(parsed) && parsed.length > 0) dbObj.brands = parsed;
+    }
+    let coupons = localStorage.getItem('af_coupons');
+    if (coupons) {
+      let parsed = JSON.parse(coupons);
+      if (Array.isArray(parsed) && parsed.length > 0) dbObj.coupons = parsed;
+    }
+    let deliveries = localStorage.getItem('af_deliveries');
+    if (deliveries) {
+      let parsed = JSON.parse(deliveries);
+      if (Array.isArray(parsed) && parsed.length > 0) dbObj.deliveries = parsed;
+    }
+    let staff = localStorage.getItem('af_staff');
+    if (staff) {
+      let parsed = JSON.parse(staff);
+      if (Array.isArray(parsed) && parsed.length > 0) dbObj.staff = parsed;
+    }
   } catch(e) {
     console.warn('Storage read warning', e);
   }
@@ -592,20 +640,20 @@ function normalizeData() {
     if (!o.payment) o.payment = o.status === 'Delivered' ? 'Collected' : 'Pending';
     ensureOrderItems(o, true);
   });
-  // Extract real customers from orders if available
+  // Extract and preserve real customers from orders and existing records
   let custMap = new Map();
   db.customers.forEach(c => custMap.set(c.phone, c));
   db.orders.forEach(o => {
     if (o.phone) {
       let existing = custMap.get(o.phone);
       if (existing) {
-        existing.orders = (existing.orders || 1) + 1;
-        existing.spent = (existing.spent || 0) + (o.total || 0);
+        existing.orders = db.orders.filter(x => x.phone === o.phone).length;
+        existing.spent = db.orders.filter(x => x.phone === o.phone).reduce((s, x) => s + (x.total || 0), 0);
         if (o.area && !existing.area) existing.area = o.area;
       } else {
         let newC = {
           id: custMap.size + 1,
-          name: o.customer || 'Customer',
+          name: o.customer || o.name || 'Customer',
           phone: o.phone,
           email: '',
           address: o.address || '',
@@ -627,6 +675,11 @@ function saveLocal() {
   try {
     localStorage.setItem('af_products', JSON.stringify(db.products));
     localStorage.setItem('af_orders', JSON.stringify(db.orders));
+    localStorage.setItem('af_customers', JSON.stringify(db.customers));
+    localStorage.setItem('af_brands', JSON.stringify(db.brands));
+    localStorage.setItem('af_coupons', JSON.stringify(db.coupons));
+    localStorage.setItem('af_deliveries', JSON.stringify(db.deliveries));
+    localStorage.setItem('af_staff', JSON.stringify(db.staff));
     let catObjs = db.categories.map(c => ({
       name: c,
       image: db.categoryImages[c] || '',
@@ -638,6 +691,12 @@ function saveLocal() {
     if (db.settings.freeDelivery !== undefined) localStorage.setItem('af_free_delivery', String(db.settings.freeDelivery));
     if (db.settings.dealEnd) localStorage.setItem('af_deal_end', db.settings.dealEnd);
     if (db.settings.logo) localStorage.setItem('af_logo', db.settings.logo);
+    if (db.settings.hero) localStorage.setItem('af_hero', db.settings.hero);
+    else localStorage.removeItem('af_hero');
+    if (db.settings.promo1) localStorage.setItem('af_promo1', db.settings.promo1);
+    else localStorage.removeItem('af_promo1');
+    if (db.settings.promo2) localStorage.setItem('af_promo2', db.settings.promo2);
+    else localStorage.removeItem('af_promo2');
     let sEl = document.getElementById('saved');
     if (sEl) sEl.textContent = '';
   } catch(e) {

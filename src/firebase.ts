@@ -403,6 +403,17 @@ export async function updateOrderStatusInFirestore(orderId: string, status: stri
   }
 }
 
+export async function deleteOrderFromFirestore(orderId: string) {
+  const path = `orders/${orderId}`;
+  try {
+    await deleteDoc(doc(db, 'orders', String(orderId)));
+  } catch (err) {
+    handleFirestoreError(err, OperationType.DELETE, path);
+    throw err;
+  }
+}
+
+
 export async function getOrdersFromFirestore(): Promise<OrderData[]> {
   const path = 'orders';
   try {
