@@ -134,7 +134,26 @@ export interface StoreSettingsData {
   promo2?: string;
   adminAvatar?: string;
   adminName?: string;
+  aboutTitle?: string;
+  aboutText?: string;
+  aboutImage?: string;
+  aboutStory?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  contactWhatsapp?: string;
+  contactAddress?: string;
+  contactHours?: string;
   updatedAt?: string;
+}
+
+export interface CustomerMessage {
+  id: string;
+  name: string;
+  contact: string;
+  subject?: string;
+  message: string;
+  status?: string;
+  createdAt?: string;
 }
 
 export interface OrderItem {
@@ -580,6 +599,72 @@ export function subscribeCategories(cb: (items: CategoryItem[]) => void) {
     }
   }, (err) => {
     handleFirestoreError(err, OperationType.GET, 'settings/categories');
+  });
+}
+
+// =================== CUSTOMER MESSAGES / INQUIRIES ===================
+
+export async function saveMessageToFirestore(m: CustomerMessage) {
+  const path = `messages/${m.id}`;
+  try {
+    const payload = {
+      ...m,
+      createdAt: m.createdAt || new Date().toISOString()
+    };
+    await setDoc(doc(db, 'messages', String(m.id)), payload);
+    return payload;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export async function getMessagesFromFirestore(): Promise<CustomerMessage[]> {
+  const path = 'messages';
+  try {
+    const snap = await getDocs(collection(db, path));
+    const items: CustomerMessage[] = [];
+    snap.forEach(d => {
+      items.push(d.data() as CustomerMessage);
+    });
+    return items.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+  } catch (err) {
+    handleFirestoreError(err, OperationType.LIST, path);
+    return [];
+  }
+}
+
+export async function updateMessageStatusInFirestore(messageId: string, status: string) {
+  const path = `messages/${messageId}`;
+  try {
+    await setDoc(doc(db, 'messages', String(messageId)), { status, updatedAt: new Date().toISOString() }, { merge: true });
+  } catch (err) {
+    handleFirestoreError(err, OperationType.UPDATE, path);
+    throw err;
+  }
+}
+
+export async function deleteMessageFromFirestore(messageId: string) {
+  const path = `messages/${messageId}`;
+  try {
+    await deleteDoc(doc(db, 'messages', String(messageId)));
+  } catch (err) {
+    handleFirestoreError(err, OperationType.DELETE, path);
+    throw err;
+  }
+}
+
+export function subscribeMessages(callback: (messages: CustomerMessage[]) => void) {
+  const path = 'messages';
+  return onSnapshot(collection(db, path), (snap) => {
+    const items: CustomerMessage[] = [];
+    snap.forEach(d => {
+      items.push(d.data() as CustomerMessage);
+    });
+    items.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+    callback(items);
+  }, (err) => {
+    handleFirestoreError(err, OperationType.LIST, path);
   });
 }
 
