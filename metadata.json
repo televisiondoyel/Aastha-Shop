@@ -1,5 +1,5 @@
 {
-  "name": "Aastha Fresh Grocery",
+  "name": "Baromasi Fresh Grocery",
   "description": "Everyday grocery store with fresh essentials, packages, offers, cart and admin management.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Aastha Admin Dashboard</title>
+<title>Baromasi Admin Dashboard</title>
+<link id="sitefavicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23087e6e'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-size='28' fill='white' font-family='Arial'%3EB%3C/text%3E%3C/svg%3E">
 <style>
 :root{
   --g:#16864b;
@@ -351,10 +352,10 @@ tbody tr:hover{background:#fafdface}
 <aside class="side" id="side">
   <div class="brand">
     <div class="brand-logo-wrap" id="brandLogoWrap" onclick="openLogoUploadModal()" title="Upload or change store logo">
-      <div class="mark">A</div>
+      <div class="mark">B</div>
     </div>
     <div style="flex:1;min-width:0;cursor:pointer" onclick="openLogoUploadModal()" title="Upload or change store logo">
-      <b>Aastha</b>
+      <b>Baromasi</b>
       <small>Admin Dashboard</small>
     </div>
   </div>
@@ -390,7 +391,7 @@ tbody tr:hover{background:#fafdface}
         <span class="ico" data-i="menu"></span>
       </button>
       <div>
-        <div class="crumb">Aastha / <span id="crumb">Dashboard</span></div>
+        <div class="crumb">Baromasi / <span id="crumb">Dashboard</span></div>
         <h3 id="topTitle">Dashboard Overview</h3>
       </div>
     </div>
@@ -440,6 +441,7 @@ import {
   getProductsFromFirestore,
   subscribeProducts,
   saveOrderToFirestore,
+  deleteOrderFromFirestore,
   updateOrderStatusInFirestore,
   getOrdersFromFirestore,
   subscribeOrders,
@@ -465,6 +467,7 @@ const icons = {
   chart: '<path d="M3 3v18h18M7 14l4-4 4 3 6-7"/>',
   shield: '<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M19 15a8 8 0 0 0 0-6l1.5-1.1-1.4-2.4-1.7.6a8 8 0 0 0-1.6-.9L15.5 3h-3l-.3 2.2a8 8 0 0 0-1.6.9l-1.7-.6-1.4 2.4L9 9a8 8 0 0 0 0 6l-1.5 1.1 1.4 2.4 1.7-.6a8 8 0 0 0 1.6.9l.3 2.2h3l.3-2.2a8 8 0 0 0 1.6-.9l1.7.6 1.4-2.4Z"/>',
+  image: '<rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
   bell: '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
   alert: '<path d="m12 3 10 18H2L12 3ZM12 9v4M12 17h.01"/>',
@@ -504,9 +507,9 @@ const DELIVERY_AREAS = [
 // Seed fallback data
 const seed = {
   products: [
-    {id:1, name:'Premium Miniket Rice', sku:'AST-RC-001', category:'Rice', brand:'Aastha Select', price:78, old:85, discount:0, stock:42, unit:'kg', status:'Active', deal:false, description:'Fine grain premium aromatic miniket rice carefully cleaned and packed for daily family cooking.', image:''},
+    {id:1, name:'Premium Miniket Rice', sku:'AST-RC-001', category:'Rice', brand:'Baromasi Select', price:78, old:85, discount:0, stock:42, unit:'kg', status:'Active', deal:false, description:'Fine grain premium aromatic miniket rice carefully cleaned and packed for daily family cooking.', image:''},
     {id:2, name:'Pure Mustard Oil', sku:'AST-OL-002', category:'Oil', brand:'Fresh', price:185, old:200, discount:0, stock:24, unit:'litre', status:'Active', deal:true, description:'100% natural cold-pressed mustard oil with authentic pungent aroma and flavor.', image:''},
-    {id:3, name:'Red Lentils (Masoor Dal)', sku:'AST-DL-003', category:'Dal or Lentil', brand:'Aastha Select', price:118, old:130, discount:0, stock:35, unit:'kg', status:'Active', deal:false, description:'Selected polished red lentils rich in protein, quick cooking and delicious taste.', image:''},
+    {id:3, name:'Red Lentils (Masoor Dal)', sku:'AST-DL-003', category:'Dal or Lentil', brand:'Baromasi Select', price:118, old:130, discount:0, stock:35, unit:'kg', status:'Active', deal:false, description:'Selected polished red lentils rich in protein, quick cooking and delicious taste.', image:''},
     {id:4, name:'Turmeric Powder', sku:'AST-SP-004', category:'Spices', brand:'Pran', price:95, old:105, discount:0, stock:18, unit:'pack', status:'Active', deal:false, description:'Pure grounded turmeric powder without artificial coloring for authentic flavor.', image:''},
     {id:5, name:'Atta Whole Wheat Flour', sku:'AST-FL-005', category:'Flour', brand:'Teer', price:65, old:70, discount:0, stock:8, unit:'kg', status:'Active', deal:false, description:'100% whole wheat flour rich in fiber for soft rotis and parathas.', image:''}
   ],
@@ -514,22 +517,22 @@ const seed = {
   customers: [],
   categories: ['Oil','Spices','Flour','Dal or Lentil','Packages','Rice','Pantry','Offers'],
   categoryImages: {},
-  brands: ['Aastha Select', 'Fresh', 'Teer', 'Pran', 'Radhuni', 'Local Farm'],
+  brands: ['Baromasi Select', 'Fresh', 'Teer', 'Pran', 'Radhuni', 'Local Farm'],
   coupons: [
-    {id:1, code:'AASTHA10', type:'Percentage', value:10, min:500, limit:100, used:0, start:'2026-10-01', end:'2026-12-31', active:true},
+    {id:1, code:'BAROMASI10', type:'Percentage', value:10, min:500, limit:100, used:0, start:'2026-10-01', end:'2026-12-31', active:true},
     {id:2, code:'SAVE50', type:'Fixed', value:50, min:800, limit:50, used:0, start:'2026-09-01', end:'2026-10-15', active:false}
   ],
   deliveries: [],
   staff: [
-    {id:1, name:'Aastha Owner', email:'admin@aastha.example', role:'Super Admin', status:'Active'},
-    {id:2, name:'Order Manager', email:'orders@aastha.example', role:'Order Manager', status:'Active'},
-    {id:3, name:'Inventory Manager', email:'stock@aastha.example', role:'Inventory Manager', status:'Active'}
+    {id:1, name:'Baromasi Owner', email:'admin@baromasi.example', role:'Super Admin', status:'Active'},
+    {id:2, name:'Order Manager', email:'orders@baromasi.example', role:'Order Manager', status:'Active'},
+    {id:3, name:'Inventory Manager', email:'stock@baromasi.example', role:'Inventory Manager', status:'Active'}
   ],
   settings: {
-    name: 'Aastha',
+    name: 'Baromasi',
     address: 'Sandwip, Chattogram, Bangladesh',
     phone: '01800000000',
-    email: 'hello@aastha.example',
+    email: 'hello@baromasi.example',
     currency: 'BDT (৳)',
     tax: 0,
     lowStock: 10,
@@ -572,7 +575,13 @@ function loadLocal() {
       }
     }
     let storeName = localStorage.getItem('af_store_name');
-    if (storeName) dbObj.settings.name = storeName;
+    if (storeName === 'Aastha' || !storeName) {
+      storeName = 'Baromasi';
+      try { localStorage.setItem('af_store_name', 'Baromasi'); } catch(e) {}
+    }
+    dbObj.settings.name = storeName;
+    let favicon = localStorage.getItem('af_favicon');
+    if (favicon) dbObj.settings.favicon = favicon;
     let delFee = localStorage.getItem('af_delivery_fee');
     if (delFee !== null) dbObj.settings.deliveryCharge = +delFee;
     let freeDel = localStorage.getItem('af_free_delivery');
@@ -627,7 +636,7 @@ function normalizeData() {
   db.products.forEach(p => {
     if (typeof p.image !== 'string') p.image = '';
     if (typeof p.sku !== 'string') p.sku = 'AST-PROD-' + String(p.id).padStart(3, '0');
-    if (typeof p.brand !== 'string') p.brand = 'Aastha Select';
+    if (typeof p.brand !== 'string') p.brand = 'Baromasi Select';
     if (p.stock === undefined || p.stock === null) p.stock = 50;
     if (typeof p.unit !== 'string') p.unit = 'kg';
     if (typeof p.status !== 'string') p.status = 'Active';
@@ -643,13 +652,19 @@ function normalizeData() {
   // Extract and preserve real customers from orders and existing records
   let custMap = new Map();
   db.customers.forEach(c => custMap.set(c.phone, c));
+  let deletedPhones = [];
+  try { deletedPhones = JSON.parse(localStorage.getItem('af_deleted_customers') || '[]'); } catch(e) {}
+  let savedStatuses = {};
+  try { savedStatuses = JSON.parse(localStorage.getItem('af_customer_statuses') || '{}'); } catch(e) {}
+
   db.orders.forEach(o => {
-    if (o.phone) {
+    if (o.phone && !deletedPhones.includes(o.phone)) {
       let existing = custMap.get(o.phone);
       if (existing) {
         existing.orders = db.orders.filter(x => x.phone === o.phone).length;
         existing.spent = db.orders.filter(x => x.phone === o.phone).reduce((s, x) => s + (x.total || 0), 0);
         if (o.area && !existing.area) existing.area = o.area;
+        if (savedStatuses[o.phone]) existing.status = savedStatuses[o.phone];
       } else {
         let newC = {
           id: custMap.size + 1,
@@ -660,14 +675,14 @@ function normalizeData() {
           area: o.area || 'Sandwip',
           orders: 1,
           spent: o.total || 0,
-          status: 'Active',
+          status: savedStatuses[o.phone] || 'Active',
           joined: (o.date || new Date().toISOString().slice(0, 10))
         };
         custMap.set(o.phone, newC);
       }
     }
   });
-  db.customers = Array.from(custMap.values());
+  db.customers = Array.from(custMap.values()).filter(c => !deletedPhones.includes(c.phone));
 }
 normalizeData();
 
@@ -691,6 +706,9 @@ function saveLocal() {
     if (db.settings.freeDelivery !== undefined) localStorage.setItem('af_free_delivery', String(db.settings.freeDelivery));
     if (db.settings.dealEnd) localStorage.setItem('af_deal_end', db.settings.dealEnd);
     if (db.settings.logo) localStorage.setItem('af_logo', db.settings.logo);
+    else localStorage.removeItem('af_logo');
+    if (db.settings.favicon) localStorage.setItem('af_favicon', db.settings.favicon);
+    else localStorage.removeItem('af_favicon');
     if (db.settings.hero) localStorage.setItem('af_hero', db.settings.hero);
     else localStorage.removeItem('af_hero');
     if (db.settings.promo1) localStorage.setItem('af_promo1', db.settings.promo1);
@@ -748,6 +766,7 @@ try {
 } catch(e) {}
 
 function seedInitialNotifications() {
+  if (localStorage.getItem('af_notifications_seeded') === 'true') return;
   if (notifications.length > 0) return;
   if (Array.isArray(db.orders) && db.orders.length) {
     db.orders.slice(0, 6).forEach((o, idx) => {
@@ -788,6 +807,7 @@ function seedInitialNotifications() {
       });
     }
   });
+  try { localStorage.setItem('af_notifications_seeded', 'true'); } catch(e) {}
   saveNotifications();
 }
 
@@ -837,6 +857,7 @@ function playNotificationSound() {
 
 function addNotification(n) {
   notifications.unshift(n);
+  try { localStorage.setItem('af_notifications_seeded', 'true'); } catch(e) {}
   saveNotifications();
   playNotificationSound();
   notify(n.title + ' — ' + n.message);
@@ -856,15 +877,25 @@ window.toggleNotificationPanel = function(e) {
 };
 
 window.markAllNotificationsRead = function() {
-  notifications.forEach(n => n.read = true);
+  notifications = notifications.map(n => ({ ...n, read: true }));
+  try {
+    localStorage.setItem('af_notifications_seeded', 'true');
+    localStorage.setItem('af_admin_notifications', JSON.stringify(notifications.slice(0, 60)));
+  } catch(e) {}
   saveNotifications();
   renderNotificationList();
+  notify('All notifications marked as read.');
 };
 
 window.clearAllNotifications = function() {
   notifications = [];
+  try {
+    localStorage.setItem('af_notifications_seeded', 'true');
+    localStorage.setItem('af_admin_notifications', '[]');
+  } catch(e) {}
   saveNotifications();
   renderNotificationList();
+  notify('All notifications cleared.');
 };
 
 window.handleNotificationClick = function(id) {
@@ -967,7 +998,8 @@ function renderPage(p) {
     payments: 'Payments · Cash on Delivery',
     reports: 'Reports & Analytics',
     staff: 'Staff & Permissions',
-    settings: 'Store Settings'
+    settings: 'Store Settings',
+    banners: 'Banners & Promotional Cards'
   };
   let crumb = document.getElementById('crumb');
   let topTitle = document.getElementById('topTitle');
@@ -975,7 +1007,7 @@ function renderPage(p) {
   if (topTitle) topTitle.textContent = names[p] || 'Dashboard Overview';
   document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === p));
   let pages = {
-    dashboard, products, orders, customers, inventory, delivery, categories, coupons, payments, reports, staff, settings
+    dashboard, products, orders, customers, inventory, delivery, categories, coupons, payments, reports, staff, settings, banners
   };
   let container = document.getElementById('content');
   if (container && pages[p]) {
@@ -1136,7 +1168,7 @@ function productRows(arr) {
         </td>
         <td>
           <b>${esc(p.category)}</b>
-          <div class="small">${esc(p.brand || 'Aastha Select')}</div>
+          <div class="small">${esc(p.brand || 'Baromasi Select')}</div>
         </td>
         <td>
           <b>${money(p.price)}</b>
@@ -1159,7 +1191,7 @@ window.openProduct = function(id = null) {
   editId = id;
   let p = id ? db.products.find(x => x.id === id) : {
     name: '', sku: 'AST-' + Date.now().toString().slice(-5), category: db.categories[0] || 'Oil',
-    brand: db.brands[0] || 'Aastha Select', price: '', old: '', discount: 0, stock: 50,
+    brand: db.brands[0] || 'Baromasi Select', price: '', old: '', discount: 0, stock: 50,
     unit: 'kg', status: 'Active', deal: false, description: '', image: ''
   };
   modal(id ? 'Edit Product: ' + esc(p.name) : 'Add New Product', `
@@ -1272,7 +1304,7 @@ window.saveProduct = async function() {
     name,
     sku,
     category: formEntries.category || 'Pantry',
-    brand: formEntries.brand || 'Aastha Select',
+    brand: formEntries.brand || 'Baromasi Select',
     price,
     old,
     discount,
@@ -1303,14 +1335,14 @@ window.saveProduct = async function() {
 };
 
 window.deleteProduct = async function(id) {
-  let p = db.products.find(x => x.id === id);
+  let p = db.products.find(x => x.id === id || String(x.id) === String(id));
   if (p && confirm('Are you sure you want to delete "' + p.name + '"?')) {
-    db.products = db.products.filter(x => x.id !== id);
+    db.products = db.products.filter(x => x.id !== id && String(x.id) !== String(id));
     saveLocal();
     renderPage('products');
-    notify('Product deleted.');
+    notify('Product "' + p.name + '" deleted successfully.');
     try {
-      await deleteProductFromFirestore(id);
+      await deleteProductFromFirestore(p.id);
     } catch(err) {
       console.error('Failed to delete product from Firestore:', err);
     }
@@ -1347,6 +1379,7 @@ function orders() {
               <th>Update Status</th>
               <th>Order Details</th>
               <th>Invoice</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="orows">${orderRows(db.orders)}</tbody>
@@ -1378,8 +1411,9 @@ function orderRows(arr) {
       </td>
       <td><button class="link" onclick="viewOrder('${esc(o.id)}')">View items</button></td>
       <td><button class="link" onclick="downloadInvoice('${esc(o.id)}')">Download</button></td>
+      <td><button class="link" style="color:#b43c3c" onclick="deleteOrder('${esc(o.id)}')">Delete</button></td>
     </tr>
-  `}).join('') || '<tr><td colspan="10"><div class="empty">No orders found.</div></td></tr>';
+  `}).join('') || '<tr><td colspan="11"><div class="empty">No orders found.</div></td></tr>';
 }
 
 window.updateOrderStatus = async function(id, newStatus) {
@@ -1432,6 +1466,24 @@ window.updateOrderStatus = async function(id, newStatus) {
     console.error('Failed to update status in Firestore:', err);
   }
 };
+
+window.deleteOrder = async function(id) {
+  let o = db.orders.find(x => x.id === id);
+  if (!o) return;
+  if (confirm('Are you sure you want to delete order "' + id + '"?')) {
+    db.orders = db.orders.filter(x => x.id !== id);
+    db.deliveries = db.deliveries.filter(x => x.order !== id);
+    saveLocal();
+    renderPage('orders');
+    notify('Order ' + id + ' deleted successfully.');
+    try {
+      await deleteOrderFromFirestore(id);
+    } catch(err) {
+      console.error('Failed to delete order from Firestore:', err);
+    }
+  }
+};
+
 
 function calculateOrderFinancials(o, items) {
   let subtotal = items.reduce((sum, it) => sum + (Number(it.price) || 0) * (Number(it.qty) || 1), 0);
@@ -1566,7 +1618,7 @@ window.viewOrder = function(id) {
       <div style="font-size:14px;color:#475569;margin-bottom:6px">Delivery Fee: <b>${deliveryFee > 0 ? money(deliveryFee) : 'FREE (৳ 0)'}</b></div>
       <div style="font-size:18px;font-weight:bold;color:#18733f">Total Amount: ${money(o.total)}</div>
     </div>
-  `, `<button class="btn" onclick="closeModal()">Close</button><button class="btn primary" onclick="downloadInvoice('${esc(o.id)}')">Download Invoice</button>`);
+  `, `<button class="btn" onclick="closeModal()">Close</button><button class="btn" style="background:#b43c3c;color:#fff" onclick="deleteOrder('${esc(o.id)}');closeModal()">Delete Order</button><button class="btn primary" onclick="downloadInvoice('${esc(o.id)}')">Download Invoice</button>`);
 };
 
 window.downloadInvoice = function(id) {
@@ -1604,7 +1656,7 @@ window.downloadInvoice = function(id) {
   </style>
 </head>
 <body>
-  <h1>Aastha</h1>
+  <h1>${esc(db.settings?.name || 'Baromasi')}</h1>
   <p class="muted">Customer Invoice · ${esc(o.id)}</p>
   <hr style="border:0;border-top:1px solid #e0e0e0;margin:12px 0 16px 0">
   <p style="line-height:1.6">
@@ -1629,7 +1681,7 @@ window.downloadInvoice = function(id) {
   <div class="actions">
     <button onclick="window.print()" style="padding:8px 16px;background:#15864a;color:#fff;border:0;cursor:pointer;font-weight:bold;font-size:13px">Print / Save PDF</button>
   </div>
-  <p class="muted" style="margin-top:24px;font-size:12px">Thank you for ordering with Aastha.</p>
+  <p class="muted" style="margin-top:24px;font-size:12px">Thank you for ordering with Baromasi.</p>
 </body>
 </html>`;
 
@@ -1637,7 +1689,7 @@ window.downloadInvoice = function(id) {
   let url = URL.createObjectURL(blob);
   let a = document.createElement('a');
   a.href = url;
-  a.download = 'Aastha-Invoice-' + o.id + '.html';
+  a.download = 'Baromasi-Invoice-' + o.id + '.html';
   document.body.appendChild(a);
   a.click();
   a.remove();
@@ -1692,7 +1744,7 @@ function customerRows(arr) {
       <td>
         <button class="link" onclick="viewCustomer(${c.id})">View History</button>
         <button class="link" onclick="suspendCustomer(${c.id})">${c.status === 'Active' ? 'Suspend' : 'Activate'}</button>
-        <button class="link" style="color:#b43c3c" onclick="blockCustomer(${c.id})">${c.status === 'Blocked' ? 'Unblock' : 'Block'}</button>
+        <button class="link" style="color:#b43c3c" onclick="deleteCustomer(${c.id})">Delete</button>
       </td>
     </tr>
   `).join('') || '<tr><td colspan="8"><div class="empty">No customer records found.</div></td></tr>';
@@ -1718,16 +1770,35 @@ window.viewCustomer = function(id) {
         <b>${money(o.total)}</b>
       </div>
     `).join('') : '<p class="small">No matching order details in database.</p>'}
-  `, `<button class="btn" onclick="closeModal()">Close</button>`);
+  `, `<button class="btn" onclick="closeModal()">Close</button><button class="btn" style="background:#b43c3c;color:#fff" onclick="deleteCustomer(${c.id});closeModal()">Delete Customer</button>`);
 };
 
 window.suspendCustomer = function(id) {
   let c = db.customers.find(x => x.id === id);
   if (!c) return;
   c.status = c.status === 'Active' ? 'Suspended' : 'Active';
+  let savedStatuses = {};
+  try { savedStatuses = JSON.parse(localStorage.getItem('af_customer_statuses') || '{}'); } catch(e) {}
+  if (c.phone) savedStatuses[c.phone] = c.status;
+  localStorage.setItem('af_customer_statuses', JSON.stringify(savedStatuses));
   saveLocal();
   renderPage('customers');
-  notify('Customer status updated to ' + c.status);
+  notify('Customer status successfully updated to ' + c.status + '.');
+};
+
+window.deleteCustomer = function(id) {
+  let c = db.customers.find(x => x.id === id);
+  if (!c) return;
+  if (confirm('Are you sure you want to delete customer "' + c.name + '"?')) {
+    let deletedPhones = [];
+    try { deletedPhones = JSON.parse(localStorage.getItem('af_deleted_customers') || '[]'); } catch(e) {}
+    if (c.phone && !deletedPhones.includes(c.phone)) deletedPhones.push(c.phone);
+    localStorage.setItem('af_deleted_customers', JSON.stringify(deletedPhones));
+    db.customers = db.customers.filter(x => x.id !== id);
+    saveLocal();
+    renderPage('customers');
+    notify('Customer "' + c.name + '" deleted successfully.');
+  }
 };
 
 window.blockCustomer = function(id) {
@@ -1735,6 +1806,10 @@ window.blockCustomer = function(id) {
   if (!c) return;
   if (confirm((c.status === 'Blocked' ? 'Unblock ' : 'Block ') + c.name + '?')) {
     c.status = c.status === 'Blocked' ? 'Active' : 'Blocked';
+    let savedStatuses = {};
+    try { savedStatuses = JSON.parse(localStorage.getItem('af_customer_statuses') || '{}'); } catch(e) {}
+    if (c.phone) savedStatuses[c.phone] = c.status;
+    localStorage.setItem('af_customer_statuses', JSON.stringify(savedStatuses));
     saveLocal();
     renderPage('customers');
     notify('Customer marked ' + c.status);
@@ -2478,7 +2553,7 @@ window.staffModal = function(id = null) {
       </div>
       <div class="field">
         <label>Email *</label>
-        <input name="email" type="email" required value="${esc(s.email)}" placeholder="staff@aastha.example">
+        <input name="email" type="email" required value="${esc(s.email)}" placeholder="staff@baromasi.example">
       </div>
       <div class="field">
         <label>Role</label>
@@ -2543,7 +2618,7 @@ function settings() {
         <form id="settingsForm">
           <div class="field">
             <label>Store Name</label>
-            <input name="name" required value="${esc(s.name || 'Aastha')}">
+            <input name="name" required value="${esc(s.name || 'Baromasi')}">
           </div>
           <div class="field">
             <label>Store Address</label>
@@ -2555,13 +2630,23 @@ function settings() {
           </div>
           <div class="field">
             <label>Contact Email</label>
-            <input name="email" type="email" value="${esc(s.email || 'hello@aastha.example')}">
+            <input name="email" type="email" value="${esc(s.email || 'hello@baromasi.example')}">
           </div>
           <div class="field">
             <label>Store Logo (upload from device gallery)</label>
             <input id="logoFile" type="file" accept="image/*">
             <input type="hidden" name="logo" id="logoData" value="${esc(s.logo || '')}">
             <img id="logoPreview" class="upload-preview" src="${esc(s.logo || '')}" alt="Logo preview" style="${s.logo ? '' : 'display:none;'}">
+          </div>
+          <div class="field">
+            <label>Site Icon / Favicon (upload from device gallery)</label>
+            <input id="faviconFile" type="file" accept="image/*">
+            <input type="hidden" name="favicon" id="faviconData" value="${esc(s.favicon || '')}">
+            <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+              <img id="faviconPreview" class="upload-preview" src="${esc(s.favicon || '')}" alt="Favicon preview" style="width:36px;height:36px;object-fit:contain;border:1px solid #c0d5c6;padding:2px;background:#fff;${s.favicon ? '' : 'display:none;'}">
+              ${s.favicon ? `<button type="button" class="btn" style="color:#b43c3c" onclick="removeFavicon()">Remove Icon</button>` : ''}
+            </div>
+            <small class="small">Small square icon displayed in browser tab and mobile bookmarks.</small>
           </div>
           <button class="btn primary" style="margin-top:10px">Save Store Information</button>
         </form>
@@ -2611,6 +2696,14 @@ function settings() {
           </div>
         </div>
 
+        <div class="setting-row" style="margin-top:16px">
+          <div>
+            <b>Storefront Promotional Banners</b>
+            <div class="small">Upload or change Fresh groceries banner, Spices &amp; Grains promotions</div>
+          </div>
+          <button type="button" class="btn primary" onclick="renderPage('banners')">Manage Banners</button>
+        </div>
+
         <div class="setting-row">
           <div>
             <b>Backup Data</b>
@@ -2639,6 +2732,216 @@ window.setDealTimer = function(days) {
   notify('Deals countdown timer set to ' + days + (days === 1 ? ' day' : ' days') + '!');
   saveSettingsToFirestore({ dealEnd: iso }).catch(e => console.error(e));
 };
+
+// =================== BANNERS & PROMOTIONS ===================
+function banners() {
+  let s = db.settings;
+  let heroSrc = s.hero || 'assets/banner.svg';
+  let p1Src = s.promo1 || 'assets/spices.svg';
+  let p2Src = s.promo2 || 'assets/grains.svg';
+
+  return heading('Banners &amp; Promotional Cards',
+    'Upload or change the storefront homepage banners: Fresh groceries banner (Hero), Spices promotion, and Grains promotion.',
+    `<button class="btn primary" onclick="saveAllBanners()">${ic('check')} Save All Banners</button>`) +
+    `
+    <div class="banner-grid">
+      <!-- 1. Fresh groceries banner (Main Hero) -->
+      <div class="banner-card card">
+        <div class="banner-meta">
+          <div>
+            <b>Fresh groceries banner</b>
+            <div class="small">Homepage Main Hero Banner</div>
+          </div>
+          <span class="tag">1200 × 360 px</span>
+        </div>
+        <div class="banner-box" style="aspect-ratio:1200/360;max-height:160px">
+          <img id="heroPreviewImg" src="${esc(heroSrc)}" alt="Fresh groceries banner">
+        </div>
+        <div class="field" style="margin-bottom:6px">
+          <label>Image URL or direct link</label>
+          <input id="heroUrlInput" value="${esc(s.hero || '')}" placeholder="https://... or upload below" oninput="previewBannerUrl('hero', this.value)">
+        </div>
+        <div class="banner-actions">
+          <input type="file" id="heroFileInput" accept="image/*" style="display:none" onchange="uploadBannerFile('hero', this)">
+          <button type="button" class="btn primary" onclick="document.getElementById('heroFileInput').click()">
+            ${ic('image')} Upload from Device / Gallery
+          </button>
+          <button type="button" class="btn" onclick="resetBannerToDefault('hero')">
+            Reset to Default SVG
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Spices promotion -->
+      <div class="banner-card card">
+        <div class="banner-meta">
+          <div>
+            <b>Spices promotion</b>
+            <div class="small">Homepage Promotion Banner 1</div>
+          </div>
+          <span class="tag">600 × 350 px</span>
+        </div>
+        <div class="banner-box" style="aspect-ratio:600/350;max-height:160px">
+          <img id="promo1PreviewImg" src="${esc(p1Src)}" alt="Spices promotion">
+        </div>
+        <div class="field" style="margin-bottom:6px">
+          <label>Image URL or direct link</label>
+          <input id="promo1UrlInput" value="${esc(s.promo1 || '')}" placeholder="https://... or upload below" oninput="previewBannerUrl('promo1', this.value)">
+        </div>
+        <div class="banner-actions">
+          <input type="file" id="promo1FileInput" accept="image/*" style="display:none" onchange="uploadBannerFile('promo1', this)">
+          <button type="button" class="btn primary" onclick="document.getElementById('promo1FileInput').click()">
+            ${ic('image')} Upload from Device / Gallery
+          </button>
+          <button type="button" class="btn" onclick="resetBannerToDefault('promo1')">
+            Reset to Default SVG
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Grains promotion -->
+      <div class="banner-card card">
+        <div class="banner-meta">
+          <div>
+            <b>Grains promotion</b>
+            <div class="small">Homepage Promotion Banner 2</div>
+          </div>
+          <span class="tag">600 × 350 px</span>
+        </div>
+        <div class="banner-box" style="aspect-ratio:600/350;max-height:160px">
+          <img id="promo2PreviewImg" src="${esc(p2Src)}" alt="Grains promotion">
+        </div>
+        <div class="field" style="margin-bottom:6px">
+          <label>Image URL or direct link</label>
+          <input id="promo2UrlInput" value="${esc(s.promo2 || '')}" placeholder="https://... or upload below" oninput="previewBannerUrl('promo2', this.value)">
+        </div>
+        <div class="banner-actions">
+          <input type="file" id="promo2FileInput" accept="image/*" style="display:none" onchange="uploadBannerFile('promo2', this)">
+          <button type="button" class="btn primary" onclick="document.getElementById('promo2FileInput').click()">
+            ${ic('image')} Upload from Device / Gallery
+          </button>
+          <button type="button" class="btn" onclick="resetBannerToDefault('promo2')">
+            Reset to Default SVG
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Storefront Arrangement Preview -->
+    <div class="card" style="margin-top:16px">
+      <div class="cardhead">
+        <div>
+          <h2>Storefront Homepage Live Preview</h2>
+          <p>This is how your three banners appear together on the customer storefront homepage.</p>
+        </div>
+        <button class="btn primary" onclick="saveAllBanners()">${ic('check')} Save Changes</button>
+      </div>
+      <div class="storefront-mock">
+        <div class="mock-hero">
+          <img id="mockHeroImg" src="${esc(heroSrc)}" alt="Fresh groceries banner">
+        </div>
+        <div class="mock-promos">
+          <div class="mock-promo">
+            <img id="mockPromo1Img" src="${esc(p1Src)}" alt="Spices promotion">
+          </div>
+          <div class="mock-promo">
+            <img id="mockPromo2Img" src="${esc(p2Src)}" alt="Grains promotion">
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+window.previewBannerUrl = function(key, url) {
+  let cleanUrl = url.trim();
+  let defaultSvg = key === 'hero' ? 'assets/banner.svg' : (key === 'promo1' ? 'assets/spices.svg' : 'assets/grains.svg');
+  let targetSrc = cleanUrl || defaultSvg;
+  let pImg = document.getElementById(key + 'PreviewImg');
+  if (pImg) pImg.src = targetSrc;
+  let mImg = document.getElementById(key === 'hero' ? 'mockHeroImg' : (key === 'promo1' ? 'mockPromo1Img' : 'mockPromo2Img'));
+  if (mImg) mImg.src = targetSrc;
+  db.settings[key] = cleanUrl;
+};
+
+window.uploadBannerFile = function(key, input) {
+  let file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) return notify('Please select a valid image file.');
+  notify('Processing image for ' + (key === 'hero' ? 'Fresh groceries banner' : (key === 'promo1' ? 'Spices promotion' : 'Grains promotion')) + '...');
+
+  let reader = new FileReader();
+  reader.onload = () => {
+    let im = new Image();
+    im.onload = async () => {
+      let maxW = key === 'hero' ? 1200 : 700;
+      let maxH = key === 'hero' ? 420 : 420;
+      let scale = Math.min(1, maxW / im.width, maxH / im.height);
+      let c = document.createElement('canvas');
+      c.width = Math.round(im.width * scale);
+      c.height = Math.round(im.height * scale);
+      let ctx = c.getContext('2d');
+      ctx.drawImage(im, 0, 0, c.width, c.height);
+      let dataUrl = c.toDataURL('image/jpeg', 0.82);
+
+      db.settings[key] = dataUrl;
+      let pImg = document.getElementById(key + 'PreviewImg');
+      if (pImg) pImg.src = dataUrl;
+      let mImg = document.getElementById(key === 'hero' ? 'mockHeroImg' : (key === 'promo1' ? 'mockPromo1Img' : 'mockPromo2Img'));
+      if (mImg) mImg.src = dataUrl;
+      let urlInp = document.getElementById(key + 'UrlInput');
+      if (urlInp) urlInp.value = dataUrl.slice(0, 50) + '...';
+
+      saveLocal();
+      let label = key === 'hero' ? 'Fresh groceries banner' : (key === 'promo1' ? 'Spices promotion' : 'Grains promotion');
+      notify(label + ' uploaded and updated successfully!');
+      try {
+        await saveSettingsToFirestore({ [key]: dataUrl });
+      } catch(err) {
+        console.error('Failed to sync banner to Firestore:', err);
+      }
+    };
+    im.onerror = () => notify('Unable to process the selected image.');
+    im.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.resetBannerToDefault = async function(key) {
+  let label = key === 'hero' ? 'Fresh groceries banner' : (key === 'promo1' ? 'Spices promotion' : 'Grains promotion');
+  let defaultSvg = key === 'hero' ? 'assets/banner.svg' : (key === 'promo1' ? 'assets/spices.svg' : 'assets/grains.svg');
+  db.settings[key] = '';
+  let pImg = document.getElementById(key + 'PreviewImg');
+  if (pImg) pImg.src = defaultSvg;
+  let mImg = document.getElementById(key === 'hero' ? 'mockHeroImg' : (key === 'promo1' ? 'mockPromo1Img' : 'mockPromo2Img'));
+  if (mImg) mImg.src = defaultSvg;
+  let urlInp = document.getElementById(key + 'UrlInput');
+  if (urlInp) urlInp.value = '';
+
+  saveLocal();
+  notify(label + ' reset to default SVG.');
+  try {
+    await saveSettingsToFirestore({ [key]: '' });
+  } catch(err) {
+    console.error('Failed to sync reset to Firestore:', err);
+  }
+};
+
+window.saveAllBanners = async function() {
+  saveLocal();
+  notify('All banners saved successfully!');
+  try {
+    await saveSettingsToFirestore({
+      hero: db.settings.hero || '',
+      promo1: db.settings.promo1 || '',
+      promo2: db.settings.promo2 || ''
+    });
+  } catch(err) {
+    console.error('Failed to save banners to Firestore:', err);
+    notify('Saved locally. Cloud sync warning.');
+  }
+};
+
 
 // =================== HELPERS, MODALS & CHARTS ===================
 function modal(t, b, foot) {
@@ -2761,14 +3064,17 @@ function bind() {
         address: d.address,
         phone: d.phone,
         email: d.email,
-        logo: d.logo || db.settings.logo || ''
+        logo: d.logo || db.settings.logo || '',
+        favicon: d.favicon || db.settings.favicon || ''
       });
       saveLocal();
+      if (db.settings.favicon) applyFavicon(db.settings.favicon);
       notify('Store business information saved.');
       try {
         await saveSettingsToFirestore({
           storeName: d.name,
-          logo: db.settings.logo || ''
+          logo: db.settings.logo || '',
+          favicon: db.settings.favicon || ''
         });
       } catch(err) {
         console.error(err);
@@ -2818,7 +3124,54 @@ function bind() {
       });
     };
   }
+
+  let favInp = document.getElementById('faviconFile');
+  if (favInp) {
+    favInp.onchange = e => {
+      let f = e.target.files && e.target.files[0];
+      if (!f) return;
+      compressImage(f, data => {
+        db.settings.favicon = data;
+        let prev = document.getElementById('faviconPreview');
+        let hidden = document.getElementById('faviconData');
+        if (prev) { prev.src = data; prev.style.display = 'block'; }
+        if (hidden) hidden.value = data;
+        saveLocal();
+        applyFavicon(data);
+        notify('Site icon / favicon updated successfully.');
+        saveSettingsToFirestore({ favicon: data }).catch(err => console.error(err));
+      }, true);
+    };
+  }
 }
+
+window.applyFavicon = function(url) {
+  let el = document.getElementById('sitefavicon');
+  if (el) {
+    if (url) {
+      el.href = url;
+    } else {
+      el.href = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23087e6e'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-size='28' fill='white' font-family='Arial'%3EB%3C/text%3E%3C/svg%3E";
+    }
+  }
+};
+
+window.removeFavicon = async function() {
+  db.settings.favicon = '';
+  try { localStorage.removeItem('af_favicon'); } catch(e) {}
+  saveLocal();
+  window.applyFavicon('');
+  let prev = document.getElementById('faviconPreview');
+  let hidden = document.getElementById('faviconData');
+  if (prev) { prev.src = ''; prev.style.display = 'none'; }
+  if (hidden) hidden.value = '';
+  notify('Site icon removed.');
+  try {
+    await saveSettingsToFirestore({ favicon: '' });
+  } catch(err) {
+    console.error(err);
+  }
+};
 
 window.exportCSV = function(type) {
   let rows = db[type] || [];
@@ -2831,7 +3184,7 @@ window.exportCSV = function(type) {
   let url = URL.createObjectURL(new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8;' }));
   let a = document.createElement('a');
   a.href = url;
-  a.download = 'aastha-' + type + '.csv';
+  a.download = 'baromasi-' + type + '.csv';
   a.click();
   URL.revokeObjectURL(url);
   notify('CSV exported successfully.');
@@ -2842,7 +3195,7 @@ window.backup = function() {
   let url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
   let a = document.createElement('a');
   a.href = url;
-  a.download = 'aastha-admin-backup.json';
+  a.download = 'baromasi-admin-backup.json';
   a.click();
   URL.revokeObjectURL(url);
   notify('Complete store backup downloaded.');
@@ -2919,7 +3272,6 @@ subscribeOrders(remoteOrders => {
     db.orders = remoteOrders;
     normalizeData();
     saveLocal();
-    seedInitialNotifications();
     updateNotifBadge();
     if (['dashboard','orders','customers','payments','reports'].includes(page)) renderPage(page);
   }
@@ -2942,9 +3294,9 @@ function renderBrandLogo() {
   if (!wrap) return;
   let logo = db.settings.logo || localStorage.getItem('af_logo');
   if (logo) {
-    wrap.innerHTML = `<img src="${logo}" alt="Aastha Logo" class="brand-logo-img">`;
+    wrap.innerHTML = `<img src="${logo}" alt="Baromasi Logo" class="brand-logo-img">`;
   } else {
-    wrap.innerHTML = `<div class="mark" title="Click to upload logo">A</div>`;
+    wrap.innerHTML = `<div class="mark" title="Click to upload logo">B</div>`;
   }
 }
 window.renderBrandLogo = renderBrandLogo;
@@ -2956,7 +3308,7 @@ window.openLogoUploadModal = function() {
       <p class="small" style="margin:0 0 10px">Upload the official store logo from your mobile phone gallery or computer. It will display in the Admin Dashboard header and website.</p>
       <div style="text-align:center;padding:16px;background:#f6f9f7;border:1px dashed #c0d5c6;margin-bottom:14px">
         <div id="modalLogoPreviewWrap">
-          ${currentLogo ? `<img id="modalLogoPreview" src="${currentLogo}" alt="Logo" style="max-height:80px;max-width:180px;object-fit:contain;background:#fff;padding:4px">` : `<div style="color:var(--muted);font-size:12px">No custom logo uploaded yet. Upload an image to replace the plain 'A' icon.</div>`}
+          ${currentLogo ? `<img id="modalLogoPreview" src="${currentLogo}" alt="Logo" style="max-height:80px;max-width:180px;object-fit:contain;background:#fff;padding:4px">` : `<div style="color:var(--muted);font-size:12px">No custom logo uploaded yet. Upload an image to replace the plain 'B' icon.</div>`}
         </div>
       </div>
       <div class="field">
@@ -3131,13 +3483,18 @@ subscribeSettings(remoteSettings => {
     if (remoteSettings.freeDelivery !== undefined) db.settings.freeDelivery = remoteSettings.freeDelivery;
     if (remoteSettings.dealEnd) db.settings.dealEnd = remoteSettings.dealEnd;
     if (remoteSettings.logo) { db.settings.logo = remoteSettings.logo; renderBrandLogo(); }
+    if (remoteSettings.favicon !== undefined) { db.settings.favicon = remoteSettings.favicon; window.applyFavicon(remoteSettings.favicon); }
     if (remoteSettings.adminAvatar) { db.settings.adminAvatar = remoteSettings.adminAvatar; renderAdminAvatar(); }
+    if (remoteSettings.hero !== undefined) db.settings.hero = remoteSettings.hero;
+    if (remoteSettings.promo1 !== undefined) db.settings.promo1 = remoteSettings.promo1;
+    if (remoteSettings.promo2 !== undefined) db.settings.promo2 = remoteSettings.promo2;
     saveLocal();
-    if (page === 'settings') renderPage('settings');
+    if (page === 'settings' || page === 'banners') renderPage(page);
   }
 });
 
 // Initial boot
+window.applyFavicon(db.settings.favicon || localStorage.getItem('af_favicon'));
 seedInitialNotifications();
 updateNotifBadge();
 renderBrandLogo();
