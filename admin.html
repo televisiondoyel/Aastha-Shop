@@ -2996,6 +2996,317 @@ window.saveAllBanners = async function() {
   }
 };
 
+// =================== CUSTOMER MESSAGES ===================
+function messages() {
+  let list = db.messages || [];
+  let unreadCount = list.filter(m => (m.status || 'New') === 'New' || m.status === 'Unread').length;
+  let respondedCount = list.filter(m => m.status === 'Responded').length;
+  let resolvedCount = list.filter(m => m.status === 'Resolved').length;
+
+  return heading('Customer Messages & Inquiries', 'Manage customer inquiries, questions, and feedback submitted through the storefront Contact Us page.') +
+    `<div class="stats grid">
+      ${stat('Total Inquiries', list.length, 'Total messages received', 'mail')}
+      ${stat('New / Unread', unreadCount, 'Requires response', 'alert')}
+      ${stat('Responded', respondedCount, 'Followed up with customer', 'clock')}
+      ${stat('Resolved', resolvedCount, 'Inquiries completed', 'check')}
+    </div>
+    <div class="toolbar">
+      <input id="qmessage" placeholder="Search customer name, phone, email or message...">
+      <select id="fmessage">
+        <option value="All">All Inquiries (${list.length})</option>
+        <option value="New">New / Unread (${unreadCount})</option>
+        <option value="Responded">Responded (${respondedCount})</option>
+        <option value="Resolved">Resolved (${resolvedCount})</option>
+      </select>
+      <button class="btn" onclick="exportCSV('messages')">${ic('download')} Export CSV</button>
+      <a href="index.html#contact" target="_blank" class="btn" style="display:inline-flex;align-items:center;gap:6px">${ic('help')} Test Contact Page</a>
+    </div>
+    <div class="card tablecard">
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date &amp; Time</th>
+              <th>Customer / Sender</th>
+              <th>Contact Info</th>
+              <th>Subject</th>
+              <th>Message Snippet</th>
+              <th>Status</th>
+              <th style="text-align:right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="msgrows">
+            ${messageRows(list)}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function messageRows(list) {
+  if (!list || !list.length) {
+    return '<tr><td colspan="7" class="empty">No customer messages received yet. Inquiries sent via the Contact Us page will appear here.</td></tr>';
+  }
+  return list.map(m => {
+    let isUnread = (m.status || 'New') === 'New' || m.status === 'Unread';
+    let dateStr = m.createdAt ? (new Date(m.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' })) : 'Recently';
+    let snippet = esc(m.message || '').slice(0, 70) + ((m.message || '').length > 70 ? '...' : '');
+    let phoneNum = (m.contact || '').replace(/[^0-9+]/g, '');
+
+    return `
+      <tr class="${isUnread ? 'unread-row' : ''}">
+        <td><small style="color:var(--muted)">${esc(dateStr)}</small></td>
+        <td><b>${esc(m.name || 'Anonymous')}</b></td>
+        <td>
+          <div style="font-weight:600;color:var(--text)">${esc(m.contact || 'No contact')}</div>
+          ${phoneNum ? `<div style="display:flex;gap:6px;margin-top:3px">
+            <a href="tel:${esc(phoneNum)}" class="link small" style="color:var(--g);text-decoration:none">Call</a> ·
+            <a href="https://wa.me/${esc(phoneNum.replace(/^\+/, ''))}" target="_blank" class="link small" style="color:#128c7e;text-decoration:none">WhatsApp</a>
+          </div>` : ''}
+        </td>
+        <td><span class="small" style="font-weight:600">${esc(m.subject || 'General Inquiry')}</span></td>
+        <td><span class="small" style="color:#526357">${snippet}</span></td>
+        <td>
+          <select onchange="updateMsgStatus('${esc(m.id)}', this.value)" style="padding:3px 6px;font-size:11px;font-weight:600">
+            <option value="New" ${m.status === 'New' || !m.status || m.status === 'Unread' ? 'selected' : ''}>New</option>
+            <option value="Responded" ${m.status === 'Responded' ? 'selected' : ''}>Responded</option>
+            <option value="Resolved" ${m.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+          </select>
+        </td>
+        <td style="text-align:right">
+          <div style="display:inline-flex;gap:6px">
+            <button class="btn" onclick="openMessageDetail('${esc(m.id)}')">View</button>
+            <button class="btn" style="color:#c92a2a" onclick="deleteMessage('${esc(m.id)}')">Delete</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+window.openMessageDetail = function(id) {
+  let m = (db.messages || []).find(x => String(x.id) === String(id));
+  if (!m) return notify('Message not found.');
+  let dateStr = m.createdAt ? new Date(m.createdAt).toLocaleString() : 'N/A';
+  let phoneNum = (m.contact || '').replace(/[^0-9+]/g, '');
+  let isEmail = (m.contact || '').includes('@');
+
+  modal('Inquiry from ' + esc(m.name || 'Customer'), `
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="background:#f6f9f7;padding:12px;border:1px solid #dce8df">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <b style="font-size:14px">${esc(m.name)}</b>
+          <span class="pill ${m.status === 'Resolved' ? '' : (m.status === 'Responded' ? 'blue' : 'warn')}">${esc(m.status || 'New')}</span>
+        </div>
+        <div class="small"><b>Contact:</b> ${esc(m.contact || 'None')}</div>
+        <div class="small"><b>Date &amp; Time:</b> ${esc(dateStr)}</div>
+        <div class="small"><b>Subject:</b> ${esc(m.subject || 'General Inquiry')}</div>
+      </div>
+      <div>
+        <label class="small" style="font-weight:700;color:var(--text);display:block;margin-bottom:4px">Message Content:</label>
+        <div style="padding:14px;background:#fff;border:1px solid #dce8df;white-space:pre-wrap;line-height:1.6;font-size:13px;color:#1e3829">
+          ${esc(m.message || '')}
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px;background:#f9fbf9;border:1px solid #e2ebe4">
+        <span class="small" style="font-weight:600">Quick Contact:</span>
+        ${phoneNum ? `
+          <a href="tel:${esc(phoneNum)}" class="btn" style="background:#eaf7ef;border-color:#b9e4c6;color:var(--g)">Call: ${esc(phoneNum)}</a>
+          <a href="https://wa.me/${esc(phoneNum.replace(/^\+/, ''))}" target="_blank" class="btn" style="background:#e6f7f2;border-color:#b0e5d6;color:#0b735c">Chat on WhatsApp</a>
+        ` : ''}
+        ${isEmail ? `
+          <a href="mailto:${esc(m.contact)}?subject=Re:%20${encodeURIComponent(m.subject || 'Inquiry')}" class="btn">Send Email</a>
+        ` : ''}
+      </div>
+    </div>
+  `, `
+    <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+      <div>
+        <button class="btn" style="color:#c92a2a" onclick="deleteMessage('${esc(m.id)}');closeModal()">Delete</button>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="updateMsgStatus('${esc(m.id)}', 'Responded');closeModal()">Mark Responded</button>
+        <button class="btn primary" onclick="updateMsgStatus('${esc(m.id)}', 'Resolved');closeModal()">Mark Resolved</button>
+        <button class="btn" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  `);
+};
+
+window.updateMsgStatus = async function(id, newStatus) {
+  let m = (db.messages || []).find(x => String(x.id) === String(id));
+  if (m) {
+    m.status = newStatus;
+    saveLocal();
+    updateMsgBadge();
+    let rows = document.getElementById('msgrows');
+    if (rows) rows.innerHTML = messageRows(db.messages || []);
+    notify('Message status updated to "' + newStatus + '".');
+    try {
+      await updateMessageStatusInFirestore(String(id), newStatus);
+    } catch(err) {
+      console.error('Failed to sync message status to Firestore:', err);
+    }
+  }
+};
+
+window.deleteMessage = async function(id) {
+  let m = (db.messages || []).find(x => String(x.id) === String(id));
+  if (m && confirm('Delete this inquiry from ' + (m.name || 'customer') + '?')) {
+    db.messages = (db.messages || []).filter(x => String(x.id) !== String(id));
+    saveLocal();
+    updateMsgBadge();
+    if (page === 'messages') renderPage('messages');
+    notify('Message deleted.');
+    try {
+      await deleteMessageFromFirestore(String(id));
+    } catch(err) {
+      console.error('Failed to delete message from Firestore:', err);
+    }
+  }
+};
+
+function updateMsgBadge() {
+  let list = db.messages || [];
+  let unread = list.filter(m => (m.status || 'New') === 'New' || m.status === 'Unread').length;
+  let badge = document.getElementById('sideMsgBadge');
+  if (badge) {
+    if (unread > 0) {
+      badge.textContent = unread > 99 ? '99+' : unread;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+}
+window.updateMsgBadge = updateMsgBadge;
+
+// =================== ABOUT & CONTACT PAGES MANAGEMENT ===================
+function pages_content() {
+  let s = db.settings;
+  let aboutTitle = s.aboutTitle || 'About Baromasi';
+  let aboutSubtitle = s.aboutSubtitle || 'Your trusted everyday grocery partner in Sandwip.';
+  let aboutStory = s.aboutStory || 'Baromasi is committed to bringing authentic, fresh and everyday grocery essentials directly to your doorstep in Sandwip. We carefully source our groceries to ensure fair prices, honest weights, and fast home delivery across all 14 areas of Sandwip.';
+  let aboutImage = s.aboutImage || '';
+
+  let contactPhone = s.contactPhone || '01800000000';
+  let contactWhatsapp = s.contactWhatsapp || '01800000000';
+  let contactEmail = s.contactEmail || 'hello@baromasi.example';
+  let contactAddress = s.contactAddress || 'Sandwip, Chattogram, Bangladesh';
+  let contactHours = s.contactHours || '8:00 AM – 10:00 PM (Daily)';
+
+  return heading('About Us & Contact Page Content', 'Manage text, photos, contact numbers and location details displayed on the customer storefront About Us and Contact Us pages.') +
+    `<div class="grid cols" style="grid-template-columns:1fr 1fr;align-items:start">
+      <!-- ABOUT US CONTENT CARD -->
+      <div class="card">
+        <div class="cardhead">
+          <div>
+            <h2>About Us Page Content</h2>
+            <p>Customer-facing story, values, and photo on the About Us page.</p>
+          </div>
+          <a href="index.html#about" target="_blank" class="btn" style="font-size:11px">View Live Page</a>
+        </div>
+        <form id="aboutContentForm" style="display:flex;flex-direction:column;gap:12px">
+          <div class="field">
+            <label>Page Title</label>
+            <input name="aboutTitle" value="${esc(aboutTitle)}" required placeholder="e.g. About Baromasi">
+          </div>
+          <div class="field">
+            <label>Tagline / Subtitle</label>
+            <input name="aboutSubtitle" value="${esc(aboutSubtitle)}" placeholder="e.g. Your trusted everyday grocery partner in Sandwip.">
+          </div>
+          <div class="field">
+            <label>Our Story &amp; Mission</label>
+            <textarea name="aboutStory" rows="6" style="padding:10px;line-height:1.5" required placeholder="Write your brand story and commitment to customers...">${esc(aboutStory)}</textarea>
+          </div>
+          <div class="field">
+            <label>About Us Cover / Feature Photo</label>
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+              <div id="aboutPhotoPreviewWrap" style="width:140px;height:90px;background:#f5f8f5;border:1px dashed #c0d4c7;border-radius:4px;overflow:hidden;display:grid;place-items:center">
+                ${aboutImage ? `<img id="aboutPhotoPreview" src="${aboutImage}" style="width:100%;height:100%;object-fit:cover">` : `<span class="small" style="color:var(--muted)">No Photo</span>`}
+              </div>
+              <div style="flex:1;min-width:160px">
+                <input type="file" id="aboutPhotoFile" accept="image/*" style="font-size:11px">
+                <input type="hidden" id="aboutPhotoData" name="aboutImage" value="${esc(aboutImage)}">
+                <div class="small" style="margin-top:4px">Upload clean store, team, or delivery photo (PNG, JPG, WebP).</div>
+                ${aboutImage ? `<button type="button" class="link small" onclick="removeAboutPhoto()" style="color:#b43c3c;margin-top:4px">Remove photo</button>` : ''}
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:8px">
+            <button type="submit" class="btn primary" style="width:100%">Save About Us Content</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- CONTACT US CONTENT CARD -->
+      <div class="card">
+        <div class="cardhead">
+          <div>
+            <h2>Contact Us &amp; Support Info</h2>
+            <p>Official phone, WhatsApp, email, hours and address for customer assistance.</p>
+          </div>
+          <a href="index.html#contact" target="_blank" class="btn" style="font-size:11px">View Live Page</a>
+        </div>
+        <form id="contactContentForm" style="display:flex;flex-direction:column;gap:12px">
+          <div class="field">
+            <label>Primary Phone Number</label>
+            <input name="contactPhone" value="${esc(contactPhone)}" required placeholder="e.g. 01800000000">
+            <small class="small">Customers will tap this number to call directly from mobile.</small>
+          </div>
+          <div class="field">
+            <label>WhatsApp Support Number</label>
+            <input name="contactWhatsapp" value="${esc(contactWhatsapp)}" placeholder="e.g. 01800000000">
+            <small class="small">Direct link to WhatsApp chat on customer contact page.</small>
+          </div>
+          <div class="field">
+            <label>Support Email Address</label>
+            <input type="email" name="contactEmail" value="${esc(contactEmail)}" required placeholder="e.g. support@baromasi.example">
+          </div>
+          <div class="field">
+            <label>Store Location / Physical Address</label>
+            <textarea name="contactAddress" rows="3" style="padding:10px;line-height:1.5" required placeholder="e.g. Sandwip, Chattogram, Bangladesh">${esc(contactAddress)}</textarea>
+          </div>
+          <div class="field">
+            <label>Customer Service &amp; Delivery Hours</label>
+            <input name="contactHours" value="${esc(contactHours)}" placeholder="e.g. 8:00 AM – 10:00 PM (Daily)">
+          </div>
+          <div style="margin-top:8px">
+            <button type="submit" class="btn primary" style="width:100%">Save Contact Information</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- QUICK PREVIEW / NAVIGATION CARD -->
+    <div class="card" style="margin-top:16px;background:#f9fbf9">
+      <div class="cardhead">
+        <div>
+          <h2>Customer Inquiries Quick Shortcut</h2>
+          <p>Any inquiry sent by customers through the storefront Contact Us form automatically arrives in your inbox.</p>
+        </div>
+        <button class="btn" onclick="renderPage('messages')" style="display:inline-flex;align-items:center;gap:6px">${ic('mail')} View Customer Messages (${(db.messages || []).length})</button>
+      </div>
+    </div>`;
+}
+
+window.removeAboutPhoto = async function() {
+  if (confirm('Remove About Us feature photo?')) {
+    db.settings.aboutImage = '';
+    let hidden = document.getElementById('aboutPhotoData');
+    if (hidden) hidden.value = '';
+    let wrap = document.getElementById('aboutPhotoPreviewWrap');
+    if (wrap) wrap.innerHTML = '<span class="small" style="color:var(--muted)">No Photo</span>';
+    saveLocal();
+    notify('About Us photo removed.');
+    try {
+      await saveSettingsToFirestore({ aboutImage: '' });
+    } catch(err) {
+      console.error(err);
+    }
+  }
+};
+
 
 // =================== HELPERS, MODALS & CHARTS ===================
 function modal(t, b, foot) {
@@ -3207,6 +3518,94 @@ function bind() {
         notify('Site icon / favicon updated successfully.');
         saveSettingsToFirestore({ favicon: data }).catch(err => console.error(err));
       }, true);
+    };
+  }
+
+  let qmsg = document.getElementById('qmessage');
+  let fmsg = document.getElementById('fmessage');
+  let filterM = () => {
+    let q = (qmsg?.value || '').toLowerCase();
+    let f = fmsg?.value || 'All';
+    let filtered = (db.messages || []).filter(m => {
+      let matchesQ = (m.name + ' ' + (m.contact || '') + ' ' + (m.subject || '') + ' ' + (m.message || '')).toLowerCase().includes(q);
+      let matchesF = f === 'All' || ((m.status || 'New') === f) || (f === 'New' && m.status === 'Unread');
+      return matchesQ && matchesF;
+    });
+    let mrows = document.getElementById('msgrows');
+    if (mrows) mrows.innerHTML = messageRows(filtered);
+  };
+  if (qmsg) qmsg.oninput = filterM;
+  if (fmsg) fmsg.onchange = filterM;
+
+  let aboutForm = document.getElementById('aboutContentForm');
+  if (aboutForm) {
+    aboutForm.onsubmit = async e => {
+      e.preventDefault();
+      let d = Object.fromEntries(new FormData(e.target).entries());
+      Object.assign(db.settings, {
+        aboutTitle: d.aboutTitle || 'About Baromasi',
+        aboutSubtitle: d.aboutSubtitle || '',
+        aboutStory: d.aboutStory || '',
+        aboutImage: d.aboutImage || db.settings.aboutImage || ''
+      });
+      saveLocal();
+      notify('About Us page content saved successfully.');
+      try {
+        await saveSettingsToFirestore({
+          aboutTitle: db.settings.aboutTitle,
+          aboutSubtitle: db.settings.aboutSubtitle,
+          aboutStory: db.settings.aboutStory,
+          aboutImage: db.settings.aboutImage
+        });
+      } catch(err) {
+        console.error('Failed to sync about content to Firestore:', err);
+      }
+    };
+  }
+
+  let contactForm = document.getElementById('contactContentForm');
+  if (contactForm) {
+    contactForm.onsubmit = async e => {
+      e.preventDefault();
+      let d = Object.fromEntries(new FormData(e.target).entries());
+      Object.assign(db.settings, {
+        contactPhone: d.contactPhone || '',
+        contactWhatsapp: d.contactWhatsapp || '',
+        contactEmail: d.contactEmail || '',
+        contactAddress: d.contactAddress || '',
+        contactHours: d.contactHours || ''
+      });
+      saveLocal();
+      notify('Contact Us information saved successfully.');
+      try {
+        await saveSettingsToFirestore({
+          contactPhone: db.settings.contactPhone,
+          contactWhatsapp: db.settings.contactWhatsapp,
+          contactEmail: db.settings.contactEmail,
+          contactAddress: db.settings.contactAddress,
+          contactHours: db.settings.contactHours
+        });
+      } catch(err) {
+        console.error('Failed to sync contact content to Firestore:', err);
+      }
+    };
+  }
+
+  let aboutPhotoFile = document.getElementById('aboutPhotoFile');
+  if (aboutPhotoFile) {
+    aboutPhotoFile.onchange = e => {
+      let f = e.target.files && e.target.files[0];
+      if (!f) return;
+      compressImage(f, data => {
+        db.settings.aboutImage = data;
+        let hidden = document.getElementById('aboutPhotoData');
+        let wrap = document.getElementById('aboutPhotoPreviewWrap');
+        if (hidden) hidden.value = data;
+        if (wrap) wrap.innerHTML = `<img id="aboutPhotoPreview" src="${data}" style="width:100%;height:100%;object-fit:cover">`;
+        saveLocal();
+        notify('About Us photo updated from gallery.');
+        saveSettingsToFirestore({ aboutImage: data }).catch(err => console.error(err));
+      });
     };
   }
 }
@@ -3560,8 +3959,26 @@ subscribeSettings(remoteSettings => {
     if (remoteSettings.hero !== undefined) db.settings.hero = remoteSettings.hero;
     if (remoteSettings.promo1 !== undefined) db.settings.promo1 = remoteSettings.promo1;
     if (remoteSettings.promo2 !== undefined) db.settings.promo2 = remoteSettings.promo2;
+    if (remoteSettings.aboutTitle !== undefined) db.settings.aboutTitle = remoteSettings.aboutTitle;
+    if (remoteSettings.aboutSubtitle !== undefined) db.settings.aboutSubtitle = remoteSettings.aboutSubtitle;
+    if (remoteSettings.aboutStory !== undefined) db.settings.aboutStory = remoteSettings.aboutStory;
+    if (remoteSettings.aboutImage !== undefined) db.settings.aboutImage = remoteSettings.aboutImage;
+    if (remoteSettings.contactPhone !== undefined) db.settings.contactPhone = remoteSettings.contactPhone;
+    if (remoteSettings.contactWhatsapp !== undefined) db.settings.contactWhatsapp = remoteSettings.contactWhatsapp;
+    if (remoteSettings.contactEmail !== undefined) db.settings.contactEmail = remoteSettings.contactEmail;
+    if (remoteSettings.contactAddress !== undefined) db.settings.contactAddress = remoteSettings.contactAddress;
+    if (remoteSettings.contactHours !== undefined) db.settings.contactHours = remoteSettings.contactHours;
     saveLocal();
-    if (page === 'settings' || page === 'banners') renderPage(page);
+    if (page === 'settings' || page === 'banners' || page === 'pages_content') renderPage(page);
+  }
+});
+
+subscribeMessages(remoteMsgs => {
+  if (Array.isArray(remoteMsgs)) {
+    db.messages = remoteMsgs;
+    saveLocal();
+    updateMsgBadge();
+    if (page === 'messages') renderPage('messages');
   }
 });
 
@@ -3569,6 +3986,7 @@ subscribeSettings(remoteSettings => {
 window.applyFavicon(db.settings.favicon || localStorage.getItem('af_favicon'));
 seedInitialNotifications();
 updateNotifBadge();
+updateMsgBadge();
 renderBrandLogo();
 renderAdminAvatar();
 renderPage('dashboard');
