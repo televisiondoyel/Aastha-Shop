@@ -283,6 +283,10 @@ tbody tr:hover{background:#fafdface}
   background:#fef2f2;
   color:#dc2626;
 }
+.notif-icon.message{
+  background:#eff6ff;
+  color:#2563eb;
+}
 .notif-icon.delivery{
   background:#eff6ff;
   color:#2563eb;
@@ -366,7 +370,7 @@ tbody tr:hover{background:#fafdface}
   <nav class="nav" id="nav">
     <button class="active" data-page="dashboard"><span class="ico" data-i="dashboard"></span>Dashboard</button>
     <button data-page="products"><span class="ico" data-i="box"></span>Products</button>
-    <button data-page="orders"><span class="ico" data-i="cart"></span>Orders</button>
+    <button data-page="orders"><span class="ico" data-i="cart"></span>Orders <span id="sideOrderBadge" class="side-badge" style="display:none">0</span></button>
     <button data-page="messages"><span class="ico" data-i="mail"></span>Customer Messages <span id="sideMsgBadge" class="side-badge" style="display:none">0</span></button>
     <button data-page="customers"><span class="ico" data-i="users"></span>Customers</button>
     <button data-page="inventory"><span class="ico" data-i="layers"></span>Inventory</button>
@@ -411,9 +415,10 @@ tbody tr:hover{background:#fafdface}
             <div style="font-weight:700;font-size:13px;display:flex;align-items:center;gap:6px">
               <span class="ico" data-i="bell"></span> Notifications (<span id="notifCountText">0</span>)
             </div>
-            <div style="display:flex;gap:8px">
-              <button class="link small" onclick="markAllNotificationsRead()" style="font-size:11px;text-decoration:none">Mark all as read</button>
-              <button class="link small" onclick="clearAllNotifications()" style="font-size:11px;color:#c92a2a;text-decoration:none">Clear all</button>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button class="link small" onclick="testNotificationAlert()" style="font-size:11px;color:var(--g);font-weight:700;text-decoration:none" title="Test notification sound and alert">Test Sound</button>
+              <button class="link small" onclick="markAllNotificationsRead()" style="font-size:11px;text-decoration:none">Mark read</button>
+              <button class="link small" onclick="clearAllNotifications()" style="font-size:11px;color:#c92a2a;text-decoration:none">Clear</button>
             </div>
           </div>
           <div class="notif-list" id="notifList"></div>
@@ -887,35 +892,123 @@ function updateNotifBadge() {
   }
 }
 
-function playNotificationSound() {
-  try {
+let sharedAudioCtx = null;
+function getAudioContext() {
+  if (!sharedAudioCtx) {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
-    const now = ctx.currentTime;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.setValueAtTime(587.33, now); // D5 note
-    osc.frequency.setValueAtTime(880, now + 0.12); // A5 note
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.005, now + 0.45);
-    osc.start(now);
-    osc.stop(now + 0.48);
-  } catch(e) {}
+    if (AudioCtx) {
+      sharedAudioCtx = new AudioCtx();
+    }
+  }
+  if (sharedAudioCtx && sharedAudioCtx.state === 'suspended') {
+    sharedAudioCtx.resume().catch(() => {});
+  }
+  return sharedAudioCtx;
 }
 
-function addNotification(n) {
+// Ensure audio context is ready on any click/touch/interaction
+if (typeof window !== 'undefined') {
+  ['click', 'touchstart', 'keydown'].forEach(evt => {
+    window.addEventListener(evt, () => {
+      getAudioContext();
+    }, { once: false, passive: true });
+  });
+}
+
+function playNotificationSound(type = 'order') {
+  try {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    const now = ctx.currentTime;
+
+    if (type === 'message') {
+      // Clear double-chime for customer inquiry (G5 -> C6)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'sine';
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.frequency.setValueAtTime(783.99, now); // G5
+      gain1.gain.setValueAtTime(0.24, now);
+      gain1.gain.exponentialRampToValueAtTime(0.005, now + 0.22);
+      osc1.start(now);
+      osc1.stop(now + 0.24);
+
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.frequency.setValueAtTime(1046.50, now + 0.14); // C6
+      gain2.gain.setValueAtTime(0.28, now + 0.14);
+      gain2.gain.exponentialRampToValueAtTime(0.002, now + 0.48);
+      osc2.start(now + 0.14);
+      osc2.stop(now + 0.50);
+    } else {
+      // Vibrant 3-tone chime for customer orders (E5 -> G#5 -> B5)
+      [
+        { f: 659.25, t: 0, d: 0.18, vol: 0.22 },
+        { f: 830.61, t: 0.11, d: 0.18, vol: 0.25 },
+        { f: 987.77, t: 0.22, d: 0.38, vol: 0.28 }
+      ].forEach(n => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(n.f, now + n.t);
+        gain.gain.setValueAtTime(n.vol, now + n.t);
+        gain.gain.exponentialRampToValueAtTime(0.002, now + n.t + n.d);
+        osc.start(now + n.t);
+        osc.stop(now + n.t + n.d + 0.02);
+      });
+    }
+  } catch(e) {
+    console.warn('Audio play error:', e);
+  }
+}
+window.playNotificationSound = playNotificationSound;
+
+function addNotification(n, soundType = 'order') {
   notifications.unshift(n);
   try { localStorage.setItem('af_notifications_seeded', 'true'); } catch(e) {}
   saveNotifications();
-  playNotificationSound();
+  playNotificationSound(soundType);
   notify(n.title + ' — ' + n.message);
   renderNotificationList();
+
+  // Show desktop/browser notification if permitted
+  if (typeof Notification !== 'undefined') {
+    if (Notification.permission === 'granted') {
+      try {
+        new Notification(n.title, {
+          body: n.message,
+          icon: 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 48 48\'%3E%3Crect width=\'48\' height=\'48\' rx=\'12\' fill=\'%23087e6e\'/%3E%3Ctext x=\'24\' y=\'32\' text-anchor=\'middle\' font-size=\'28\' fill=\'white\' font-family=\'Arial\'%3EB%3C/text%3E%3C/svg%3E'
+        });
+      } catch(err) {}
+    }
+  }
 }
 window.addNotification = addNotification;
+
+window.testNotificationAlert = function() {
+  playNotificationSound('order');
+  notify('Notification chime & alert test successful!');
+  if (typeof Notification !== 'undefined') {
+    if (Notification.permission === 'default') {
+      Notification.requestPermission().then(p => {
+        if (p === 'granted') {
+          new Notification('Baromasi Store Notifications', { body: 'Desktop order and message notifications are now active!' });
+        }
+      });
+    } else if (Notification.permission === 'granted') {
+      new Notification('Baromasi Notification Test', { body: 'Sound and alerts are working properly.' });
+    }
+  }
+};
 
 window.toggleNotificationPanel = function(e) {
   if (e && e.stopPropagation) e.stopPropagation();
@@ -957,8 +1050,15 @@ window.handleNotificationClick = function(id) {
   saveNotifications();
   let p = document.getElementById('notifPanel');
   if (p) p.style.display = 'none';
+
   if (n.orderId) {
+    renderPage('orders');
     viewOrder(n.orderId);
+  } else if (n.messageId) {
+    renderPage('messages');
+    openMessageDetail(n.messageId);
+  } else if (n.type === 'alert') {
+    renderPage('inventory');
   } else {
     renderNotificationList();
   }
@@ -968,14 +1068,14 @@ function renderNotificationList() {
   let list = document.getElementById('notifList');
   if (!list) return;
   if (!notifications.length) {
-    list.innerHTML = '<div style="padding:24px;text-align:center;color:#64748b;font-size:12px">No notifications. New orders and updates will appear here.</div>';
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:#64748b;font-size:12px">No notifications. New orders and customer inquiries will appear here live.</div>';
     return;
   }
   list.innerHTML = notifications.map(n => `
     <div class="notif-item ${n.read ? '' : 'unread'}" onclick="handleNotificationClick('${esc(n.id)}')">
       <div class="notif-icon ${n.type || 'order'}">
         <span class="ico" style="width:16px;height:16px">
-          ${n.type === 'alert' ? ic('alert') : (n.type === 'delivery' ? ic('truck') : ic('cart'))}
+          ${n.type === 'alert' ? ic('alert') : (n.type === 'message' ? ic('mail') : (n.type === 'delivery' ? ic('truck') : ic('cart')))}
         </span>
       </div>
       <div style="flex:1">

@@ -14,6 +14,12 @@
 .val-card{padding:16px;background:#f8faf8;border:1px solid #e0eae2;border-radius:6px;text-align:center}
 .val-card b{display:block;margin:8px 0 4px;font-size:13px;color:#1a3626}
 .val-card p{margin:0;font-size:11px;color:#5c6b61;line-height:1.4}
+/* Shimmer Skeleton */
+.skeleton-card{background:#fff;border:1px solid #f0f0f0;padding:10px}
+.skeleton-img{width:100%;height:130px;background:linear-gradient(90deg,#f0f3f1 25%,#e5ece7 50%,#f0f3f1 75%);background-size:200% 100%;animation:shimmer 1.5s infinite}
+.skeleton-line{background:linear-gradient(90deg,#f0f3f1 25%,#e5ece7 50%,#f0f3f1 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:3px}
+.skeleton-btn{width:100%;height:30px;background:#edf2ee}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 </style><link id="sitefavicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23087e6e'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-size='28' fill='white' font-family='Arial'%3EB%3C/text%3E%3C/svg%3E"></head><body>
 <header class="brandbar"><div class="brand-inner"><button class="brandmark" id="brandmark" type="button" aria-label="Store logo"><span id="brandvisual" class="brandvisual"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="22" fill="#087e6e"/><path d="M24 36S9 28 12 17c2-7 10-7 12 0 3-7 11-7 13 0 3 11-13 19-13 19Z" fill="none" stroke="#fff" stroke-width="2.5"/><path d="M24 34V20" stroke="#fff" stroke-width="2"/></svg></span></button><div class="brand-search"><input id="topsearch" placeholder="Search for groceries..." aria-label="Search products"><button id="topsearchbtn" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.5"/><path d="m16 16 5 5"/></svg></button></div><button class="headericon headercart" data-go="cart" aria-label="Open cart" title="Shopping cart"><svg viewBox="0 0 32 36" aria-hidden="true"><path d="M7 12V8.5a9 9 0 0 1 18 0V12" /><path d="M5 12h22l2 19H3L5 12Z"/><path d="M12 19v-2.5a4 4 0 0 1 8 0V19" /><path d="M12 23c1.5 2 6.5 2 8 0"/></svg><span id="headcartcount">0</span></button><button class="headericon profileicon" id="profilebutton" aria-label="Customer profile" title="My account"><svg viewBox="0 0 32 36" aria-hidden="true"><circle cx="16" cy="9" r="6.2"/><path d="M3.5 32v-3.8c0-6.1 5.6-10.4 12.5-10.4s12.5 4.3 12.5 10.4V32Z"/></svg></button></div></header>
 <nav class="nav"><a href="#home" data-page="home">Home</a><a href="#shop" data-page="shop">Shop</a><a href="#spices" data-page="spices">Spices</a><a href="#oil" data-page="oil">Oil</a><a href="#flour" data-page="flour">Flour</a><a href="#lentils" data-page="lentils">Dal or Lentil</a><a href="#packages" data-page="packages">Our Packages</a><a href="#offers" data-page="offers">Offers</a><a href="#about" data-page="about">About us</a><a href="#contact" data-page="contact">Contact us</a><a href="#cart" data-page="cart">Cart (<span id="cartcount">0</span>)</a></nav>
@@ -98,9 +104,16 @@ let storeSettings={
   contactAddress:read('af_contact_address','Sandwip, Chattogram, Bangladesh'),
   contactHours:read('af_contact_hours','8:00 AM – 10:00 PM (Daily)')
 };
+const SEED_PRODUCTS=[
+  {id:1, name:'Premium Miniket Rice', category:'Rice', brand:'Baromasi Select', price:78, old:85, discount:0, deal:false, stock:42, unit:'kg', description:'Fine grain premium aromatic miniket rice carefully cleaned and packed for daily family cooking.', image:''},
+  {id:2, name:'Pure Mustard Oil', category:'Oil', brand:'Fresh', price:185, old:200, discount:0, deal:true, stock:24, unit:'litre', description:'100% natural cold-pressed mustard oil with authentic pungent aroma and flavor.', image:''},
+  {id:3, name:'Red Lentils (Masoor Dal)', category:'Dal or Lentil', brand:'Baromasi Select', price:118, old:130, discount:0, deal:false, stock:35, unit:'kg', description:'Selected polished red lentils rich in protein, quick cooking and delicious taste.', image:''},
+  {id:4, name:'Turmeric Powder', category:'Spices', brand:'Pran', price:95, old:105, discount:0, deal:false, stock:18, unit:'pack', description:'Pure grounded turmeric powder without artificial coloring for authentic flavor.', image:''},
+  {id:5, name:'Atta Whole Wheat Flour', category:'Flour', brand:'Teer', price:65, old:70, discount:0, deal:false, stock:8, unit:'kg', description:'100% whole wheat flour rich in fiber for soft rotis and parathas.', image:''}
+];
 let cachedProducts=read('af_products',null);
 let isProductsLoaded=Array.isArray(cachedProducts)&&cachedProducts.length>0;
-let products=isProductsLoaded?cachedProducts.map(p=>({...p,image:p.image||makeImg(p.color||'#6ab06b',p.category)})):[];
+let products=(isProductsLoaded?cachedProducts:SEED_PRODUCTS).map(p=>({...p,image:p.image||makeImg(p.color||'#6ab06b',p.category)}));
 let cart=read('af_cart',[]),orders=read('af_orders',[]),editing=null,tab='overview';
 
 const DEFAULT_CATEGORIES=[
@@ -1219,8 +1232,8 @@ async function initStoreFromFirestore(){
     isProductsLoaded=true;
     if(Array.isArray(remoteProducts)&&remoteProducts.length>0){
       products=remoteProducts.sort((a,b)=>(b.id||0)-(a.id||0));
-    }else{
-      products=[];
+    }else if(!products.length){
+      products=SEED_PRODUCTS;
     }
     save();
     render();
@@ -1245,7 +1258,7 @@ async function initStoreFromFirestore(){
   }
 }
 subscribeProducts(remoteProducts=>{
-  if(Array.isArray(remoteProducts)){
+  if(Array.isArray(remoteProducts)&&remoteProducts.length>0){
     isProductsLoaded=true;
     products=remoteProducts.sort((a,b)=>(b.id||0)-(a.id||0));
     save();
@@ -1304,6 +1317,7 @@ subscribeCategories(remoteCategories=>{
     if(document.querySelector('#page-admin.active'))adminRender();
   }
 });
+
 initStoreFromFirestore();
 
 window.addEventListener('hashchange',route);render();applyBranding();startDealTimer();route();

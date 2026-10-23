@@ -400,10 +400,12 @@ export async function getSettingsFromFirestore(): Promise<StoreSettingsData | nu
 export async function saveOrderToFirestore(o: OrderData) {
   const path = `orders/${o.id}`;
   try {
-    const payload = {
+    const rawPayload = {
       ...o,
       createdAt: o.createdAt || new Date().toISOString()
     };
+    // Strip undefined properties so Firestore never throws 'Unsupported field value: undefined'
+    const payload = JSON.parse(JSON.stringify(rawPayload));
     await setDoc(doc(db, 'orders', String(o.id)), payload);
     return payload;
   } catch (err) {
@@ -472,6 +474,11 @@ export function subscribeOrders(cb: (orders: OrderData[]) => void) {
   return onSnapshot(collection(db, 'orders'), (snap) => {
     const list: OrderData[] = [];
     snap.forEach(d => list.push(d.data() as OrderData));
+    list.sort((a, b) => {
+      const timeA = new Date(a.createdAt || a.date || 0).getTime();
+      const timeB = new Date(b.createdAt || b.date || 0).getTime();
+      return (timeB || 0) - (timeA || 0);
+    });
     cb(list);
   }, (err) => {
     handleFirestoreError(err, OperationType.LIST, 'orders');
@@ -607,10 +614,11 @@ export function subscribeCategories(cb: (items: CategoryItem[]) => void) {
 export async function saveMessageToFirestore(m: CustomerMessage) {
   const path = `messages/${m.id}`;
   try {
-    const payload = {
+    const rawPayload = {
       ...m,
       createdAt: m.createdAt || new Date().toISOString()
     };
+    const payload = JSON.parse(JSON.stringify(rawPayload));
     await setDoc(doc(db, 'messages', String(m.id)), payload);
     return payload;
   } catch (err) {

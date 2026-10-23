@@ -19,7 +19,7 @@
   
   <!-- Text content -->
   <text x="60" y="95" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#fdf07a" letter-spacing="2">100% PURE &amp; NATURAL</text>
-  <text x="60" y="160" font-family="Arial, sans-serif" font-size="44" font-weight="800" fill="#ffffff">Aastha Fresh Grocery</text>
+  <text x="60" y="160" font-family="Arial, sans-serif" font-size="44" font-weight="800" fill="#ffffff">Baromasi Grocery</text>
   <text x="60" y="210" font-family="Arial, sans-serif" font-size="22" font-weight="500" fill="#e2f5e8">Quality Daily Essentials Directly Delivered to Your Doorstep</text>
   
   <!-- Highlights tags -->
@@ -44,6 +44,6 @@
     <path d="M105 20 Q115 5 130 10 Q120 25 105 20 Z" fill="#27ae60" />
     <!-- Grocery Label -->
     <rect x="45" y="125" width="120" height="42" rx="4" fill="#ffffff" />
-    <text x="105" y="151" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#087e6e">AASTHA FRESH</text>
+    <text x="105" y="151" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#087e6e">BAROMASI</text>
   </g>
 </svg>
