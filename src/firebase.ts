@@ -676,3 +676,79 @@ export function subscribeMessages(callback: (messages: CustomerMessage[]) => voi
   });
 }
 
+// =================== CUSTOMER STATUS (SUSPENSION & BLOCKING) ===================
+
+export function normalizePhoneKey(phone: string): string {
+  if (!phone) return '';
+  let digits = String(phone).replace(/[^0-9]/g, '');
+  if (digits.startsWith('880')) digits = digits.slice(2);
+  if (digits.length === 10 && digits.startsWith('1')) digits = '0' + digits;
+  return digits || String(phone).trim();
+}
+
+export async function getCustomerStatusesFromFirestore(): Promise<Record<string, string>> {
+  const path = 'settings/customer_statuses';
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'customer_statuses'));
+    if (snap.exists()) {
+      const data = snap.data();
+      const res: Record<string, string> = {};
+      for (const [k, v] of Object.entries(data)) {
+        if (typeof v === 'string') {
+          res[k] = v;
+        } else if (v && typeof v === 'object' && 'status' in v) {
+          res[k] = (v as { status: string }).status;
+        }
+      }
+      return res;
+    }
+    return {};
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+    return {};
+  }
+}
+
+export async function updateCustomerStatusInFirestore(phoneOrKey: string, status: 'Active' | 'Suspended' | 'Blocked', reason: string = '') {
+  const path = 'settings/customer_statuses';
+  try {
+    const norm = normalizePhoneKey(phoneOrKey);
+    const key = norm || phoneOrKey.replace(/[^a-zA-Z0-9_+@-]/g, '');
+    const payload = {
+      [key]: {
+        status,
+        reason,
+        updatedAt: new Date().toISOString()
+      }
+    };
+    await setDoc(doc(db, 'settings', 'customer_statuses'), payload, { merge: true });
+    return payload;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export function subscribeCustomerStatuses(cb: (statuses: Record<string, string>) => void) {
+  const path = 'settings/customer_statuses';
+  return onSnapshot(doc(db, 'settings', 'customer_statuses'), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      const res: Record<string, string> = {};
+      for (const [k, v] of Object.entries(data)) {
+        if (typeof v === 'string') {
+          res[k] = v;
+        } else if (v && typeof v === 'object' && 'status' in v) {
+          res[k] = (v as { status: string }).status;
+        }
+      }
+      cb(res);
+    } else {
+      cb({});
+    }
+  }, (err) => {
+    handleFirestoreError(err, OperationType.GET, path);
+  });
+}
+
+

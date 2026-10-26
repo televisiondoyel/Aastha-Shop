@@ -464,7 +464,11 @@ import {
   getMessagesFromFirestore,
   updateMessageStatusInFirestore,
   deleteMessageFromFirestore,
-  subscribeMessages
+  subscribeMessages,
+  normalizePhoneKey,
+  getCustomerStatusesFromFirestore,
+  updateCustomerStatusInFirestore,
+  subscribeCustomerStatuses
 } from './src/firebase.ts';
 
 // Pure SVG Icons - Absolutely ZERO emojis anywhere in the system
@@ -675,7 +679,11 @@ function loadLocal() {
 
 let db = loadLocal();
 let page = 'dashboard';
-let editId = null;
+let customerStatuses = {};
+try {
+  let saved = localStorage.getItem('af_customer_statuses');
+  if (saved) customerStatuses = JSON.parse(saved);
+} catch(e) {}
 
 // Ensure orders and products have complete structures
 function normalizeData() {
@@ -697,23 +705,29 @@ function normalizeData() {
   });
   // Extract and preserve real customers from orders and existing records
   let custMap = new Map();
-  db.customers.forEach(c => custMap.set(c.phone, c));
+  db.customers.forEach(c => {
+    let key = normalizePhoneKey(c.phone) || c.phone;
+    if (key) custMap.set(key, c);
+  });
   let deletedPhones = [];
   try { deletedPhones = JSON.parse(localStorage.getItem('af_deleted_customers') || '[]'); } catch(e) {}
   let savedStatuses = {};
   try { savedStatuses = JSON.parse(localStorage.getItem('af_customer_statuses') || '{}'); } catch(e) {}
 
   db.orders.forEach(o => {
-    if (o.phone && !deletedPhones.includes(o.phone)) {
-      let existing = custMap.get(o.phone);
+    if (o.phone) {
+      let norm = normalizePhoneKey(o.phone);
+      if (deletedPhones.includes(o.phone) || deletedPhones.includes(norm)) return;
+      let existing = custMap.get(norm) || custMap.get(o.phone);
+      let assignedStatus = customerStatuses[norm] || customerStatuses[o.phone] || savedStatuses[norm] || savedStatuses[o.phone] || 'Active';
       if (existing) {
-        existing.orders = db.orders.filter(x => x.phone === o.phone).length;
-        existing.spent = db.orders.filter(x => x.phone === o.phone).reduce((s, x) => s + (x.total || 0), 0);
+        existing.orders = db.orders.filter(x => normalizePhoneKey(x.phone) === norm || x.phone === o.phone).length;
+        existing.spent = db.orders.filter(x => normalizePhoneKey(x.phone) === norm || x.phone === o.phone).reduce((s, x) => s + (x.total || 0), 0);
         if (o.area && !existing.area) existing.area = o.area;
-        if (savedStatuses[o.phone]) existing.status = savedStatuses[o.phone];
+        existing.status = assignedStatus;
       } else {
         let newC = {
-          id: custMap.size + 1,
+          id: norm || o.phone,
           name: o.customer || o.name || 'Customer',
           phone: o.phone,
           email: '',
@@ -721,14 +735,17 @@ function normalizeData() {
           area: o.area || 'Sandwip',
           orders: 1,
           spent: o.total || 0,
-          status: savedStatuses[o.phone] || 'Active',
+          status: assignedStatus,
           joined: (o.date || new Date().toISOString().slice(0, 10))
         };
-        custMap.set(o.phone, newC);
+        custMap.set(norm, newC);
       }
     }
   });
-  db.customers = Array.from(custMap.values()).filter(c => !deletedPhones.includes(c.phone));
+  db.customers = Array.from(custMap.values()).filter(c => {
+    let norm = normalizePhoneKey(c.phone);
+    return !deletedPhones.includes(c.phone) && !deletedPhones.includes(norm);
+  });
 }
 normalizeData();
 
@@ -1853,14 +1870,26 @@ window.downloadInvoice = function(id) {
 
 // =================== CUSTOMERS ===================
 function customers() {
-  return heading('Customers', 'Manage customer profiles, delivery areas and order histories.') +
-    `<div class="toolbar">
+  let totalCust = db.customers.length;
+  let activeCust = db.customers.filter(c => (c.status || 'Active') === 'Active').length;
+  let suspendedCust = db.customers.filter(c => c.status === 'Suspended').length;
+  let blockedCust = db.customers.filter(c => c.status === 'Blocked').length;
+  let totalSpent = db.customers.reduce((s, c) => s + (c.spent || 0), 0);
+
+  return heading('Customers', 'Manage customer profiles, account statuses (Active / Suspended / Blocked), and order histories.') +
+    `<div class="grid stats" style="margin-bottom:16px">
+      ${stat('Total Customers', totalCust, 'Registered & ordering customers', 'users')}
+      ${stat('Active Customers', activeCust, 'Allowed to place orders', 'check')}
+      ${stat('Suspended / Blocked', (suspendedCust + blockedCust), suspendedCust + ' Suspended · ' + blockedCust + ' Blocked', 'alert')}
+      ${stat('Total Revenue', money(totalSpent), 'Lifetime customer value', 'wallet')}
+    </div>
+    <div class="toolbar">
       <input id="qcustomer" placeholder="Search customer name, phone or delivery area">
       <select id="fcustomer">
-        <option value="All">All Statuses</option>
-        <option value="Active">Active</option>
-        <option value="Suspended">Suspended</option>
-        <option value="Blocked">Blocked</option>
+        <option value="All">All Statuses (${totalCust})</option>
+        <option value="Active">Active (${activeCust})</option>
+        <option value="Suspended">Suspended (${suspendedCust})</option>
+        <option value="Blocked">Blocked (${blockedCust})</option>
       </select>
       <button class="btn" onclick="exportCSV('customers')">${ic('download')} Export CSV</button>
     </div>
@@ -1870,12 +1899,12 @@ function customers() {
           <thead>
             <tr>
               <th>Customer</th>
-              <th>Contact</th>
+              <th>Contact Phone</th>
               <th>Delivery Area</th>
               <th>Orders</th>
               <th>Total Spent</th>
-              <th>Joined</th>
-              <th>Status</th>
+              <th>Joined Date</th>
+              <th>Account Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -1886,87 +1915,144 @@ function customers() {
 }
 
 function customerRows(arr) {
-  return arr.map(c => `
+  return arr.map(c => {
+    let isSuspended = c.status === 'Suspended';
+    let isBlocked = c.status === 'Blocked';
+    let safePhone = String(c.phone || '').replace(/'/g, "\\'");
+    return `
     <tr>
-      <td><b>${esc(c.name)}</b><div class="small">${esc(c.email || 'No email')}</div></td>
-      <td>${esc(c.phone)}<div class="small">${esc(c.address || '')}</div></td>
+      <td><b>${esc(c.name)}</b><div class="small">${esc(c.email || 'No email registered')}</div></td>
+      <td>
+        <b style="color:#1e3829">${esc(c.phone)}</b>
+        <div class="small">${esc(c.address || '')}</div>
+      </td>
       <td><b>${esc(c.area || 'Sandwip')}</b></td>
       <td><b>${c.orders || 1}</b></td>
       <td><b>${money(c.spent)}</b></td>
       <td>${esc(c.joined)}</td>
-      <td>${pill(c.status)}</td>
+      <td>${pill(c.status || 'Active')}</td>
       <td>
-        <button class="link" onclick="viewCustomer(${c.id})">View History</button>
-        <button class="link" onclick="suspendCustomer(${c.id})">${c.status === 'Active' ? 'Suspend' : 'Activate'}</button>
-        <button class="link" style="color:#b43c3c" onclick="deleteCustomer(${c.id})">Delete</button>
+        <button class="link" onclick="viewCustomer('${safePhone}')">View</button>
+        ${isSuspended ?
+          `<button class="link" style="color:#16864b;font-weight:700" onclick="toggleCustomerStatus('${safePhone}','Active')">Activate</button>` :
+          `<button class="link" style="color:#d97706;font-weight:700" onclick="toggleCustomerStatus('${safePhone}','Suspended')">Suspend</button>`
+        }
+        ${isBlocked ?
+          `<button class="link" style="color:#16864b" onclick="toggleCustomerStatus('${safePhone}','Active')">Unblock</button>` :
+          `<button class="link" style="color:#b43c3c" onclick="toggleCustomerStatus('${safePhone}','Blocked')">Block</button>`
+        }
+        <button class="link" style="color:#b43c3c" onclick="deleteCustomer('${safePhone}')">Delete</button>
       </td>
     </tr>
-  `).join('') || '<tr><td colspan="8"><div class="empty">No customer records found.</div></td></tr>';
+  `;
+  }).join('') || '<tr><td colspan="8"><div class="empty">No customer records found.</div></td></tr>';
 }
 
-window.viewCustomer = function(id) {
-  let c = db.customers.find(x => x.id === id);
-  if (!c) return;
-  let matches = db.orders.filter(o => o.phone === c.phone || (o.customer && o.customer.toLowerCase() === c.name.toLowerCase()));
+window.viewCustomer = function(phoneOrId) {
+  let norm = normalizePhoneKey(String(phoneOrId));
+  let c = db.customers.find(x => normalizePhoneKey(x.phone) === norm || String(x.id) === String(phoneOrId) || x.phone === String(phoneOrId));
+  if (!c) return notify('Customer profile not found.');
+  let safePhone = String(c.phone || norm).replace(/'/g, "\\'");
+  let matches = db.orders.filter(o => normalizePhoneKey(o.phone) === norm || o.phone === c.phone || (o.customer && o.customer.toLowerCase() === c.name.toLowerCase()));
+  let isSuspended = c.status === 'Suspended';
+  let isBlocked = c.status === 'Blocked';
+
   modal('Customer Profile: ' + esc(c.name), `
-    <b>${esc(c.name)}</b>
-    <p>${esc(c.email || 'No email')} · Contact: <b>${esc(c.phone)}</b></p>
-    <p>Delivery Area: <b style="color:#18733f">${esc(c.area || 'Sandwip')}</b></p>
-    <p>Address: ${esc(c.address || 'Not specified')}</p>
-    <div class="setting-row">
-      <div>Total orders: <b>${matches.length || c.orders || 1}</b></div>
-      <div>Total spent: <b>${money(c.spent)}</b></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid #dfe9e0">
+      <div>
+        <b style="font-size:16px">${esc(c.name)}</b>
+        <div class="small" style="color:var(--muted)">${esc(c.email || 'No email registered')} · Contact: <a href="tel:${esc(c.phone)}" style="color:var(--g);font-weight:700">${esc(c.phone)}</a></div>
+      </div>
+      <div>
+        <b>Account Status:</b> ${pill(c.status || 'Active')}
+      </div>
     </div>
-    <h3 style="margin:14px 0 8px 0;font-size:13px">Order History</h3>
+    <p style="margin:4px 0"><b>Delivery Area:</b> <span style="color:#18733f;font-weight:700">${esc(c.area || 'Sandwip')}</span></p>
+    <p style="margin:4px 0"><b>Saved Address:</b> ${esc(c.address || 'Not specified')}</p>
+    <div class="setting-row" style="margin-top:10px">
+      <div>Total orders placed: <b>${matches.length || c.orders || 1}</b></div>
+      <div>Total amount spent: <b>${money(c.spent)}</b></div>
+    </div>
+    <div style="background:#f8faf8;border:1px solid #dfe9e0;padding:12px;margin:12px 0">
+      <b style="font-size:12px;display:block;margin-bottom:6px">Customer Account Control:</b>
+      <p class="small" style="margin:0 0 8px 0;color:#555">
+        ${isSuspended ?
+          '<span style="color:#d97706;font-weight:bold">This customer is currently SUSPENDED. They cannot place new orders.</span>' :
+          (isBlocked ? '<span style="color:#dc2626;font-weight:bold">This customer is BLOCKED from the store.</span>' : '<span style="color:#15803d">This customer is ACTIVE and permitted to place orders.</span>')
+        }
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${isSuspended ?
+          `<button class="btn" style="background:#16864b;color:#fff" onclick="toggleCustomerStatus('${safePhone}','Active');closeModal()">Activate Customer</button>` :
+          `<button class="btn" style="background:#d97706;color:#fff" onclick="toggleCustomerStatus('${safePhone}','Suspended');closeModal()">Suspend Customer</button>`
+        }
+        ${isBlocked ?
+          `<button class="btn" onclick="toggleCustomerStatus('${safePhone}','Active');closeModal()">Unblock Customer</button>` :
+          `<button class="btn" style="color:#b43c3c" onclick="toggleCustomerStatus('${safePhone}','Blocked');closeModal()">Block Customer</button>`
+        }
+      </div>
+    </div>
+    <h3 style="margin:14px 0 8px 0;font-size:13px">Order History (${matches.length})</h3>
     ${matches.length ? matches.map(o => `
       <div class="setting-row">
-        <div><b>${esc(o.id)}</b><div class="small">${esc(o.date)} · ${esc(o.status)}</div></div>
+        <div><b>${esc(o.id)}</b><div class="small">${esc(o.date)} · ${esc(o.status)} · ${esc(o.paymentMethod || 'COD')}</div></div>
         <b>${money(o.total)}</b>
       </div>
     `).join('') : '<p class="small">No matching order details in database.</p>'}
-  `, `<button class="btn" onclick="closeModal()">Close</button><button class="btn" style="background:#b43c3c;color:#fff" onclick="deleteCustomer(${c.id});closeModal()">Delete Customer</button>`);
+  `, `<button class="btn" onclick="closeModal()">Close</button><button class="btn" style="background:#b43c3c;color:#fff" onclick="deleteCustomer('${safePhone}');closeModal()">Delete Customer</button>`);
 };
 
-window.suspendCustomer = function(id) {
-  let c = db.customers.find(x => x.id === id);
-  if (!c) return;
-  c.status = c.status === 'Active' ? 'Suspended' : 'Active';
-  let savedStatuses = {};
-  try { savedStatuses = JSON.parse(localStorage.getItem('af_customer_statuses') || '{}'); } catch(e) {}
-  if (c.phone) savedStatuses[c.phone] = c.status;
-  localStorage.setItem('af_customer_statuses', JSON.stringify(savedStatuses));
+window.toggleCustomerStatus = async function(phone, newStatus) {
+  let norm = normalizePhoneKey(phone);
+  if (!norm && !phone) return;
+
+  customerStatuses[norm] = newStatus;
+  if (phone) customerStatuses[phone] = newStatus;
+  try {
+    localStorage.setItem('af_customer_statuses', JSON.stringify(customerStatuses));
+  } catch(e) {}
+
+  db.customers.forEach(c => {
+    if (normalizePhoneKey(c.phone) === norm || c.phone === phone) {
+      c.status = newStatus;
+    }
+  });
+
   saveLocal();
   renderPage('customers');
-  notify('Customer status successfully updated to ' + c.status + '.');
-};
 
-window.deleteCustomer = function(id) {
-  let c = db.customers.find(x => x.id === id);
-  if (!c) return;
-  if (confirm('Are you sure you want to delete customer "' + c.name + '"?')) {
-    let deletedPhones = [];
-    try { deletedPhones = JSON.parse(localStorage.getItem('af_deleted_customers') || '[]'); } catch(e) {}
-    if (c.phone && !deletedPhones.includes(c.phone)) deletedPhones.push(c.phone);
-    localStorage.setItem('af_deleted_customers', JSON.stringify(deletedPhones));
-    db.customers = db.customers.filter(x => x.id !== id);
-    saveLocal();
-    renderPage('customers');
-    notify('Customer "' + c.name + '" deleted successfully.');
+  let actionBangla = newStatus === 'Suspended' ? 'স্থগিত (Suspended)' : (newStatus === 'Blocked' ? 'ব্লক (Blocked)' : 'সক্রিয় (Active)');
+  notify('Customer ' + (phone || norm) + ' is now ' + newStatus + '.');
+
+  try {
+    await updateCustomerStatusInFirestore(norm || phone, newStatus);
+    notify('Customer status saved and synchronized to cloud!');
+  } catch(err) {
+    console.error('Failed to sync customer status to Firestore:', err);
+    notify('Status saved locally. Cloud sync warning.');
   }
 };
+window.suspendCustomer = function(phoneOrId) {
+  let norm = normalizePhoneKey(String(phoneOrId));
+  let c = db.customers.find(x => normalizePhoneKey(x.phone) === norm || String(x.id) === String(phoneOrId) || x.phone === String(phoneOrId));
+  let nextStatus = (c && c.status === 'Suspended') ? 'Active' : 'Suspended';
+  window.toggleCustomerStatus(c ? c.phone : phoneOrId, nextStatus);
+};
 
-window.blockCustomer = function(id) {
-  let c = db.customers.find(x => x.id === id);
-  if (!c) return;
-  if (confirm((c.status === 'Blocked' ? 'Unblock ' : 'Block ') + c.name + '?')) {
-    c.status = c.status === 'Blocked' ? 'Active' : 'Blocked';
-    let savedStatuses = {};
-    try { savedStatuses = JSON.parse(localStorage.getItem('af_customer_statuses') || '{}'); } catch(e) {}
-    if (c.phone) savedStatuses[c.phone] = c.status;
-    localStorage.setItem('af_customer_statuses', JSON.stringify(savedStatuses));
+window.deleteCustomer = function(phoneOrId) {
+  let norm = normalizePhoneKey(String(phoneOrId));
+  let c = db.customers.find(x => normalizePhoneKey(x.phone) === norm || String(x.id) === String(phoneOrId) || x.phone === String(phoneOrId));
+  let name = c ? c.name : (phoneOrId || 'this customer');
+  if (confirm('Are you sure you want to delete customer "' + name + '"?')) {
+    let deletedPhones = [];
+    try { deletedPhones = JSON.parse(localStorage.getItem('af_deleted_customers') || '[]'); } catch(e) {}
+    if (c && c.phone && !deletedPhones.includes(c.phone)) deletedPhones.push(c.phone);
+    if (norm && !deletedPhones.includes(norm)) deletedPhones.push(norm);
+    localStorage.setItem('af_deleted_customers', JSON.stringify(deletedPhones));
+    db.customers = db.customers.filter(x => normalizePhoneKey(x.phone) !== norm && x.phone !== phoneOrId);
     saveLocal();
     renderPage('customers');
-    notify('Customer marked ' + c.status);
+    notify('Customer "' + name + '" deleted successfully.');
   }
 };
 
@@ -4079,6 +4165,15 @@ subscribeMessages(remoteMsgs => {
     saveLocal();
     updateMsgBadge();
     if (page === 'messages') renderPage('messages');
+  }
+});
+
+subscribeCustomerStatuses(remoteStatuses => {
+  if (remoteStatuses && typeof remoteStatuses === 'object') {
+    customerStatuses = { ...customerStatuses, ...remoteStatuses };
+    try { localStorage.setItem('af_customer_statuses', JSON.stringify(customerStatuses)); } catch(e) {}
+    normalizeData();
+    if (page === 'customers') renderPage('customers');
   }
 });
 

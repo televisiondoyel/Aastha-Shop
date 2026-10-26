@@ -287,7 +287,9 @@ import {
   logoutFromFirebase,
   updateUserProfile,
   subscribeAuth,
-  testConnection
+  testConnection,
+  normalizePhoneKey,
+  subscribeCustomerStatuses
 } from './src/firebase.ts';
 
 testConnection();
@@ -295,6 +297,15 @@ testConnection();
 let activeTab = 'orders';
 let authMode = 'signin';
 let currentUser = null;
+let customerStatuses = read('af_customer_statuses', {}) || {};
+
+subscribeCustomerStatuses(st => {
+  if (st && typeof st === 'object') {
+    customerStatuses = { ...customerStatuses, ...st };
+    try { localStorage.setItem('af_customer_statuses', JSON.stringify(customerStatuses)); } catch(e) {}
+    updateUI();
+  }
+});
 
 function showMessage(msg) {
   const m = document.getElementById('message');
@@ -482,7 +493,14 @@ function updateUI() {
     if (titleEl) titleEl.textContent = currentUser.displayName || cust.name || 'My Account';
     authBtn.textContent = 'Sign Out';
     tabs.style.display = 'flex';
-    quickBadge.innerHTML = '';
+    
+    let norm = normalizePhoneKey(cust.phone || '');
+    let st = customerStatuses[norm] || customerStatuses[cust.phone] || '';
+    if (st === 'Suspended' || st === 'Blocked') {
+      quickBadge.innerHTML = `<span style="background:${st === 'Blocked' ? '#fee2e2' : '#fef3c7'};color:${st === 'Blocked' ? '#991b1b' : '#92400e'};font-weight:700;font-size:12px;padding:6px 12px;border:1px solid ${st === 'Blocked' ? '#fca5a5' : '#fcd34d'}">⚠️ Account ${st}</span>`;
+    } else {
+      quickBadge.innerHTML = '';
+    }
     renderTab();
   } else {
     greeting.textContent = 'Welcome! Sign In or Sign Up to track orders and save your address.';

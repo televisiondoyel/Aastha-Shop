@@ -70,11 +70,22 @@ import {
   getCategoriesFromFirestore,
   saveCategoriesToFirestore,
   subscribeCategories,
-  saveMessageToFirestore
+  saveMessageToFirestore,
+  normalizePhoneKey,
+  subscribeCustomerStatuses
 } from './src/firebase.ts';
 testConnection();
 let firebaseUser = null;
 let adminAuthDoc = read('af_admin_auth', null);
+let customerStatuses = read('af_customer_statuses', {}) || {};
+subscribeCustomerStatuses(st => {
+  if (st && typeof st === 'object') {
+    customerStatuses = { ...customerStatuses, ...st };
+    try { localStorage.setItem('af_customer_statuses', JSON.stringify(customerStatuses)); } catch(e) {}
+    let act = document.querySelector('#page-account.active');
+    if (act) accountRender();
+  }
+});
 subscribeAuth((u, p) => {
   firebaseUser = u;
   if (p) localStorage.setItem('af_customer_profile', JSON.stringify(p));
@@ -471,7 +482,28 @@ function showProduct(id){let p=products.find(x=>x.id===id);if(!p){go('shop');ret
 function add(id,n=1){let p=products.find(p=>p.id===+id);if(!p)return;let i=cart.find(i=>i.id===p.id);if(i)i.qty+=n;else cart.push({id:p.id,qty:n});save();count();toast('Added to cart')}
 function cartRender(){let host=$('cartitems');if(!cart.length){host.innerHTML='<div class="empty">Your cart is empty. <p><button class="primary" data-go="shop">Start Shopping</button></p></div>';$('summary').innerHTML='';return}host.innerHTML=cart.map(i=>{let p=products.find(p=>p.id===i.id);return p?`<div class="cartrow"><img src="${p.image}" alt=""><div><b>${esc(p.name)}</b><div class="price">${money(p.price)}</div></div><div class="qty" style="margin:0"><button data-change="${p.id}" data-delta="-1">−</button><span>${i.qty}</span><button data-change="${p.id}" data-delta="1">+</button></div><div class="line-total">${money(p.price*i.qty)}</div><button class="tiny danger" data-remove="${p.id}">Remove</button></div>`:''}).join('');let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=getDeliveryFee(s),freeThreshold=Number(storeSettings.freeDelivery??1000);$('summary').innerHTML=`<div class="summary"><div class="sumrow"><span>Subtotal</span><b>${money(s)}</b></div><div class="sumrow"><span>Delivery</span><b>${d?money(d):'FREE'}</b></div><div class="sumrow total"><span>Total</span><b>${money(s+d)}</b></div><button class="primary" style="width:100%;margin-top:12px" data-go="checkout">Proceed to Checkout</button>${freeThreshold>0?`<p>Free delivery on orders of ${money(freeThreshold)} or more.</p>`:''}</div>`}
 function checkoutTotal(){let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=getDeliveryFee(s);$('checkouttotal').textContent='Order total: '+money(s+d)+' (Delivery: '+(d?money(d):'FREE')+')';let cp=read('af_customer_profile',null);if(cp){if(!$('name').value&&cp.name)$('name').value=cp.name;if(!$('phone').value&&cp.phone)$('phone').value=cp.phone;if(!$('address').value&&cp.address)$('address').value=cp.address;if(!$('area').value&&cp.area)$('area').value=cp.area;if(!$('note').value&&cp.note)$('note').value=cp.note;}}
-$('checkout').addEventListener('submit',e=>{e.preventDefault();if(!cart.length){toast('Your cart is empty');location.hash='shop';return}let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=getDeliveryFee(s),orderItems=cart.map(i=>{let p=products.find(prod=>prod.id===i.id);return{id:i.id,name:p?p.name:('Product #'+i.id),price:p?p.price:0,qty:i.qty,unit:p?.unit||'kg',image:p?.image||''}}),o={id:'AF'+Date.now().toString().slice(-7),customer:$('name').value,name:$('name').value,phone:$('phone').value,address:$('address').value,area:$('area').value,note:$('note').value,items:orderItems,itemsDetail:orderItems,subtotal:s,deliveryFee:d,total:s+d,payment:'Pending',paymentMethod:'Cash on Delivery',status:'Pending',date:new Date().toLocaleString(),createdAt:new Date().toISOString()};orders.unshift(o);let cp=read('af_customer_profile',null);if(!cp){localStorage.setItem('af_customer_profile',JSON.stringify({name:o.name,phone:o.phone,email:'',address:o.address,area:o.area,note:o.note}))}else{if(!cp.address)cp.address=o.address;if(!cp.area)cp.area=o.area;if(!cp.phone)cp.phone=o.phone;localStorage.setItem('af_customer_profile',JSON.stringify(cp))}cart=[];save();saveOrderToFirestore(o).catch(err=>console.error('Failed to save order to Firestore:',err));$('confirmation').textContent='Order '+o.id+' received. Total '+money(o.total)+'. Payment: Cash on Delivery.';location.hash='success';toast('Order placed')});
+$('checkout').addEventListener('submit',e=>{
+  e.preventDefault();
+  if(!cart.length){toast('Your cart is empty');location.hash='shop';return}
+  let phone=$('phone').value.trim();
+  let norm=normalizePhoneKey(phone);
+  let custStatus=customerStatuses[norm]||customerStatuses[phone]||'';
+  if(custStatus==='Suspended'||custStatus==='Blocked'){
+    let stText=custStatus==='Blocked'?'ব্লক (Blocked)':'স্থগিত (Suspended)';
+    toast('দুঃখিত, এই নম্বরটি '+stText+' রয়েছে। অর্ডার নেওয়া সম্ভব নয়।');
+    let errBanner=$('checkoutSuspendedErr');
+    if(!errBanner){
+      errBanner=document.createElement('div');
+      errBanner.id='checkoutSuspendedErr';
+      errBanner.style.cssText='color:#991b1b;background:#fee2e2;border:1px solid #f87171;padding:14px;margin-bottom:14px;font-size:13px;line-height:1.5;font-weight:600';
+      $('checkout').insertBefore(errBanner,$('checkout').firstChild);
+    }
+    errBanner.innerHTML='⚠️ দুঃখিত! এই মোবাইল নম্বরটি ('+esc(phone)+') অ্যাডমিন প্যানেল থেকে <b>'+stText+'</b> করা হয়েছে। আপনার কোনো অর্ডার সম্পন্ন করা যাবে না। বিস্তারিত জানতে দয়া করে আমাদের সাপোর্টে যোগাযোগ করুন।';
+    errBanner.scrollIntoView({behavior:'smooth'});
+    return;
+  }
+  let s=cart.reduce((a,i)=>a+(products.find(p=>p.id===i.id)?.price||0)*i.qty,0),d=getDeliveryFee(s),orderItems=cart.map(i=>{let p=products.find(prod=>prod.id===i.id);return{id:i.id,name:p?p.name:('Product #'+i.id),price:p?p.price:0,qty:i.qty,unit:p?.unit||'kg',image:p?.image||''}}),o={id:'AF'+Date.now().toString().slice(-7),customer:$('name').value,name:$('name').value,phone:$('phone').value,address:$('address').value,area:$('area').value,note:$('note').value,items:orderItems,itemsDetail:orderItems,subtotal:s,deliveryFee:d,total:s+d,payment:'Pending',paymentMethod:'Cash on Delivery',status:'Pending',date:new Date().toLocaleString(),createdAt:new Date().toISOString()};orders.unshift(o);let cp=read('af_customer_profile',null);if(!cp){localStorage.setItem('af_customer_profile',JSON.stringify({name:o.name,phone:o.phone,email:'',address:o.address,area:o.area,note:o.note}))}else{if(!cp.address)cp.address=o.address;if(!cp.area)cp.area=o.area;if(!cp.phone)cp.phone=o.phone;localStorage.setItem('af_customer_profile',JSON.stringify(cp))}cart=[];save();saveOrderToFirestore(o).catch(err=>console.error('Failed to save order to Firestore:',err));$('confirmation').textContent='Order '+o.id+' received. Total '+money(o.total)+'. Payment: Cash on Delivery.';location.hash='success';toast('Order placed')
+});
 $('topsearchbtn').addEventListener('click',()=>{location.hash='shop';setTimeout(()=>{$('search').value=$('topsearch').value;catalog();$('search').focus()},40)});$('topsearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('topsearchbtn').click()});$('search').addEventListener('input',catalog);$('filter').addEventListener('change',catalog);$('sort').addEventListener('change',catalog);
 document.addEventListener('click',e=>{
   let g=e.target.closest('[data-go]');
@@ -995,6 +1027,18 @@ function accountRender(){
     let filtered=orders.filter(o=>o.phone===cust.phone);
     if(filtered.length)userOrders=filtered;
   }
+  let custPhone=(cust&&cust.phone)?cust.phone:'';
+  let normPhone=normalizePhoneKey(custPhone);
+  let custSt=customerStatuses[normPhone]||customerStatuses[custPhone]||'';
+  let isSuspended=custSt==='Suspended';
+  let isBlocked=custSt==='Blocked';
+  let statusBannerHtml=(isSuspended||isBlocked)?`
+    <div class="card" style="border-left:4px solid ${isBlocked?'#dc2626':'#d97706'};background:${isBlocked?'#fef2f2':'#fffbeb'};color:${isBlocked?'#991b1b':'#92400e'};padding:14px;margin-bottom:14px">
+      <b style="font-size:14px">⚠️ একাউন্ট ${isBlocked?'ব্লক করা হয়েছে (Account Blocked)':'স্থগিত করা হয়েছে (Account Suspended)'}</b>
+      <p style="margin:4px 0 0 0;font-size:12px;line-height:1.5">আপনার একাউন্টটি অ্যাডমিন প্যানেল থেকে ${isBlocked?'ব্লক':'স্থগিত'} রয়েছে। নতুন কোনো অর্ডার গ্রহণ করা সম্ভব নয়। বিস্তারিত তথ্যের জন্য বারোমাসি হেল্পলাইনে যোগাযোগ করুন।</p>
+    </div>
+  `:'';
+
   let displayName=(cust&&cust.name)?cust.name:(user&&user.displayName?user.displayName:'Customer');
   let headerHtml=`
     <div class="card" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
@@ -1006,6 +1050,7 @@ function accountRender(){
         <button class="secondary" data-go="shop">Shop More</button>
       </div>
     </div>
+    ${statusBannerHtml}
     <div class="tabs">
       <button class="tab ${accountTab==='orders'?'active':''}" data-actab="orders">My Orders (${userOrders.length})</button>
       <button class="tab ${accountTab==='profile'?'active':''}" data-actab="profile">Profile Details</button>
