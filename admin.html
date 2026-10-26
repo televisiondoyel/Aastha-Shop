@@ -391,6 +391,62 @@ a { color: inherit; text-decoration: none; }
   background: var(--teal-dark);
 }
 
+/* Icon-based Action Buttons for Tables & Toolbars */
+.table-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #FFFFFF;
+  color: var(--text-dark);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.icon-btn .ico {
+  width: 16px;
+  height: 16px;
+}
+.icon-btn .ico svg {
+  width: 16px;
+  height: 16px;
+}
+.icon-btn:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+  transform: translateY(-1px);
+}
+.icon-btn.view { color: var(--teal-dark); }
+.icon-btn.view:hover { background: #F0FDFA; border-color: var(--teal); color: var(--teal); }
+.icon-btn.edit { color: var(--blue); }
+.icon-btn.edit:hover { background: #EFF6FF; border-color: var(--blue); color: #2563EB; }
+.icon-btn.download { color: #059669; }
+.icon-btn.download:hover { background: #ECFDF5; border-color: #10B981; color: #047857; }
+.icon-btn.delete { color: #DC2626; }
+.icon-btn.delete:hover { background: #FEF2F2; border-color: #EF4444; color: #B91C1C; }
+.icon-btn.suspend { color: #D97706; }
+.icon-btn.suspend:hover { background: #FFFBEB; border-color: #F59E0B; color: #B45309; }
+.icon-btn.activate { color: #16A34A; }
+.icon-btn.activate:hover { background: #F0FDF4; border-color: #22C55E; color: #15803D; }
+
+.top-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* Cards & Layout */
 .grid { display: grid; gap: 18px; }
 .stats { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 18px; }
@@ -636,6 +692,66 @@ a { color: inherit; text-decoration: none; }
 .pill.warn { color: #F59E0B !important; }
 .pill.bad { color: #EF4444 !important; }
 .pill.blue { color: #3B82F6 !important; }
+
+/* Stock Alerts & Inventory Cards - Reference Style */
+.stock-alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.stock-alert-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line-light);
+}
+.stock-alert-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.stock-alert-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  flex: 1;
+}
+.stock-alert-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.stock-alert-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.stock-alert-info {
+  min-width: 0;
+  flex: 1;
+}
+.stock-alert-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stock-alert-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
 
 /* Recent Comment / Message Card - Reference Style */
 .comment-card-list {
@@ -1033,7 +1149,7 @@ tbody tr:hover { background: #F8FAFC; }
 
   <nav class="nav" id="nav">
     <button class="active" data-page="dashboard"><span class="ico" data-i="dashboard"></span>Dashboard</button>
-    <button data-page="orders"><span class="ico" data-i="calendar"></span>Orders <span id="sideOrderBadge" class="side-badge order-badge" style="display:none">0</span></button>
+    <button data-page="orders"><span class="ico" data-i="orders"></span>Orders <span id="sideOrderBadge" class="side-badge order-badge" style="display:none">0</span></button>
     <button data-page="messages"><span class="ico" data-i="inbox"></span>Inbox <span id="sideMsgBadge" class="side-badge msg-badge" style="display:none">0</span></button>
     <button data-page="products"><span class="ico" data-i="widget"></span>Products</button>
     <button data-page="delivery"><span class="ico" data-i="tasks"></span>Tasks / Delivery</button>
@@ -1089,8 +1205,8 @@ tbody tr:hover { background: #F8FAFC; }
           <div class="notif-list" id="notifList"></div>
         </div>
       </div>
-      <a href="index.html#home" class="btn" title="View customer storefront" style="display:inline-flex;align-items:center;gap:6px">
-        <span class="ico" data-i="store"></span> Storefront
+      <a href="index.html#home" class="btn top-icon-btn" title="View Storefront" aria-label="View Storefront">
+        <span class="ico" data-i="store"></span>
       </a>
       <div class="avatar" id="topAdminAvatar" onclick="openAdminProfileModal()" title="Admin Profile &amp; Photo Upload">SA</div>
     </div>
@@ -1152,7 +1268,8 @@ const icons = {
   eye: '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
   trash: '<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
   box: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>',
-  cart: '<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>',
+  cart: '<circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>',
+  orders: '<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>',
   users: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   layers: '<path d="m12 2 9 5-9 5-9-5 9-5ZM3 12l9 5 9-5M3 17l9 5 9-5"/>',
   truck: '<path d="M3 6h12v12H3zM15 10h4l3 4v4h-7z"/><circle cx="7.5" cy="19" r="2"/><circle cx="18.5" cy="19" r="2"/>',
@@ -1171,7 +1288,7 @@ const icons = {
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   download: '<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
   menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
-  store: '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>',
+  store: '<path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/>',
   logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'
 };
 
@@ -1959,10 +2076,44 @@ function renderDashOrderRows(arr) {
       <td><span style="color:#64748B">${esc(o.date || 'Recent')}</span></td>
       <td>${statusDot(o.status)}</td>
       <td style="text-align:right">
-        <button class="link" onclick="viewOrder('${esc(o.id)}')">${ic('eye')} View</button>
+        <div class="table-actions" style="justify-content:flex-end">
+          <button class="icon-btn view" onclick="viewOrder('${esc(o.id)}')" title="View Order Items">${ic('eye')}</button>
+          <button class="icon-btn download" onclick="downloadInvoice('${esc(o.id)}')" title="Download Invoice">${ic('download')}</button>
+        </div>
       </td>
     </tr>
   `).join('');
+}
+
+function renderDashStockAlerts() {
+  let lowLimit = db.settings.lowStock || 10;
+  let items = (db.products || []).filter(p => Number(p.stock) <= lowLimit).slice(0, 4);
+  if (!items.length) {
+    items = (db.products || []).slice(0, 4);
+  }
+  if (!items.length) {
+    return '<div class="empty">All inventory levels are healthy.</div>';
+  }
+  return items.map(p => {
+    let isOOS = Number(p.stock) === 0;
+    return `
+      <div class="stock-alert-item">
+        <div class="stock-alert-left">
+          <div class="stock-alert-thumb">
+            ${p.image ? `<img src="${p.image}" alt="${esc(p.name)}">` : `<span class="ico">${icons.box}</span>`}
+          </div>
+          <div class="stock-alert-info">
+            <div class="stock-alert-title">${esc(p.name)}</div>
+            <div class="stock-alert-sub">${esc(p.category)} · <span style="font-family:monospace">${esc(p.sku)}</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          ${statusDot(isOOS ? 'Out of Stock' : (p.stock + ' ' + (p.unit || 'kg') + ' left'))}
+          <button class="icon-btn edit" onclick="openProduct(${p.id})" title="Edit Product / Restock">${ic('pencil')}</button>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 window.filterDashOrders = function(q) {
@@ -2036,9 +2187,6 @@ function dashboard() {
     totalItemsSold = 72;
   }
 
-  let recentMsgs = (db.messages || []).slice(0, 2);
-  let avatarColors = ['pink', 'orange', 'blue', 'purple'];
-
   return `
     <!-- Top Row: Income Bar Chart + Calendar Widget (Matching Reference Image) -->
     <div class="grid cols" style="margin-bottom:18px">
@@ -2074,7 +2222,7 @@ function dashboard() {
       </div>
     </div>
 
-    <!-- Middle Row: Recent Orders + Recent Comments / Messages -->
+    <!-- Middle Row: Recent Orders + Low Stock Alerts (Replaces generic recent comment) -->
     <div class="grid cols" style="margin-bottom:18px">
       <!-- Recent Orders Card -->
       <div class="card tablecard">
@@ -2100,47 +2248,14 @@ function dashboard() {
         </div>
       </div>
 
-      <!-- Recent Comment / Messages Card -->
+      <!-- Low Stock Inventory Alerts -->
       <div class="card">
         <div class="cardhead">
-          <h2>recent comment</h2>
-          <button class="link" onclick="renderPage('messages')" style="font-size:11px">view all</button>
+          <h2>stock alerts</h2>
+          <button class="link" onclick="renderPage('inventory')" style="font-size:11px">manage stock</button>
         </div>
-        <div class="comment-card-list" id="dashCommentList">
-          ${recentMsgs.length ? recentMsgs.map((m, idx) => `
-            <div class="comment-item">
-              <div class="comment-avatar ${avatarColors[idx % avatarColors.length]}">
-                ${esc((m.name || 'C').slice(0, 1).toUpperCase())}
-              </div>
-              <div class="comment-content">
-                <div class="comment-author">
-                  <b>${esc(m.name || 'Customer')}</b> on <span>${esc(m.subject || 'customer inquiry')}</span>
-                </div>
-                <div class="comment-time">${esc(m.createdAt ? new Date(m.createdAt).toLocaleString([], { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : 'Recently')}</div>
-                <div class="comment-text">${esc(m.message || 'Customer message inquiry received.')}</div>
-                <button class="btn pink" onclick="openMessageDetail('${esc(m.id)}')">reply &rarr;</button>
-              </div>
-            </div>
-          `).join('') : `
-            <div class="comment-item">
-              <div class="comment-avatar pink">M</div>
-              <div class="comment-content">
-                <div class="comment-author"><b>Mark J Hamilton</b> on <span>Sandwip grocery delivery</span></div>
-                <div class="comment-time">05 July 2026, 17:12</div>
-                <div class="comment-text">Very prompt delivery service in Harishpur area. Products arrived fresh and well-packed.</div>
-                <button class="btn pink" onclick="renderPage('messages')">reply &rarr;</button>
-              </div>
-            </div>
-            <div class="comment-item">
-              <div class="comment-avatar orange">T</div>
-              <div class="comment-content">
-                <div class="comment-author"><b>Thommas Gold</b> on <span>Pure Mustard Oil inquiry</span></div>
-                <div class="comment-time">05 July 2026, 17:12</div>
-                <div class="comment-text">Can you restock 5 liters cold-pressed mustard oil cans before tomorrow evening?</div>
-                <button class="btn pink" onclick="renderPage('messages')">reply &rarr;</button>
-              </div>
-            </div>
-          `}
+        <div class="stock-alert-list" id="dashStockList">
+          ${renderDashStockAlerts()}
         </div>
       </div>
     </div>
@@ -2232,8 +2347,10 @@ function productRows(arr) {
         <td>${p.deal ? '<b style="color:#d94816">Yes</b>' : 'No'}</td>
         <td>${pill(Number(p.stock) === 0 ? 'Out of Stock' : (p.status || 'Active'))}</td>
         <td>
-          <button class="link" onclick="openProduct(${p.id})">Edit</button>
-          <button class="link" style="color:#b43c3c" onclick="deleteProduct(${p.id})">Delete</button>
+          <div class="table-actions">
+            <button class="icon-btn edit" onclick="openProduct(${p.id})" title="Edit Product">${ic('pencil')}</button>
+            <button class="icon-btn delete" onclick="deleteProduct(${p.id})" title="Delete Product">${ic('trash')}</button>
+          </div>
         </td>
       </tr>
     `;
@@ -2430,9 +2547,7 @@ function orders() {
               <th>Payment</th>
               <th>Status</th>
               <th>Update Status</th>
-              <th>Order Details</th>
-              <th>Invoice</th>
-              <th>Action</th>
+              <th style="text-align:center">Actions</th>
             </tr>
           </thead>
           <tbody id="orows">${orderRows(db.orders)}</tbody>
@@ -2462,11 +2577,15 @@ function orderRows(arr) {
           ${['Pending','Confirmed','Processing','Shipped','Out for Delivery','Delivered','Cancelled'].map(s => `<option ${s === o.status ? 'selected' : ''}>${s}</option>`).join('')}
         </select>
       </td>
-      <td><button class="link" onclick="viewOrder('${esc(o.id)}')">View items</button></td>
-      <td><button class="link" onclick="downloadInvoice('${esc(o.id)}')">Download</button></td>
-      <td><button class="link" style="color:#b43c3c" onclick="deleteOrder('${esc(o.id)}')">Delete</button></td>
+      <td style="text-align:center">
+        <div class="table-actions" style="justify-content:center">
+          <button class="icon-btn view" onclick="viewOrder('${esc(o.id)}')" title="View Items &amp; Order Details">${ic('eye')}</button>
+          <button class="icon-btn download" onclick="downloadInvoice('${esc(o.id)}')" title="Download Invoice HTML">${ic('download')}</button>
+          <button class="icon-btn delete" onclick="deleteOrder('${esc(o.id)}')" title="Delete Order">${ic('trash')}</button>
+        </div>
+      </td>
     </tr>
-  `}).join('') || '<tr><td colspan="11"><div class="empty">No orders found.</div></td></tr>';
+  `}).join('') || '<tr><td colspan="9"><div class="empty">No orders found.</div></td></tr>';
 }
 
 window.updateOrderStatus = async function(id, newStatus) {
@@ -2814,16 +2933,14 @@ function customerRows(arr) {
       <td>${esc(c.joined)}</td>
       <td>${pill(c.status || 'Active')}</td>
       <td>
-        <button class="link" onclick="viewCustomer('${safePhone}')">View</button>
-        ${isSuspended ?
-          `<button class="link" style="color:#16864b;font-weight:700" onclick="toggleCustomerStatus('${safePhone}','Active')">Activate</button>` :
-          `<button class="link" style="color:#d97706;font-weight:700" onclick="toggleCustomerStatus('${safePhone}','Suspended')">Suspend</button>`
-        }
-        ${isBlocked ?
-          `<button class="link" style="color:#16864b" onclick="toggleCustomerStatus('${safePhone}','Active')">Unblock</button>` :
-          `<button class="link" style="color:#b43c3c" onclick="toggleCustomerStatus('${safePhone}','Blocked')">Block</button>`
-        }
-        <button class="link" style="color:#b43c3c" onclick="deleteCustomer('${safePhone}')">Delete</button>
+        <div class="table-actions">
+          <button class="icon-btn view" onclick="viewCustomer('${safePhone}')" title="View Customer Profile &amp; Orders">${ic('eye')}</button>
+          ${isSuspended ?
+            `<button class="icon-btn activate" onclick="toggleCustomerStatus('${safePhone}','Active')" title="Activate Customer Account">${ic('check')}</button>` :
+            `<button class="icon-btn suspend" onclick="toggleCustomerStatus('${safePhone}','Suspended')" title="Suspend Customer Account">${ic('shield')}</button>`
+          }
+          <button class="icon-btn delete" onclick="deleteCustomer('${safePhone}')" title="Delete Customer Record">${ic('trash')}</button>
+        </div>
       </td>
     </tr>
   `;
@@ -2990,7 +3107,9 @@ function stockRows(arr) {
       <td><b>${p.stock}</b> <span class="small">${esc(p.unit || 'kg')}</span></td>
       <td>${limit} <span class="small">${esc(p.unit || 'kg')}</span></td>
       <td>${pill(Number(p.stock) === 0 ? 'Out of Stock' : (Number(p.stock) <= limit ? 'Low Stock' : 'In Stock'))}</td>
-      <td><button class="link" onclick="stockModal(${p.id})">Adjust stock</button></td>
+      <td>
+        <button class="icon-btn edit" onclick="stockModal(${p.id})" title="Adjust Inventory Stock">${ic('pencil')}</button>
+      </td>
     </tr>
   `).join('') || '<tr><td colspan="6"><div class="empty">No products found.</div></td></tr>';
 }
@@ -3093,8 +3212,10 @@ function delivery() {
                   ${d.tracking ? `<a class="link" href="${esc(d.tracking)}" target="_blank" rel="noopener">Open link</a>` : '<span class="small">Not provided</span>'}
                 </td>
                 <td>
-                  <button class="link" onclick="deliveryModal(${i})">Edit</button>
-                  <button class="link" style="color:#b43c3c" onclick="removeDelivery(${i})">Remove</button>
+                  <div class="table-actions">
+                    <button class="icon-btn edit" onclick="deliveryModal(${i})" title="Edit Assignment">${ic('pencil')}</button>
+                    <button class="icon-btn delete" onclick="removeDelivery(${i})" title="Remove Assignment">${ic('trash')}</button>
+                  </div>
                 </td>
               </tr>
             `).join('') || '<tr><td colspan="7"><div class="empty">No delivery assignments recorded.</div></td></tr>'}
@@ -3215,8 +3336,10 @@ function categories() {
                     <td><b>${esc(c)}</b></td>
                     <td><b>${db.products.filter(p => p.category === c).length}</b></td>
                     <td>
-                      <button class="link" onclick="editCategory(${i})">Edit</button>
-                      <button class="link" style="color:#b43c3c" onclick="deleteCategory(${i})">Delete</button>
+                      <div class="table-actions">
+                        <button class="icon-btn edit" onclick="editCategory(${i})" title="Edit Category">${ic('pencil')}</button>
+                        <button class="icon-btn delete" onclick="deleteCategory(${i})" title="Delete Category">${ic('trash')}</button>
+                      </div>
                     </td>
                   </tr>
                 `;
@@ -3241,8 +3364,10 @@ function categories() {
                   <td><b>${esc(b)}</b></td>
                   <td><b>${db.products.filter(p => p.brand === b).length}</b></td>
                   <td>
-                    <button class="link" onclick="editBrand(${i})">Edit</button>
-                    <button class="link" style="color:#b43c3c" onclick="deleteBrand(${i})">Delete</button>
+                    <div class="table-actions">
+                      <button class="icon-btn edit" onclick="editBrand(${i})" title="Edit Brand">${ic('pencil')}</button>
+                      <button class="icon-btn delete" onclick="deleteBrand(${i})" title="Delete Brand">${ic('trash')}</button>
+                    </div>
                   </td>
                 </tr>
               `).join('')}
@@ -3418,8 +3543,10 @@ function coupons() {
                 <td>${esc(c.start)} <div class="small">to ${esc(c.end)}</div></td>
                 <td>${pill(c.active && c.end >= new Date().toISOString().slice(0, 10) ? 'Active' : 'Expired')}</td>
                 <td>
-                  <button class="link" onclick="toggleCoupon(${c.id})">${c.active ? 'Disable' : 'Enable'}</button>
-                  <button class="link" style="color:#b43c3c" onclick="deleteCoupon(${c.id})">Delete</button>
+                  <div class="table-actions">
+                    <button class="icon-btn ${c.active ? 'suspend' : 'activate'}" onclick="toggleCoupon(${c.id})" title="${c.active ? 'Disable Coupon' : 'Enable Coupon'}">${c.active ? ic('shield') : ic('check')}</button>
+                    <button class="icon-btn delete" onclick="deleteCoupon(${c.id})" title="Delete Coupon">${ic('trash')}</button>
+                  </div>
                 </td>
               </tr>
             `).join('')}
@@ -3653,9 +3780,11 @@ function staff() {
                 <td>${pill(s.status)}</td>
                 <td>${s.role === 'Super Admin' ? 'Full access' : s.role === 'Admin' ? 'Store & Orders' : 'Assigned module'}</td>
                 <td>
-                  <button class="link" onclick="staffModal(${s.id})">Edit</button>
-                  <button class="link" onclick="toggleStaff(${s.id})">${s.status === 'Active' ? 'Deactivate' : 'Activate'}</button>
-                  ${s.role === 'Super Admin' ? '' : `<button class="link" style="color:#b43c3c" onclick="deleteStaff(${s.id})">Delete</button>`}
+                  <div class="table-actions">
+                    <button class="icon-btn edit" onclick="staffModal(${s.id})" title="Edit Staff Member">${ic('pencil')}</button>
+                    <button class="icon-btn ${s.status === 'Active' ? 'suspend' : 'activate'}" onclick="toggleStaff(${s.id})" title="${s.status === 'Active' ? 'Deactivate Staff' : 'Activate Staff'}">${s.status === 'Active' ? ic('shield') : ic('check')}</button>
+                    ${s.role === 'Super Admin' ? '' : `<button class="icon-btn delete" onclick="deleteStaff(${s.id})" title="Delete Staff">${ic('trash')}</button>`}
+                  </div>
                 </td>
               </tr>
             `).join('')}
@@ -4142,9 +4271,9 @@ function messageRows(list) {
           </select>
         </td>
         <td style="text-align:right">
-          <div style="display:inline-flex;gap:6px">
-            <button class="btn" onclick="openMessageDetail('${esc(m.id)}')">View</button>
-            <button class="btn" style="color:#c92a2a" onclick="deleteMessage('${esc(m.id)}')">Delete</button>
+          <div class="table-actions" style="justify-content:flex-end">
+            <button class="icon-btn view" onclick="openMessageDetail('${esc(m.id)}')" title="View Inquiry">${ic('eye')}</button>
+            <button class="icon-btn delete" onclick="deleteMessage('${esc(m.id)}')" title="Delete Inquiry">${ic('trash')}</button>
           </div>
         </td>
       </tr>
