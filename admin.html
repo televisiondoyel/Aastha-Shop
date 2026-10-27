@@ -7,7 +7,7 @@
 <link id="sitefavicon" rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Crect width='48' height='48' rx='12' fill='%23087e6e'/%3E%3Ctext x='24' y='32' text-anchor='middle' font-size='28' fill='white' font-family='Arial'%3EB%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --side-bg: #232B47;
@@ -41,15 +41,17 @@ body {
   margin: 0;
   background: var(--main-bg);
   color: var(--text-dark);
-  font-family: 'Inter', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Open Sans', 'open_sanssemibold', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 13px;
+  font-weight: 400;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 button, input, select, textarea {
-  font-family: inherit;
+  font-family: 'Open Sans', 'open_sanssemibold', 'Hind Siliguri', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: inherit;
+  font-weight: 400;
 }
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
@@ -168,7 +170,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--side-text);
   text-align: left;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: background .15s ease, color .15s ease;
 }
@@ -504,7 +506,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 15px;
   margin: 0;
   color: var(--side-bg);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.2px;
 }
 .cardhead p {
@@ -895,7 +897,7 @@ th {
   text-align: left;
   padding: 12px 16px;
   border-bottom: 1px solid var(--line);
-  font-weight: 700;
+  font-weight: 600;
 }
 td {
   font-size: 12px;
@@ -966,7 +968,7 @@ tbody tr:hover { background: #F8FAFC; }
 }
 .toolbar input { min-width: 220px; }
 .field { display: grid; gap: 6px; margin-bottom: 14px; }
-.field label { font-size: 11px; font-weight: 700; color: #334155; }
+.field label { font-size: 11px; font-weight: 600; color: #334155; }
 .field input, .field select, .field textarea { width: 100%; }
 .formgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
 .full { grid-column: 1/-1; }
@@ -1921,7 +1923,8 @@ function pill(s) {
 }
 
 function heading(t, d, a = '') {
-  return `<div class="heading"><div><h1>${t}</h1><p>${d}</p></div>${a}</div>`;
+  if (!a) return '';
+  return `<div style="display:flex;justify-content:flex-end;margin-bottom:16px">${a}</div>`;
 }
 function stat(t, v, d, k) {
   return `<div class="card"><div class="stat-top"><span>${t}</span><span class="symbol">${ic(k)}</span></div><div class="value">${v}</div><div class="small">${d}</div></div>`;
@@ -1953,26 +1956,24 @@ document.getElementById('nav').onclick = e => {
 function renderPage(p) {
   page = p;
   let names = {
-    dashboard: 'Dashboard Overview',
-    products: 'Product Management',
-    orders: 'Order Management',
-    customers: 'Customer Management',
-    inventory: 'Inventory Management',
-    delivery: 'Delivery Management',
-    categories: 'Categories & Brands',
-    coupons: 'Coupon & Discount Management',
-    payments: 'Payments · Cash on Delivery',
-    reports: 'Analytics & Reports',
-    staff: 'Staff & Permissions',
-    settings: 'Store Settings',
-    banners: 'Banners & Promotions',
-    messages: 'Customer Messages & Inquiries',
-    pages_content: 'About Us & Contact'
+    dashboard: 'DASHBOARD',
+    orders: 'ORDERS',
+    messages: 'INBOX',
+    products: 'PRODUCTS',
+    delivery: 'DELIVERY',
+    customers: 'CUSTOMERS',
+    banners: 'BANNERS',
+    categories: 'CATEGORIES',
+    inventory: 'INVENTORY',
+    coupons: 'COUPONS',
+    payments: 'PAYMENTS',
+    reports: 'ANALYTICS',
+    pages_content: 'ABOUT & CONTACT',
+    staff: 'STAFF',
+    settings: 'SETTINGS'
   };
-  let crumb = document.getElementById('crumb');
   let topTitle = document.getElementById('topTitle');
-  if (crumb) crumb.textContent = (names[p] || 'Dashboard').replace(' Management', '');
-  if (topTitle) topTitle.textContent = names[p] || 'Dashboard Overview';
+  if (topTitle) topTitle.textContent = names[p] || (p || 'DASHBOARD').toUpperCase();
   document.querySelectorAll('[data-page]').forEach(b => b.classList.toggle('active', b.dataset.page === p));
   let pages = {
     dashboard, products, orders, customers, inventory, delivery, categories, coupons, payments, reports, staff, settings, banners, messages, pages_content
@@ -1982,6 +1983,7 @@ function renderPage(p) {
     container.innerHTML = pages[p]();
     bind();
     renderIcons();
+    renderAdminAvatar();
     if (p === 'dashboard' || p === 'reports') drawChart(p === 'dashboard' ? 'chart1' : 'chart2');
   }
 }
@@ -5100,11 +5102,11 @@ function renderAdminAvatar() {
   let initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'AB';
 
   if (topEl) {
-    if (avatar) topEl.innerHTML = `<img src="${avatar}" alt="Admin Photo">`;
+    if (avatar) topEl.innerHTML = `<img src="${avatar}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentElement.textContent='${initials}'">`;
     else topEl.textContent = initials;
   }
   if (sideEl) {
-    if (avatar) sideEl.innerHTML = `<img src="${avatar}" alt="Admin Photo">`;
+    if (avatar) sideEl.innerHTML = `<img src="${avatar}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none';this.parentElement.textContent='${initials}'">`;
     else sideEl.textContent = initials;
   }
   if (sideName) sideName.textContent = name;
