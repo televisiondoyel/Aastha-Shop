@@ -163,7 +163,7 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   padding: 10px 14px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 0;
   background: transparent;
   color: var(--side-text);
   text-align: left;
@@ -275,7 +275,7 @@ a { color: inherit; text-decoration: none; }
 .top .search {
   background: #F1F5F9;
   border: 1px solid #E2E8F0;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 8px 14px 8px 36px;
   font-size: 13px;
   color: var(--text-dark);
@@ -350,7 +350,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 600;
   font-size: 12px;
   color: #334155;
-  border-radius: 8px;
+  border-radius: 0;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -372,8 +372,8 @@ a { color: inherit; text-decoration: none; }
   background: var(--pink);
   border-color: var(--pink);
   color: #FFFFFF;
-  border-radius: 9999px;
-  padding: 4px 14px;
+  border-radius: 0;
+  padding: 4px 12px;
   font-size: 11px;
 }
 .btn.pink:hover {
@@ -383,64 +383,65 @@ a { color: inherit; text-decoration: none; }
   background: var(--teal);
   border-color: var(--teal);
   color: #FFFFFF;
-  border-radius: 9999px;
-  padding: 4px 14px;
+  border-radius: 0;
+  padding: 4px 12px;
   font-size: 11px;
 }
 .btn.teal:hover {
   background: var(--teal-dark);
 }
 
-/* Icon-based Action Buttons for Tables & Toolbars */
+/* Icon-based Action Buttons for Tables & Toolbars - Clean Borderless Sharp Icons */
 .table-actions {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 .icon-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid var(--line);
-  background: #FFFFFF;
+  width: 26px;
+  height: 26px;
+  border-radius: 0;
+  border: 0;
+  background: transparent;
   color: var(--text-dark);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
 }
 .icon-btn .ico {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
 }
 .icon-btn .ico svg {
-  width: 16px;
-  height: 16px;
+  width: 17px;
+  height: 17px;
 }
 .icon-btn:hover {
-  background: #F8FAFC;
-  border-color: #CBD5E1;
-  transform: translateY(-1px);
+  background: transparent;
+  border: 0;
+  transform: scale(1.15);
+  opacity: 0.9;
 }
 .icon-btn.view { color: var(--teal-dark); }
-.icon-btn.view:hover { background: #F0FDFA; border-color: var(--teal); color: var(--teal); }
+.icon-btn.view:hover { color: var(--teal); }
 .icon-btn.edit { color: var(--blue); }
-.icon-btn.edit:hover { background: #EFF6FF; border-color: var(--blue); color: #2563EB; }
+.icon-btn.edit:hover { color: #1D4ED8; }
 .icon-btn.download { color: #059669; }
-.icon-btn.download:hover { background: #ECFDF5; border-color: #10B981; color: #047857; }
+.icon-btn.download:hover { color: #047857; }
 .icon-btn.delete { color: #DC2626; }
-.icon-btn.delete:hover { background: #FEF2F2; border-color: #EF4444; color: #B91C1C; }
+.icon-btn.delete:hover { color: #991B1B; }
 .icon-btn.suspend { color: #D97706; }
-.icon-btn.suspend:hover { background: #FFFBEB; border-color: #F59E0B; color: #B45309; }
+.icon-btn.suspend:hover { color: #B45309; }
 .icon-btn.activate { color: #16A34A; }
-.icon-btn.activate:hover { background: #F0FDF4; border-color: #22C55E; color: #15803D; }
+.icon-btn.activate:hover { color: #15803D; }
 
 .top-icon-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 0;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -453,10 +454,10 @@ a { color: inherit; text-decoration: none; }
 .card {
   background: var(--card-bg);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 0;
   padding: 20px;
   min-width: 0;
-  box-shadow: 0 3px 12px rgba(35, 43, 71, 0.04);
+  box-shadow: 0 1px 4px rgba(35, 43, 71, 0.04);
 }
 .stat-top {
   display: flex;
@@ -469,7 +470,7 @@ a { color: inherit; text-decoration: none; }
 .symbol {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: 0;
   background: #F1F5F9;
   color: var(--side-bg);
   display: grid;
@@ -514,7 +515,7 @@ a { color: inherit; text-decoration: none; }
 .card-search {
   background: #F1F5F9;
   border: 1px solid #E2E8F0;
-  border-radius: 6px;
+  border-radius: 0;
   padding: 5px 10px;
   font-size: 11px;
   color: var(--text-dark);
@@ -565,7 +566,7 @@ a { color: inherit; text-decoration: none; }
   background: #F8FAFC;
   border: 1px solid var(--line);
   padding: 10px 12px;
-  border-radius: 8px;
+  border-radius: 0;
 }
 .dash-sales-summary .colon { color: #94A3B8; margin: 0 4px; }
 .dash-sales-summary b { color: var(--side-bg); font-weight: 700; }
@@ -581,7 +582,7 @@ a { color: inherit; text-decoration: none; }
 .cal-card {
   padding: 0;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 0;
 }
 .cal-header {
   background: var(--teal);
@@ -602,7 +603,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 800;
   cursor: pointer;
   padding: 2px 8px;
-  border-radius: 4px;
+  border-radius: 0;
   line-height: 1;
 }
 .cal-btn:hover { background: rgba(255, 255, 255, 0.2); }
@@ -721,7 +722,7 @@ a { color: inherit; text-decoration: none; }
 .stock-alert-thumb {
   width: 38px;
   height: 38px;
-  border-radius: 8px;
+  border-radius: 0;
   border: 1px solid var(--line);
   background: #FFFFFF;
   display: flex;
@@ -827,7 +828,7 @@ a { color: inherit; text-decoration: none; }
   gap: 12px;
   padding: 10px 12px;
   border: 1px solid var(--line);
-  border-radius: 10px;
+  border-radius: 0;
   background: #FFFFFF;
   cursor: pointer;
   transition: transform 0.15s, box-shadow 0.15s;
@@ -872,7 +873,7 @@ a { color: inherit; text-decoration: none; }
 .tablecard {
   padding: 0;
   overflow: hidden;
-  border-radius: 14px;
+  border-radius: 0;
 }
 .tablecard .cardhead {
   padding: 18px 20px 14px;
@@ -913,7 +914,7 @@ tbody tr:hover { background: #F8FAFC; }
   object-fit: contain;
   background: #FFFFFF;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 2px;
 }
 .thumb {
@@ -927,7 +928,7 @@ tbody tr:hover { background: #F8FAFC; }
   font-size: 12px;
   font-weight: 800;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 0;
 }
 .link {
   border: 0;
@@ -937,7 +938,7 @@ tbody tr:hover { background: #F8FAFC; }
   font-weight: 700;
   padding: 2px 6px;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0;
 }
 .link:hover { text-decoration: underline; }
 
@@ -951,7 +952,7 @@ tbody tr:hover { background: #F8FAFC; }
 }
 .toolbar input, .toolbar select, .field input, .field select, .field textarea {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 9px 12px;
   background: #FFFFFF;
   color: var(--text-dark);
@@ -975,7 +976,8 @@ tbody tr:hover { background: #F8FAFC; }
   padding: 12px 16px;
   font-size: 12px;
   margin-bottom: 16px;
-  border-radius: 8px;
+  border-radius: 0;
+  border: 1px solid #BBF7D0;
   border-left: 4px solid var(--green);
 }
 
@@ -995,7 +997,7 @@ tbody tr:hover { background: #F8FAFC; }
   max-height: 90vh;
   overflow-y: auto;
   background: #FFFFFF;
-  border-radius: 16px;
+  border-radius: 0;
   border: 1px solid var(--line);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
 }
@@ -1021,7 +1023,7 @@ tbody tr:hover { background: #F8FAFC; }
   background: var(--side-bg);
   color: #FFFFFF;
   padding: 12px 18px;
-  border-radius: 10px;
+  border-radius: 0;
   z-index: 60;
   box-shadow: 0 8px 24px rgba(0,0,0,0.18);
   font-size: 12px;
@@ -1061,7 +1063,7 @@ tbody tr:hover { background: #F8FAFC; }
   max-width: 90vw;
   background: #FFFFFF;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 0;
   box-shadow: 0 14px 40px rgba(0,0,0,0.14);
   z-index: 1050;
   overflow: hidden;
@@ -2275,7 +2277,7 @@ function dashboard() {
 
 // =================== PRODUCTS ===================
 function products() {
-  return heading('Products', 'Manage product listings, prices, images, stock and descriptions.',
+  return heading('Products', 'Product catalog and stock',
     `<button class="btn primary" onclick="openProduct()">Add New Product</button>`) +
     `<div class="toolbar">
       <input id="qprod" placeholder="Search product name, category or SKU">
@@ -2521,7 +2523,7 @@ window.deleteProduct = async function(id) {
 
 // =================== ORDERS ===================
 function orders() {
-  return heading('Orders', 'Review customer orders, delivery areas, items and update fulfillment status.') +
+  return heading('Orders', 'Fulfillment and delivery tracking') +
     `<div class="toolbar">
       <input id="qorder" placeholder="Search order ID, customer name or phone">
       <select id="forder">
@@ -2877,7 +2879,7 @@ function customers() {
   let blockedCust = db.customers.filter(c => c.status === 'Blocked').length;
   let totalSpent = db.customers.reduce((s, c) => s + (c.spent || 0), 0);
 
-  return heading('Customers', 'Manage customer profiles, account statuses (Active / Suspended / Blocked), and order histories.') +
+  return heading('Customers', 'Account statuses and order histories') +
     `<div class="grid stats" style="margin-bottom:16px">
       ${stat('Total Customers', totalCust, 'Registered & ordering customers', 'users')}
       ${stat('Active Customers', activeCust, 'Allowed to place orders', 'check')}
@@ -3063,7 +3065,7 @@ function inventory() {
   let out = db.products.filter(p => Number(p.stock) === 0).length;
   let restock = db.products.filter(p => Number(p.stock) <= lowLimit).length;
 
-  return heading('Inventory Management', 'Track stock levels, monitor low quantities and restock products.') +
+  return heading('Inventory Management', 'Stock levels and alerts') +
     `<div class="grid stats">
       ${stat('Tracked Products', tracked, 'Catalog items', 'box')}
       ${stat('Low Stock', low, 'At or below alert level', 'alert')}
@@ -4200,7 +4202,7 @@ function messages() {
   let respondedCount = list.filter(m => m.status === 'Responded').length;
   let resolvedCount = list.filter(m => m.status === 'Resolved').length;
 
-  return heading('Customer Messages & Inquiries', 'Manage customer inquiries, questions, and feedback submitted through the storefront Contact Us page.') +
+  return heading('Customer Messages', 'Inquiries and customer feedback') +
     `<div class="stats grid">
       ${stat('Total Inquiries', list.length, 'Total messages received', 'mail')}
       ${stat('New / Unread', unreadCount, 'Requires response', 'alert')}
@@ -4392,14 +4394,14 @@ function pages_content() {
   let contactAddress = s.contactAddress || 'Sandwip, Chattogram, Bangladesh';
   let contactHours = s.contactHours || '8:00 AM – 10:00 PM (Daily)';
 
-  return heading('About Us & Contact Page Content', 'Manage text, photos, contact numbers and location details displayed on the customer storefront About Us and Contact Us pages.') +
-    `<div class="grid cols" style="grid-template-columns:1fr 1fr;align-items:start">
+  return heading('About Us & Contact', 'Storefront about us and contact details.') +
+    `<div style="display:flex;flex-direction:column;gap:20px;max-width:980px">
       <!-- ABOUT US CONTENT CARD -->
       <div class="card">
         <div class="cardhead">
           <div>
             <h2>About Us Page Content</h2>
-            <p>Customer-facing story, values, and photo on the About Us page.</p>
+            <p>Storefront story, mission, and feature photo</p>
           </div>
           <a href="index.html#about" target="_blank" class="btn" style="font-size:11px">View Live Page</a>
         </div>
@@ -4414,18 +4416,18 @@ function pages_content() {
           </div>
           <div class="field">
             <label>Our Story &amp; Mission</label>
-            <textarea name="aboutStory" rows="6" style="padding:10px;line-height:1.5" required placeholder="Write your brand story and commitment to customers...">${esc(aboutStory)}</textarea>
+            <textarea name="aboutStory" rows="5" style="padding:10px;line-height:1.5" required placeholder="Write your brand story and commitment to customers...">${esc(aboutStory)}</textarea>
           </div>
           <div class="field">
             <label>About Us Cover / Feature Photo</label>
             <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-              <div id="aboutPhotoPreviewWrap" style="width:140px;height:90px;background:#f5f8f5;border:1px dashed #c0d4c7;border-radius:4px;overflow:hidden;display:grid;place-items:center">
+              <div id="aboutPhotoPreviewWrap" style="width:140px;height:90px;background:#f5f8f5;border:1px dashed #c0d4c7;border-radius:0;overflow:hidden;display:grid;place-items:center">
                 ${aboutImage ? `<img id="aboutPhotoPreview" src="${aboutImage}" style="width:100%;height:100%;object-fit:cover">` : `<span class="small" style="color:var(--muted)">No Photo</span>`}
               </div>
               <div style="flex:1;min-width:160px">
                 <input type="file" id="aboutPhotoFile" accept="image/*" style="font-size:11px">
                 <input type="hidden" id="aboutPhotoData" name="aboutImage" value="${esc(aboutImage)}">
-                <div class="small" style="margin-top:4px">Upload clean store, team, or delivery photo (PNG, JPG, WebP).</div>
+                <div class="small" style="margin-top:4px">Upload PNG, JPG, or WebP photo</div>
                 ${aboutImage ? `<button type="button" class="link small" onclick="removeAboutPhoto()" style="color:#b43c3c;margin-top:4px">Remove photo</button>` : ''}
               </div>
             </div>
@@ -4441,32 +4443,34 @@ function pages_content() {
         <div class="cardhead">
           <div>
             <h2>Contact Us &amp; Support Info</h2>
-            <p>Official phone, WhatsApp, email, hours and address for customer assistance.</p>
+            <p>Store phone, WhatsApp, email, hours, and address</p>
           </div>
           <a href="index.html#contact" target="_blank" class="btn" style="font-size:11px">View Live Page</a>
         </div>
         <form id="contactContentForm" style="display:flex;flex-direction:column;gap:12px">
-          <div class="field">
-            <label>Primary Phone Number</label>
-            <input name="contactPhone" value="${esc(contactPhone)}" required placeholder="e.g. 01800000000">
-            <small class="small">Customers will tap this number to call directly from mobile.</small>
+          <div class="formgrid">
+            <div class="field">
+              <label>Primary Phone Number</label>
+              <input name="contactPhone" value="${esc(contactPhone)}" required placeholder="e.g. 01800000000">
+            </div>
+            <div class="field">
+              <label>WhatsApp Support Number</label>
+              <input name="contactWhatsapp" value="${esc(contactWhatsapp)}" placeholder="e.g. 01800000000">
+            </div>
           </div>
-          <div class="field">
-            <label>WhatsApp Support Number</label>
-            <input name="contactWhatsapp" value="${esc(contactWhatsapp)}" placeholder="e.g. 01800000000">
-            <small class="small">Direct link to WhatsApp chat on customer contact page.</small>
-          </div>
-          <div class="field">
-            <label>Support Email Address</label>
-            <input type="email" name="contactEmail" value="${esc(contactEmail)}" required placeholder="e.g. support@baromasi.example">
+          <div class="formgrid">
+            <div class="field">
+              <label>Support Email Address</label>
+              <input type="email" name="contactEmail" value="${esc(contactEmail)}" required placeholder="e.g. support@baromasi.example">
+            </div>
+            <div class="field">
+              <label>Customer Service &amp; Delivery Hours</label>
+              <input name="contactHours" value="${esc(contactHours)}" placeholder="e.g. 8:00 AM – 10:00 PM (Daily)">
+            </div>
           </div>
           <div class="field">
             <label>Store Location / Physical Address</label>
-            <textarea name="contactAddress" rows="3" style="padding:10px;line-height:1.5" required placeholder="e.g. Sandwip, Chattogram, Bangladesh">${esc(contactAddress)}</textarea>
-          </div>
-          <div class="field">
-            <label>Customer Service &amp; Delivery Hours</label>
-            <input name="contactHours" value="${esc(contactHours)}" placeholder="e.g. 8:00 AM – 10:00 PM (Daily)">
+            <textarea name="contactAddress" rows="2" style="padding:10px;line-height:1.5" required placeholder="e.g. Sandwip, Chattogram, Bangladesh">${esc(contactAddress)}</textarea>
           </div>
           <div style="margin-top:8px">
             <button type="submit" class="btn primary" style="width:100%">Save Contact Information</button>
@@ -4476,13 +4480,13 @@ function pages_content() {
     </div>
     
     <!-- QUICK PREVIEW / NAVIGATION CARD -->
-    <div class="card" style="margin-top:16px;background:#f9fbf9">
+    <div class="card" style="margin-top:16px;max-width:980px">
       <div class="cardhead">
         <div>
-          <h2>Customer Inquiries Quick Shortcut</h2>
-          <p>Any inquiry sent by customers through the storefront Contact Us form automatically arrives in your inbox.</p>
+          <h2>Customer Inquiries</h2>
+          <p>Customer inquiries submitted through Contact Us form</p>
         </div>
-        <button class="btn" onclick="renderPage('messages')" style="display:inline-flex;align-items:center;gap:6px">${ic('mail')} View Customer Messages (${(db.messages || []).length})</button>
+        <button class="btn" onclick="renderPage('messages')" style="display:inline-flex;align-items:center;gap:6px">${ic('mail')} View Inquiries (${(db.messages || []).length})</button>
       </div>
     </div>`;
 }
