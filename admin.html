@@ -1154,14 +1154,14 @@ tbody tr:hover { background: #F8FAFC; }
     <button data-page="orders"><span class="ico" data-i="orders"></span>Orders <span id="sideOrderBadge" class="side-badge order-badge" style="display:none">0</span></button>
     <button data-page="messages"><span class="ico" data-i="inbox"></span>Inbox <span id="sideMsgBadge" class="side-badge msg-badge" style="display:none">0</span></button>
     <button data-page="products"><span class="ico" data-i="widget"></span>Products</button>
-    <button data-page="delivery"><span class="ico" data-i="tasks"></span>Tasks / Delivery</button>
+    <button data-page="delivery"><span class="ico" data-i="truck"></span>Delivery</button>
     <button data-page="customers"><span class="ico" data-i="profile"></span>Customers</button>
-    <button data-page="banners"><span class="ico" data-i="pencil"></span>Write Post / Banners</button>
-    <button data-page="categories"><span class="ico" data-i="pages"></span>Pages &amp; Categories</button>
+    <button data-page="banners"><span class="ico" data-i="banner"></span>Banners</button>
+    <button data-page="categories"><span class="ico" data-i="category"></span>Categories</button>
     <button data-page="inventory"><span class="ico" data-i="layers"></span>Inventory</button>
     <button data-page="coupons"><span class="ico" data-i="ticket"></span>Coupons</button>
     <button data-page="payments"><span class="ico" data-i="wallet"></span>Payments (COD)</button>
-    <button data-page="reports"><span class="ico" data-i="chart"></span>Chart / Analytics</button>
+    <button data-page="reports"><span class="ico" data-i="chart"></span>Analytics</button>
     <button data-page="pages_content"><span class="ico" data-i="help"></span>About &amp; Contact</button>
     <button data-page="staff"><span class="ico" data-i="shield"></span>Staff &amp; Permissions</button>
     <button data-page="settings"><span class="ico" data-i="settings"></span>Global Setting</button>
@@ -1263,6 +1263,8 @@ const icons = {
   tasks: '<path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="m9 14 2 2 4-4"/>',
   profile: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   pencil: '<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  banner: '<rect width="18" height="12" x="3" y="4" rx="1"/><circle cx="8" cy="8" r="1.5"/><path d="m21 13-4.5-4-5.5 5-3-2.5L3 14"/><path d="M7 16v4M17 16v4"/>',
+  category: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><circle cx="6.5" cy="17.5" r="3.5"/>',
   pages: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
   chart: '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
   search: '<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
@@ -1957,15 +1959,15 @@ function renderPage(p) {
     customers: 'Customer Management',
     inventory: 'Inventory Management',
     delivery: 'Delivery Management',
-    categories: 'Category & Brand Management',
+    categories: 'Categories & Brands',
     coupons: 'Coupon & Discount Management',
     payments: 'Payments · Cash on Delivery',
-    reports: 'Reports & Analytics',
+    reports: 'Analytics & Reports',
     staff: 'Staff & Permissions',
     settings: 'Store Settings',
-    banners: 'Banners & Promotional Cards',
+    banners: 'Banners & Promotions',
     messages: 'Customer Messages & Inquiries',
-    pages_content: 'About Us & Contact Page Content'
+    pages_content: 'About Us & Contact'
   };
   let crumb = document.getElementById('crumb');
   let topTitle = document.getElementById('topTitle');
@@ -3177,7 +3179,7 @@ function delivery() {
   let unassignedCount = db.deliveries.filter(d => d.partner === 'Unassigned').length;
   let deliveredCount = db.orders.filter(o => o.status === 'Delivered').length;
 
-  return heading('Delivery Management', 'Assign delivery partners, track Sandwip delivery areas and update links.',
+  return heading('Delivery', 'Assign delivery partners and track Sandwip areas',
     `<button class="btn primary" onclick="deliveryModal()">Assign Delivery</button>`) +
     `<div class="grid stats">
       ${stat('Active Deliveries', activeCount, 'Orders in transit', 'truck')}
@@ -3314,7 +3316,7 @@ window.removeDelivery = function(i) {
 
 // =================== CATEGORIES & BRANDS ===================
 function categories() {
-  return heading('Categories & Brands', 'Organize products into categories and brands with mobile gallery photos.') +
+  return heading('Categories', 'Product categories and brand management') +
     `<div class="grid cols">
       <div class="card">
         <div class="cardhead">
@@ -3705,7 +3707,7 @@ function reports() {
   let gross = db.orders.reduce((s, o) => s + (o.total || 0), 0);
   let deliveredSales = db.orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
 
-  return heading('Reports & Analytics', 'Store performance, sales trends, popular products and customer statistics.') +
+  return heading('Analytics', 'Store performance, sales trends and customer metrics.') +
     `<div class="toolbar">
       <select id="daterange"><option>All records</option><option>Today</option><option>Last 7 days</option><option>Last 30 days</option></select>
       <button class="btn" onclick="exportCSV('orders')">${ic('download')} Export Orders CSV</button>
@@ -3993,8 +3995,8 @@ function banners() {
   let p1Src = s.promo1 || 'assets/spices.svg';
   let p2Src = s.promo2 || 'assets/grains.svg';
 
-  return heading('Banners &amp; Promotional Cards',
-    'Upload or change the storefront homepage banners: Fresh groceries banner (Hero), Spices promotion, and Grains promotion.',
+  return heading('Banners',
+    'Storefront homepage promotional banners and campaign cards',
     `<button class="btn primary" onclick="saveAllBanners()">${ic('check')} Save All Banners</button>`) +
     `
     <div class="banner-grid">
