@@ -414,10 +414,28 @@ export async function saveOrderToFirestore(o: OrderData) {
   }
 }
 
-export async function updateOrderStatusInFirestore(orderId: string, status: string) {
+export async function updateOrderStatusInFirestore(orderId: string, status: string, payment?: string) {
   const path = `orders/${orderId}`;
   try {
-    await setDoc(doc(db, 'orders', String(orderId)), { status, updatedAt: new Date().toISOString() }, { merge: true });
+    const payload: Record<string, any> = { status, updatedAt: new Date().toISOString() };
+    if (payment !== undefined) {
+      payload.payment = payment;
+    }
+    await setDoc(doc(db, 'orders', String(orderId)), payload, { merge: true });
+  } catch (err) {
+    handleFirestoreError(err, OperationType.UPDATE, path);
+    throw err;
+  }
+}
+
+export async function updateOrderPaymentInFirestore(orderId: string, payment: string, status?: string) {
+  const path = `orders/${orderId}`;
+  try {
+    const payload: Record<string, any> = { payment, updatedAt: new Date().toISOString() };
+    if (status !== undefined) {
+      payload.status = status;
+    }
+    await setDoc(doc(db, 'orders', String(orderId)), payload, { merge: true });
   } catch (err) {
     handleFirestoreError(err, OperationType.UPDATE, path);
     throw err;

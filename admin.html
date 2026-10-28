@@ -54,6 +54,9 @@ button, input, select, textarea {
   font-size: inherit;
   font-weight: 400;
 }
+b, strong {
+  font-weight: 600;
+}
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 
@@ -123,7 +126,7 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   overflow: hidden;
   cursor: pointer;
   border: 2px solid #FFFFFF;
@@ -137,7 +140,7 @@ a { color: inherit; text-decoration: none; }
 .profile-name {
   color: #FFFFFF;
   font-size: 15px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: -0.2px;
   margin-bottom: 6px;
   cursor: pointer;
@@ -247,7 +250,7 @@ a { color: inherit; text-decoration: none; }
 .dash-title {
   margin: 0;
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--side-bg);
   letter-spacing: 0.6px;
   text-transform: uppercase;
@@ -300,7 +303,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-weight: 800;
+  font-weight: 700;
   font-size: 13px;
   border: 2px solid #FFFFFF;
   box-shadow: 0 2px 8px rgba(0,0,0,0.08);
@@ -334,7 +337,7 @@ a { color: inherit; text-decoration: none; }
 }
 .heading h1 {
   font-size: 20px;
-  font-weight: 800;
+  font-weight: 700;
   margin: 0 0 4px;
   color: var(--side-bg);
   letter-spacing: -0.3px;
@@ -481,7 +484,7 @@ a { color: inherit; text-decoration: none; }
 }
 .value {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.4px;
   margin: 10px 0 2px;
   color: var(--side-bg);
@@ -544,7 +547,7 @@ a { color: inherit; text-decoration: none; }
 }
 .dash-income-value {
   font-size: 26px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--side-bg);
 }
 .dash-income-pills {
@@ -1113,15 +1116,110 @@ tbody tr:hover { background: #F8FAFC; }
 .notif-item p { margin: 0; font-size: 11px; color: #475569; line-height: 1.4; }
 .notif-item .time { font-size: 10px; color: var(--text-dim); margin-top: 4px; }
 
-/* Responsive */
+/* Banner Grid & Management */
+.banner-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+.banner-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.banner-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+.banner-meta b {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--side-bg);
+}
+.banner-box {
+  width: 100%;
+  background: #F8FAFC;
+  border: 1px solid var(--line);
+  margin-bottom: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.banner-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.banner-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.storefront-mock {
+  background: #F8FAFC;
+  border: 1px solid var(--line);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.mock-hero {
+  width: 100%;
+  max-height: 220px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: #FFFFFF;
+}
+.mock-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.mock-promos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.mock-promo {
+  width: 100%;
+  max-height: 160px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  background: #FFFFFF;
+}
+.mock-promo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Category Photo styling */
+.category-photo {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Complete Mobile & Tablet Responsive Engine */
 @media (max-width: 1050px) {
   .side { width: 220px; }
   .main { margin-left: 220px; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .cols { grid-template-columns: 1fr; }
   .cols-equal { grid-template-columns: 1fr; }
-  .content { padding: 20px; }
+  .content { padding: 20px 16px; }
 }
+
 @media (max-width: 768px) {
   .side { width: 250px; transform: translateX(-100%); z-index: 40; }
   .side.open { transform: translateX(0); }
@@ -1129,15 +1227,79 @@ tbody tr:hover { background: #F8FAFC; }
   .main { margin-left: 0; }
   .menu { display: inline-flex; }
   .overlay.show { display: block; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 35; }
-  .top { padding: 0 16px; height: 60px; }
-  .top .search { display: none; }
-  .content { padding: 16px 12px; }
-  .stats { gap: 10px; }
+  
+  .top { padding: 0 14px; height: 58px; }
+  .top-search-wrap { display: none; }
+  .topright { gap: 8px; }
+  
+  .content { padding: 14px 10px; }
+  .stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .card { padding: 14px; }
   .value { font-size: 20px; }
-  .dash-title { font-size: 16px; }
+  .dash-title { font-size: 15px; }
   .formgrid { grid-template-columns: 1fr; }
   .full { grid-column: auto; }
+  
+  .dash-chart-row { grid-template-columns: 1fr; gap: 14px; }
+  .mock-promos { grid-template-columns: 1fr; }
+  
+  .toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .toolbar input, .toolbar select {
+    width: 100%;
+    min-width: 0 !important;
+  }
+  .toolbar .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .tablewrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .stats { grid-template-columns: 1fr !important; }
+  .dash-income-wrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .dash-income-pills {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .contacts-grid {
+    grid-template-columns: 1fr;
+  }
+  .cardhead {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .card-search {
+    width: 100%;
+  }
+  .cal-header {
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+  .cal-day {
+    height: 28px;
+    font-size: 11px;
+  }
+  .cal-dot {
+    width: 24px;
+    height: 24px;
+  }
+  .modalhead, .modalfoot { padding: 12px 14px; }
+  .modalbody { padding: 14px; }
 }
 </style>
 </head>
@@ -1244,6 +1406,7 @@ import {
   saveOrderToFirestore,
   deleteOrderFromFirestore,
   updateOrderStatusInFirestore,
+  updateOrderPaymentInFirestore,
   getOrdersFromFirestore,
   subscribeOrders,
   saveSettingsToFirestore,
@@ -2174,31 +2337,62 @@ window.filterDashContacts = function(q) {
   if (grid) grid.innerHTML = renderDashContacts(filtered.slice(0, 12));
 };
 
-function dashboard() {
-  let sales = db.orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
-  if (!sales) sales = db.orders.reduce((s, o) => s + (o.total || 0), 0);
-  if (!sales) sales = 1250;
+let chartSelectedMonth = new Date().getMonth();
+let chartSelectedYear = new Date().getFullYear();
+let chartViewMode = 'weekly'; // 'weekly' or 'monthly'
 
+window.setChartMonth = function(m) {
+  chartSelectedMonth = Number(m);
+  renderPage('dashboard');
+};
+
+window.toggleChartViewMode = function() {
+  chartViewMode = (chartViewMode === 'weekly' ? 'monthly' : 'weekly');
+  renderPage('dashboard');
+};
+
+function dashboard() {
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  // Parse actual orders for the selected month/year
+  let ordersInMonth = (db.orders || []).filter(o => {
+    let rawDate = o.date || o.createdAt || '';
+    let d = new Date(rawDate);
+    if (!isNaN(d.getTime())) {
+      return d.getFullYear() === chartSelectedYear && d.getMonth() === chartSelectedMonth;
+    }
+    let parts = String(rawDate).split('-');
+    if (parts.length === 3) {
+      return Number(parts[0]) === chartSelectedYear && (Number(parts[1]) - 1) === chartSelectedMonth;
+    }
+    return false;
+  });
+
+  // Calculate actual revenue
+  let monthDelivered = ordersInMonth.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.total || 0), 0);
+  let monthAll = ordersInMonth.reduce((s, o) => s + (o.total || 0), 0);
+  let displaySales = monthDelivered || monthAll;
+  if (!displaySales && !ordersInMonth.length) {
+    displaySales = db.orders.reduce((s, o) => s + (o.total || 0), 0);
+  }
+
+  // Calculate real product sales from actual orders
   let itemSales = {};
   let totalItemsSold = 0;
-  (db.orders || []).forEach(o => {
-    let items = ensureOrderItems(o);
+  let relevantOrders = ordersInMonth.length ? ordersInMonth : (db.orders || []);
+  relevantOrders.forEach(o => {
+    let items = ensureOrderItems(o, true);
     items.forEach(it => {
       let q = Number(it.qty) || 1;
       totalItemsSold += q;
-      let name = it.name || 'item';
+      let name = it.name || 'Product';
       itemSales[name] = (itemSales[name] || 0) + q;
     });
   });
+
   let topItems = Object.entries(itemSales).sort((a, b) => b[1] - a[1]).slice(0, 4);
   if (!topItems.length) {
-    topItems = [
-      ['item #1 sold', 50],
-      ['item #2 sold', 10],
-      ['item #3 sold', 5],
-      ['item #5 sold', 7]
-    ];
-    totalItemsSold = 72;
+    topItems = (db.products || []).slice(0, 4).map(p => [p.name, 0]);
   }
 
   return `
@@ -2208,16 +2402,22 @@ function dashboard() {
       <div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
         <div class="dash-income-wrap">
           <div>
-            <div class="dash-income-label">this week income :</div>
-            <div class="dash-income-value">${money(sales)}</div>
+            <div class="dash-income-label">${chartViewMode === 'weekly' ? 'income (' + monthNames[chartSelectedMonth] + ') :' : 'annual income (' + chartSelectedYear + ') :'}</div>
+            <div class="dash-income-value">${money(displaySales)}</div>
           </div>
-          <div class="dash-income-pills" style="display:flex;gap:6px">
-            <span style="background:var(--teal);color:#FFFFFF;border-radius:9999px;padding:3px 12px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px">
-              ${new Date().toLocaleString('en-US', { month: 'long' })} <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-            </span>
-            <span style="background:var(--pink);color:#FFFFFF;border-radius:9999px;padding:3px 12px;font-size:11px;font-weight:600;display:inline-flex;align-items:center;gap:4px">
-              view monthly <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-            </span>
+          <div class="dash-income-pills" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <!-- Functional Month Dropdown Selector -->
+            <div style="position:relative;display:inline-flex;align-items:center">
+              <select onchange="window.setChartMonth(this.value)" style="background:var(--teal);color:#FFFFFF;border:0;border-radius:9999px;padding:4px 24px 4px 12px;font-size:11px;font-weight:600;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;line-height:1.4" title="Select Month for Sales Chart">
+                ${monthNames.map((m, idx) => `<option value="${idx}" ${idx === chartSelectedMonth ? 'selected' : ''} style="background:#FFFFFF;color:#1E293B">${m}</option>`).join('')}
+              </select>
+              <svg style="position:absolute;right:8px;pointer-events:none" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+
+            <!-- Functional View Mode Toggle ("view monthly" / "view weekly") -->
+            <button type="button" onclick="window.toggleChartViewMode()" style="background:var(--pink);color:#FFFFFF;border:0;border-radius:9999px;padding:4px 12px;font-size:11px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;line-height:1.4" title="Toggle between Weekly and Monthly view">
+              ${chartViewMode === 'weekly' ? 'view monthly' : 'view weekly'} <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
           </div>
         </div>
 
@@ -2607,7 +2807,7 @@ function orderRows(arr) {
 }
 
 window.updateOrderStatus = async function(id, newStatus) {
-  let o = db.orders.find(x => x.id === id);
+  let o = db.orders.find(x => String(x.id) === String(id));
   if (!o) return;
   let previousStatus = o.status;
   o.status = newStatus;
@@ -2651,7 +2851,7 @@ window.updateOrderStatus = async function(id, newStatus) {
   saveLocal();
   renderPage('orders');
   try {
-    await updateOrderStatusInFirestore(o.id, newStatus);
+    await updateOrderStatusInFirestore(String(o.id), newStatus, o.payment);
   } catch(err) {
     console.error('Failed to update status in Firestore:', err);
   }
@@ -3348,11 +3548,18 @@ function categories() {
                 return `
                   <tr>
                     <td>
-                      ${img ? `<img class="category-photo" src="${img}" alt="${esc(c)}">` : '<div class="thumb">IMG</div>'}
-                      <input class="file-mini" type="file" accept="image/*" onchange="uploadCatImage(event, ${i})">
+                      <div style="display:flex;align-items:center;gap:10px">
+                        <div style="width:42px;height:42px;background:#F8FAFC;border:1px solid var(--line);display:grid;place-items:center;flex-shrink:0;overflow:hidden">
+                          ${img ? `<img src="${img}" alt="${esc(c)}" style="width:100%;height:100%;object-fit:cover">` : `<span class="ico" style="color:#94A3B8">${icons.image}</span>`}
+                        </div>
+                        <label class="btn" style="padding:4px 8px;font-size:11px;cursor:pointer;margin:0" title="Upload Photo from gallery">
+                          ${ic('image')} Upload
+                          <input type="file" accept="image/*" style="display:none" onchange="uploadCatImage(event, ${i})">
+                        </label>
+                      </div>
                     </td>
-                    <td><b>${esc(c)}</b></td>
-                    <td><b>${db.products.filter(p => p.category === c).length}</b></td>
+                    <td><span style="font-weight:600;color:var(--text-dark)">${esc(c)}</span></td>
+                    <td><span style="font-weight:600;color:var(--text-muted)">${db.products.filter(p => p.category === c).length} products</span></td>
                     <td>
                       <div class="table-actions">
                         <button class="icon-btn edit" onclick="editCategory(${i})" title="Edit Category">${ic('pencil')}</button>
@@ -3379,8 +3586,8 @@ function categories() {
             <tbody>
               ${db.brands.map((b, i) => `
                 <tr>
-                  <td><b>${esc(b)}</b></td>
-                  <td><b>${db.products.filter(p => p.brand === b).length}</b></td>
+                  <td><span style="font-weight:600;color:var(--text-dark)">${esc(b)}</span></td>
+                  <td><span style="font-weight:600;color:var(--text-muted)">${db.products.filter(p => p.brand === b).length} products</span></td>
                   <td>
                     <div class="table-actions">
                       <button class="icon-btn edit" onclick="editBrand(${i})" title="Edit Brand">${ic('pencil')}</button>
@@ -3685,7 +3892,7 @@ function payments() {
             </tr>
           </thead>
           <tbody>
-            ${db.orders.map(o => `
+            ${db.orders.length ? db.orders.map(o => `
               <tr>
                 <td><b>${esc(o.id)}</b></td>
                 <td>${esc(o.customer)}<div class="small">${esc(o.phone)}</div></td>
@@ -3694,26 +3901,59 @@ function payments() {
                 <td>${pill(o.status)}</td>
                 <td>${pill(o.payment || 'Pending')}</td>
                 <td>
-                  <button class="btn" ${o.payment === 'Collected' ? 'disabled' : ''} onclick="collectCOD('${esc(o.id)}')">
-                    ${o.payment === 'Collected' ? 'Collected' : 'Confirm Collected'}
-                  </button>
+                  ${o.payment === 'Collected' ? `
+                    <span style="display:inline-flex;align-items:center;gap:4px;color:#10B981;font-weight:600;font-size:12px">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Collected
+                    </span>
+                    <button class="link small" onclick="togglePaymentStatus('${esc(o.id)}', 'Pending')" style="margin-left:8px;color:#94A3B8;font-size:11px" title="Mark as Pending">Undo</button>
+                  ` : `
+                    <button class="btn teal" onclick="collectCOD('${esc(o.id)}')">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Confirm Collected
+                    </button>
+                  `}
                 </td>
               </tr>
-            `).join('')}
+            `).join('') : '<tr><td colspan="7"><div class="empty">No COD orders found.</div></td></tr>'}
           </tbody>
         </table>
       </div>
     </div>`;
 }
 
-window.collectCOD = function(id) {
-  let o = db.orders.find(x => x.id === id);
+window.collectCOD = async function(id) {
+  let o = db.orders.find(x => String(x.id) === String(id));
   if (!o) return;
   o.payment = 'Collected';
   saveLocal();
   renderPage('payments');
-  notify('COD collection confirmed for ' + o.id);
-  updateOrderStatusInFirestore(o.id, o.status).catch(e => console.error(e));
+  notify('COD collection confirmed for Order #' + o.id);
+  try {
+    if (typeof updateOrderPaymentInFirestore === 'function') {
+      await updateOrderPaymentInFirestore(String(o.id), 'Collected', o.status);
+    } else if (typeof updateOrderStatusInFirestore === 'function') {
+      await updateOrderStatusInFirestore(String(o.id), o.status, 'Collected');
+    }
+  } catch(e) {
+    console.error('Failed to update COD payment in Firestore:', e);
+  }
+};
+
+window.togglePaymentStatus = async function(id, newPayment) {
+  let o = db.orders.find(x => String(x.id) === String(id));
+  if (!o) return;
+  o.payment = newPayment || 'Pending';
+  saveLocal();
+  renderPage('payments');
+  notify('Payment status updated to ' + o.payment + ' for Order #' + o.id);
+  try {
+    if (typeof updateOrderPaymentInFirestore === 'function') {
+      await updateOrderPaymentInFirestore(String(o.id), o.payment, o.status);
+    } else if (typeof updateOrderStatusInFirestore === 'function') {
+      await updateOrderStatusInFirestore(String(o.id), o.status, o.payment);
+    }
+  } catch(e) {
+    console.error('Failed to update payment status in Firestore:', e);
+  }
 };
 
 // =================== REPORTS & ANALYTICS ===================
@@ -4894,49 +5134,163 @@ function drawChart(id) {
   if (!el) return;
 
   if (id === 'chart1') {
-    // Multi-colored vertical bar chart matching the reference image!
-    // 4 weeks: week 1, week 2, week 3, week 4
-    // Colors: Yellow #F59E0B, Cyan #06B6D4, Green #10B981, Blue #3B82F6, Pink #EC4899
-    el.innerHTML = `
-      <line x1="0" y1="20" x2="460" y2="20" stroke="#EEF2F6" stroke-width="1"/>
-      <line x1="0" y1="60" x2="460" y2="60" stroke="#EEF2F6" stroke-width="1"/>
-      <line x1="0" y1="100" x2="460" y2="100" stroke="#EEF2F6" stroke-width="1"/>
-      <line x1="0" y1="140" x2="460" y2="140" stroke="#EEF2F6" stroke-width="1"/>
-      <line x1="0" y1="165" x2="460" y2="165" stroke="#CBD5E1" stroke-width="1"/>
+    if (chartViewMode === 'weekly') {
+      // 4 weeks of the selected month
+      let weekData = [
+        { label: 'week 1', sales: 0, items: 0, count: 0 },
+        { label: 'week 2', sales: 0, items: 0, count: 0 },
+        { label: 'week 3', sales: 0, items: 0, count: 0 },
+        { label: 'week 4', sales: 0, items: 0, count: 0 }
+      ];
 
-      <!-- Vertical week divider grid lines -->
-      <line x1="105" y1="10" x2="105" y2="165" stroke="#F1F5F9" stroke-width="1"/>
-      <line x1="215" y1="10" x2="215" y2="165" stroke="#F1F5F9" stroke-width="1"/>
-      <line x1="325" y1="10" x2="325" y2="165" stroke="#F1F5F9" stroke-width="1"/>
+      (db.orders || []).forEach(o => {
+        let rawDate = o.date || o.createdAt || '';
+        let d = new Date(rawDate);
+        let day = 0, mon = -1, yr = 0;
+        if (!isNaN(d.getTime())) {
+          day = d.getDate();
+          mon = d.getMonth();
+          yr = d.getFullYear();
+        } else {
+          let parts = String(rawDate).split('-');
+          if (parts.length === 3) {
+            yr = Number(parts[0]);
+            mon = Number(parts[1]) - 1;
+            day = Number(parts[2]);
+          }
+        }
+        if (yr === chartSelectedYear && mon === chartSelectedMonth) {
+          let wIdx = day <= 7 ? 0 : (day <= 14 ? 1 : (day <= 21 ? 2 : 3));
+          weekData[wIdx].sales += (o.total || 0);
+          weekData[wIdx].count += 1;
+          let items = ensureOrderItems(o, true);
+          items.forEach(it => { weekData[wIdx].items += (Number(it.qty) || 1); });
+        }
+      });
 
-      <!-- Week 1 -->
-      <rect x="25" y="105" width="9" height="60" rx="1" fill="#F59E0B"/>
-      <rect x="37" y="65" width="9" height="100" rx="1" fill="#06B6D4"/>
-      <rect x="49" y="115" width="9" height="50" rx="1" fill="#EC4899"/>
-      <text x="41" y="182" text-anchor="middle" font-size="10" fill="#94A3B8" font-weight="600" font-family="'Open Sans',sans-serif">week 1</text>
+      let maxSales = Math.max(...weekData.map(w => w.sales), 100);
+      let maxItems = Math.max(...weekData.map(w => w.items), 10);
+      let maxCount = Math.max(...weekData.map(w => w.count), 5);
 
-      <!-- Week 2 -->
-      <rect x="125" y="80" width="9" height="85" rx="1" fill="#F59E0B"/>
-      <rect x="137" y="25" width="9" height="140" rx="1" fill="#10B981"/>
-      <rect x="149" y="88" width="9" height="77" rx="1" fill="#06B6D4"/>
-      <rect x="161" y="145" width="9" height="20" rx="1" fill="#EC4899"/>
-      <text x="146" y="182" text-anchor="middle" font-size="10" fill="#94A3B8" font-weight="600" font-family="'Open Sans',sans-serif">week 2</text>
+      let svgHtml = `
+        <!-- Horizontal grid lines -->
+        <line x1="0" y1="30" x2="460" y2="30" stroke="#EEF2F6" stroke-width="1"/>
+        <line x1="0" y1="70" x2="460" y2="70" stroke="#EEF2F6" stroke-width="1"/>
+        <line x1="0" y1="110" x2="460" y2="110" stroke="#EEF2F6" stroke-width="1"/>
+        <line x1="0" y1="145" x2="460" y2="145" stroke="#EEF2F6" stroke-width="1"/>
+        <line x1="0" y1="155" x2="460" y2="155" stroke="#CBD5E1" stroke-width="1"/>
 
-      <!-- Week 3 -->
-      <rect x="235" y="145" width="9" height="20" rx="1" fill="#F59E0B"/>
-      <rect x="247" y="112" width="9" height="53" rx="1" fill="#10B981"/>
-      <rect x="259" y="52" width="9" height="113" rx="1" fill="#3B82F6"/>
-      <rect x="271" y="92" width="9" height="73" rx="1" fill="#EC4899"/>
-      <text x="256" y="182" text-anchor="middle" font-size="10" fill="#94A3B8" font-weight="600" font-family="'Open Sans',sans-serif">week 3</text>
+        <!-- Vertical week divider grid lines -->
+        <line x1="115" y1="15" x2="115" y2="155" stroke="#F1F5F9" stroke-width="1"/>
+        <line x1="230" y1="15" x2="230" y2="155" stroke="#F1F5F9" stroke-width="1"/>
+        <line x1="345" y1="15" x2="345" y2="155" stroke="#F1F5F9" stroke-width="1"/>
 
-      <!-- Week 4 -->
-      <rect x="345" y="82" width="9" height="83" rx="1" fill="#F59E0B"/>
-      <rect x="357" y="125" width="9" height="40" rx="1" fill="#10B981"/>
-      <rect x="369" y="132" width="9" height="33" rx="1" fill="#06B6D4"/>
-      <rect x="381" y="68" width="9" height="97" rx="1" fill="#EC4899"/>
-      <text x="366" y="182" text-anchor="middle" font-size="10" fill="#94A3B8" font-weight="600" font-family="'Open Sans',sans-serif">week 4</text>
-    `;
-    return;
+        <!-- Legend -->
+        <g transform="translate(10, 14)">
+          <rect x="0" y="0" width="8" height="8" rx="1" fill="#10B981"/>
+          <text x="12" y="7" font-size="9" fill="#64748B" font-family="'Open Sans',sans-serif">Revenue (৳)</text>
+          <rect x="85" y="0" width="8" height="8" rx="1" fill="#06B6D4"/>
+          <text x="97" y="7" font-size="9" fill="#64748B" font-family="'Open Sans',sans-serif">Units Sold</text>
+          <rect x="160" y="0" width="8" height="8" rx="1" fill="#F59E0B"/>
+          <text x="172" y="7" font-size="9" fill="#64748B" font-family="'Open Sans',sans-serif">Orders</text>
+        </g>
+      `;
+
+      let weekCenters = [57, 172, 287, 402];
+      weekData.forEach((w, i) => {
+        let cx = weekCenters[i];
+        let hCount = w.count > 0 ? Math.max(6, Math.round((w.count / maxCount) * 80)) : 3;
+        let hSales = w.sales > 0 ? Math.max(6, Math.round((w.sales / maxSales) * 115)) : 3;
+        let hItems = w.items > 0 ? Math.max(6, Math.round((w.items / maxItems) * 95)) : 3;
+
+        let yCount = 155 - hCount;
+        let ySales = 155 - hSales;
+        let yItems = 155 - hItems;
+
+        svgHtml += `
+          <!-- ${w.label} -->
+          <rect x="${cx - 16}" y="${yCount}" width="9" height="${hCount}" rx="1" fill="#F59E0B">
+            <title>${w.count} orders</title>
+          </rect>
+          <rect x="${cx - 4}" y="${ySales}" width="10" height="${hSales}" rx="1" fill="#10B981">
+            <title>৳ ${w.sales} sales</title>
+          </rect>
+          <rect x="${cx + 9}" y="${yItems}" width="9" height="${hItems}" rx="1" fill="#06B6D4">
+            <title>${w.items} units sold</title>
+          </rect>
+          <text x="${cx}" y="172" text-anchor="middle" font-size="10" fill="#64748B" font-weight="600" font-family="'Open Sans',sans-serif">${w.label}</text>
+          ${w.sales > 0 ? `<text x="${cx}" y="${Math.min(ySales - 4, 142)}" text-anchor="middle" font-size="9" fill="#1E293B" font-weight="600" font-family="'Open Sans',sans-serif">৳${w.sales >= 1000 ? (w.sales/1000).toFixed(1)+'k' : w.sales}</text>` : ''}
+        `;
+      });
+
+      el.innerHTML = svgHtml;
+      return;
+    } else {
+      // 6-Month Monthly Trend View
+      const monthNamesShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      let currentMon = new Date().getMonth();
+      let monthsToDisplay = [];
+      for (let offset = 5; offset >= 0; offset--) {
+        let mIdx = (currentMon - offset + 12) % 12;
+        let y = chartSelectedYear - ((currentMon - offset < 0) ? 1 : 0);
+        monthsToDisplay.push({ month: mIdx, year: y, label: monthNamesShort[mIdx], sales: 0, items: 0 });
+      }
+
+      (db.orders || []).forEach(o => {
+        let rawDate = o.date || o.createdAt || '';
+        let d = new Date(rawDate);
+        let mon = -1, yr = 0;
+        if (!isNaN(d.getTime())) {
+          mon = d.getMonth();
+          yr = d.getFullYear();
+        } else {
+          let parts = String(rawDate).split('-');
+          if (parts.length === 3) {
+            yr = Number(parts[0]);
+            mon = Number(parts[1]) - 1;
+          }
+        }
+        let matched = monthsToDisplay.find(m => m.month === mon && m.year === yr);
+        if (matched) {
+          matched.sales += (o.total || 0);
+          let items = ensureOrderItems(o, true);
+          items.forEach(it => { matched.items += (Number(it.qty) || 1); });
+        }
+      });
+
+      let maxSales = Math.max(...monthsToDisplay.map(m => m.sales), 500);
+      let svgHtml = `
+        <line x1="0" y1="30" x2="460" y2="30" stroke="#EEF2F6" stroke-width="1"/>
+        <line x1="0" y1="70" x2="460" y2="70" stroke="#EEF2F6" stroke-width="1"/>
+        <line x1="0" y1="110" x2="460" y2="110" stroke="#EEF2F6" stroke-width="1"/>
+        <line x1="0" y1="145" x2="460" y2="145" stroke="#EEF2F6" stroke-width="1"/>
+        <line x1="0" y1="155" x2="460" y2="155" stroke="#CBD5E1" stroke-width="1"/>
+
+        <!-- Legend -->
+        <g transform="translate(10, 14)">
+          <rect x="0" y="0" width="8" height="8" rx="1" fill="#10B981"/>
+          <text x="12" y="7" font-size="9" fill="#64748B" font-family="'Open Sans',sans-serif">Monthly Store Sales (৳)</text>
+        </g>
+      `;
+
+      let colWidth = 460 / monthsToDisplay.length;
+      monthsToDisplay.forEach((m, i) => {
+        let cx = Math.round(i * colWidth + colWidth / 2);
+        let hSales = m.sales > 0 ? Math.max(6, Math.round((m.sales / maxSales) * 115)) : 3;
+        let ySales = 155 - hSales;
+
+        svgHtml += `
+          <rect x="${cx - 14}" y="${ySales}" width="28" height="${hSales}" rx="1" fill="${m.sales > 0 ? '#10B981' : '#E2E8F0'}">
+            <title>${m.label}: ৳ ${m.sales}</title>
+          </rect>
+          <text x="${cx}" y="172" text-anchor="middle" font-size="10" fill="#64748B" font-weight="600" font-family="'Open Sans',sans-serif">${m.label}</text>
+          ${m.sales > 0 ? `<text x="${cx}" y="${Math.min(ySales - 4, 142)}" text-anchor="middle" font-size="9" fill="#1E293B" font-weight="600" font-family="'Open Sans',sans-serif">৳${m.sales >= 1000 ? (m.sales/1000).toFixed(1)+'k' : m.sales}</text>` : ''}
+        `;
+      });
+
+      el.innerHTML = svgHtml;
+      return;
+    }
   }
 
   let v = [38, 56, 45, 78, 62, 94, 76];
