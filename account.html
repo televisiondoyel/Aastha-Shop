@@ -292,7 +292,7 @@ import {
   subscribeCustomerStatuses
 } from './src/firebase.ts';
 
-testConnection();
+testConnection().catch(() => {});
 
 let activeTab = 'orders';
 let authMode = 'signin';

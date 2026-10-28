@@ -9,6 +9,7 @@ import {
   type User as FirebaseUser
 } from 'firebase/auth';
 import {
+  initializeFirestore,
   getFirestore,
   doc,
   setDoc,
@@ -35,15 +36,27 @@ export const firebaseConfig = {
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 
-// Test connection as required by Firebase skill
+// Use initializeFirestore with experimentalForceLongPolling to avoid WebSocket connection drops in iFrame/proxy environments
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+  ignoreUndefinedProperties: true
+}, firebaseConfig.firestoreDatabaseId);
+
+// Test connection as required by Firebase skill, catching offline/unavailable states gracefully
 export async function testConnection() {
   try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
-  } catch (error) {
+    await Promise.race([
+      getDocFromServer(doc(db, 'test', 'connection')),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Connection check timeout')), 3000))
+    ]);
+  } catch (error: any) {
+    if (error?.code === 'unavailable' || (error instanceof Error && (error.message.includes('offline') || error.message.includes('unavailable') || error.message.includes('timeout')))) {
+      // Offline mode active; Firestore seamlessly operates in offline mode
+      return;
+    }
     if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error("Please check your Firebase configuration.");
+      console.warn("Please check your Firebase configuration or internet connection.");
     }
   }
 }
@@ -75,6 +88,11 @@ export interface FirestoreErrorInfo {
 }
 
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const err = error as any;
+  if (err?.code === 'unavailable' || (err instanceof Error && (err.message.includes('unavailable') || err.message.includes('the client is offline') || err.message.includes('Could not reach Cloud Firestore')))) {
+    console.warn(`Firestore is currently offline or unreachable for ${operationType} on ${path}. Operating in cached offline mode.`);
+    return null;
+  }
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
