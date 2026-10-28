@@ -347,13 +347,16 @@ export function subscribeAuth(callback: (user: FirebaseUser | null, profile: Use
 // =================== ADMIN & STORE FIRESTORE INTEGRATION ===================
 
 export async function saveProductToFirestore(p: ProductItem) {
-  const path = `products/${p.id}`;
+  const cleanId = String(p.id || Date.now());
+  const path = `products/${cleanId}`;
   try {
-    const payload = {
+    const rawPayload = {
       ...p,
+      id: cleanId,
       updatedAt: new Date().toISOString()
     };
-    await setDoc(doc(db, 'products', String(p.id)), payload);
+    const payload = JSON.parse(JSON.stringify(rawPayload));
+    await setDoc(doc(db, 'products', cleanId), payload, { merge: true });
     return payload;
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
@@ -362,9 +365,10 @@ export async function saveProductToFirestore(p: ProductItem) {
 }
 
 export async function deleteProductFromFirestore(productId: number | string) {
-  const path = `products/${productId}`;
+  const cleanId = String(productId).trim();
+  const path = `products/${cleanId}`;
   try {
-    await deleteDoc(doc(db, 'products', String(productId)));
+    await deleteDoc(doc(db, 'products', cleanId));
   } catch (err) {
     handleFirestoreError(err, OperationType.DELETE, path);
     throw err;
@@ -377,7 +381,11 @@ export async function getProductsFromFirestore(): Promise<ProductItem[]> {
     const snap = await getDocs(collection(db, path));
     const items: ProductItem[] = [];
     snap.forEach(d => {
-      items.push(d.data() as ProductItem);
+      const data = d.data() as ProductItem;
+      if (!data.id) {
+        data.id = d.id;
+      }
+      items.push(data);
     });
     return items;
   } catch (err) {
@@ -389,10 +397,11 @@ export async function getProductsFromFirestore(): Promise<ProductItem[]> {
 export async function saveSettingsToFirestore(settings: StoreSettingsData) {
   const path = 'settings/store';
   try {
-    const payload = {
+    const rawPayload = {
       ...settings,
       updatedAt: new Date().toISOString()
     };
+    const payload = JSON.parse(JSON.stringify(rawPayload));
     await setDoc(doc(db, 'settings', 'store'), payload, { merge: true });
     return payload;
   } catch (err) {
@@ -416,15 +425,18 @@ export async function getSettingsFromFirestore(): Promise<StoreSettingsData | nu
 }
 
 export async function saveOrderToFirestore(o: OrderData) {
-  const path = `orders/${o.id}`;
+  const cleanId = String(o.id);
+  const path = `orders/${cleanId}`;
   try {
     const rawPayload = {
       ...o,
-      createdAt: o.createdAt || new Date().toISOString()
+      id: cleanId,
+      createdAt: o.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     // Strip undefined properties so Firestore never throws 'Unsupported field value: undefined'
     const payload = JSON.parse(JSON.stringify(rawPayload));
-    await setDoc(doc(db, 'orders', String(o.id)), payload);
+    await setDoc(doc(db, 'orders', cleanId), payload, { merge: true });
     return payload;
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
@@ -433,13 +445,14 @@ export async function saveOrderToFirestore(o: OrderData) {
 }
 
 export async function updateOrderStatusInFirestore(orderId: string, status: string, payment?: string) {
-  const path = `orders/${orderId}`;
+  const cleanId = String(orderId).trim();
+  const path = `orders/${cleanId}`;
   try {
     const payload: Record<string, any> = { status, updatedAt: new Date().toISOString() };
-    if (payment !== undefined) {
+    if (payment !== undefined && payment !== null) {
       payload.payment = payment;
     }
-    await setDoc(doc(db, 'orders', String(orderId)), payload, { merge: true });
+    await setDoc(doc(db, 'orders', cleanId), payload, { merge: true });
   } catch (err) {
     handleFirestoreError(err, OperationType.UPDATE, path);
     throw err;
@@ -447,13 +460,14 @@ export async function updateOrderStatusInFirestore(orderId: string, status: stri
 }
 
 export async function updateOrderPaymentInFirestore(orderId: string, payment: string, status?: string) {
-  const path = `orders/${orderId}`;
+  const cleanId = String(orderId).trim();
+  const path = `orders/${cleanId}`;
   try {
     const payload: Record<string, any> = { payment, updatedAt: new Date().toISOString() };
-    if (status !== undefined) {
+    if (status !== undefined && status !== null) {
       payload.status = status;
     }
-    await setDoc(doc(db, 'orders', String(orderId)), payload, { merge: true });
+    await setDoc(doc(db, 'orders', cleanId), payload, { merge: true });
   } catch (err) {
     handleFirestoreError(err, OperationType.UPDATE, path);
     throw err;
@@ -461,9 +475,10 @@ export async function updateOrderPaymentInFirestore(orderId: string, payment: st
 }
 
 export async function deleteOrderFromFirestore(orderId: string) {
-  const path = `orders/${orderId}`;
+  const cleanId = String(orderId).trim();
+  const path = `orders/${cleanId}`;
   try {
-    await deleteDoc(doc(db, 'orders', String(orderId)));
+    await deleteDoc(doc(db, 'orders', cleanId));
   } catch (err) {
     handleFirestoreError(err, OperationType.DELETE, path);
     throw err;
@@ -489,7 +504,13 @@ export async function getOrdersFromFirestore(): Promise<OrderData[]> {
 export function subscribeProducts(cb: (products: ProductItem[]) => void) {
   return onSnapshot(collection(db, 'products'), (snap) => {
     const list: ProductItem[] = [];
-    snap.forEach(d => list.push(d.data() as ProductItem));
+    snap.forEach(d => {
+      const data = d.data() as ProductItem;
+      if (!data.id) {
+        data.id = d.id;
+      }
+      list.push(data);
+    });
     cb(list);
   }, (err) => {
     handleFirestoreError(err, OperationType.LIST, 'products');
@@ -509,7 +530,13 @@ export function subscribeSettings(cb: (settings: StoreSettingsData) => void) {
 export function subscribeOrders(cb: (orders: OrderData[]) => void) {
   return onSnapshot(collection(db, 'orders'), (snap) => {
     const list: OrderData[] = [];
-    snap.forEach(d => list.push(d.data() as OrderData));
+    snap.forEach(d => {
+      const data = d.data() as OrderData;
+      if (!data.id) {
+        data.id = d.id;
+      }
+      list.push(data);
+    });
     list.sort((a, b) => {
       const timeA = new Date(a.createdAt || a.date || 0).getTime();
       const timeB = new Date(b.createdAt || b.date || 0).getTime();
@@ -545,13 +572,14 @@ export async function getAdminAuthFromFirestore(): Promise<AdminAuthData | null>
 export async function saveAdminAuthToFirestore(data: { username: string; passwordHash: string }): Promise<AdminAuthData> {
   const path = 'settings/admin_auth';
   try {
-    const payload: AdminAuthData = {
+    const rawPayload: AdminAuthData = {
       registered: true,
       username: data.username,
       passwordHash: data.passwordHash,
       updatedAt: new Date().toISOString()
     };
-    await setDoc(doc(db, 'settings', 'admin_auth'), payload);
+    const payload = JSON.parse(JSON.stringify(rawPayload));
+    await setDoc(doc(db, 'settings', 'admin_auth'), payload, { merge: true });
     return payload;
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
@@ -620,11 +648,12 @@ export async function getCategoriesFromFirestore(): Promise<CategoryItem[]> {
 export async function saveCategoriesToFirestore(items: CategoryItem[]): Promise<CategoryItem[]> {
   const path = 'settings/categories';
   try {
-    const payload = {
+    const rawPayload = {
       items,
       updatedAt: new Date().toISOString()
     };
-    await setDoc(doc(db, 'settings', 'categories'), payload);
+    const payload = JSON.parse(JSON.stringify(rawPayload));
+    await setDoc(doc(db, 'settings', 'categories'), payload, { merge: true });
     return items;
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
@@ -648,14 +677,17 @@ export function subscribeCategories(cb: (items: CategoryItem[]) => void) {
 // =================== CUSTOMER MESSAGES / INQUIRIES ===================
 
 export async function saveMessageToFirestore(m: CustomerMessage) {
-  const path = `messages/${m.id}`;
+  const cleanId = String(m.id || Date.now());
+  const path = `messages/${cleanId}`;
   try {
     const rawPayload = {
       ...m,
-      createdAt: m.createdAt || new Date().toISOString()
+      id: cleanId,
+      createdAt: m.createdAt || new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     };
     const payload = JSON.parse(JSON.stringify(rawPayload));
-    await setDoc(doc(db, 'messages', String(m.id)), payload);
+    await setDoc(doc(db, 'messages', cleanId), payload, { merge: true });
     return payload;
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
@@ -669,7 +701,11 @@ export async function getMessagesFromFirestore(): Promise<CustomerMessage[]> {
     const snap = await getDocs(collection(db, path));
     const items: CustomerMessage[] = [];
     snap.forEach(d => {
-      items.push(d.data() as CustomerMessage);
+      const data = d.data() as CustomerMessage;
+      if (!data.id) {
+        data.id = d.id;
+      }
+      items.push(data);
     });
     return items.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
   } catch (err) {
@@ -679,9 +715,10 @@ export async function getMessagesFromFirestore(): Promise<CustomerMessage[]> {
 }
 
 export async function updateMessageStatusInFirestore(messageId: string, status: string) {
-  const path = `messages/${messageId}`;
+  const cleanId = String(messageId).trim();
+  const path = `messages/${cleanId}`;
   try {
-    await setDoc(doc(db, 'messages', String(messageId)), { status, updatedAt: new Date().toISOString() }, { merge: true });
+    await setDoc(doc(db, 'messages', cleanId), { status, updatedAt: new Date().toISOString() }, { merge: true });
   } catch (err) {
     handleFirestoreError(err, OperationType.UPDATE, path);
     throw err;
@@ -689,9 +726,10 @@ export async function updateMessageStatusInFirestore(messageId: string, status: 
 }
 
 export async function deleteMessageFromFirestore(messageId: string) {
-  const path = `messages/${messageId}`;
+  const cleanId = String(messageId).trim();
+  const path = `messages/${cleanId}`;
   try {
-    await deleteDoc(doc(db, 'messages', String(messageId)));
+    await deleteDoc(doc(db, 'messages', cleanId));
   } catch (err) {
     handleFirestoreError(err, OperationType.DELETE, path);
     throw err;
@@ -703,7 +741,11 @@ export function subscribeMessages(callback: (messages: CustomerMessage[]) => voi
   return onSnapshot(collection(db, path), (snap) => {
     const items: CustomerMessage[] = [];
     snap.forEach(d => {
-      items.push(d.data() as CustomerMessage);
+      const data = d.data() as CustomerMessage;
+      if (!data.id) {
+        data.id = d.id;
+      }
+      items.push(data);
     });
     items.sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
     callback(items);

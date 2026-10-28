@@ -2336,7 +2336,7 @@ function renderDashStockAlerts() {
         </div>
         <div style="display:flex;align-items:center;gap:10px">
           ${statusDot(isOOS ? 'Out of Stock' : (p.stock + ' ' + (p.unit || 'kg') + ' left'))}
-          <button class="icon-btn edit" onclick="openProduct(${p.id})" title="Edit Product / Restock">${ic('pencil')}</button>
+          <button class="icon-btn edit" onclick="openProduct('${esc(p.id)}')" title="Edit Product / Restock">${ic('pencil')}</button>
         </div>
       </div>
     `;
