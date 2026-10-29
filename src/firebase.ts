@@ -125,7 +125,7 @@ export interface UserProfileData {
 }
 
 export interface ProductItem {
-  id: number;
+  id: number | string;
   name: string;
   category: string;
   price: number;
@@ -671,6 +671,50 @@ export function subscribeCategories(cb: (items: CategoryItem[]) => void) {
     }
   }, (err) => {
     handleFirestoreError(err, OperationType.GET, 'settings/categories');
+  });
+}
+
+// =================== STORE COUPONS ===================
+
+export interface CouponItem {
+  id: number | string;
+  code: string;
+  type: string;
+  value: number;
+  min: number;
+  limit: number;
+  used: number;
+  start: string;
+  end: string;
+  active: boolean;
+}
+
+export async function saveCouponsToFirestore(items: CouponItem[]): Promise<CouponItem[]> {
+  const path = 'settings/coupons';
+  try {
+    const rawPayload = {
+      items,
+      updatedAt: new Date().toISOString()
+    };
+    const payload = JSON.parse(JSON.stringify(rawPayload));
+    await setDoc(doc(db, 'settings', 'coupons'), payload, { merge: true });
+    return items;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export function subscribeCoupons(cb: (items: CouponItem[]) => void) {
+  return onSnapshot(doc(db, 'settings', 'coupons'), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        cb(data.items as CouponItem[]);
+      }
+    }
+  }, (err) => {
+    handleFirestoreError(err, OperationType.GET, 'settings/coupons');
   });
 }
 
