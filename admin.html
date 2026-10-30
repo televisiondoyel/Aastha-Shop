@@ -431,6 +431,9 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer;
   transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
 }
+.icon-btn * {
+  pointer-events: none;
+}
 .icon-btn .ico {
   width: 17px;
   height: 17px;
@@ -1491,6 +1494,11 @@ import {
   subscribeCustomerStatuses
 } from './src/firebase.ts';
 
+window.closeModal = function() {
+  let root = document.getElementById('modalroot');
+  if (root) root.innerHTML = '';
+};
+
 // Custom Confirmation Modal: "Are you sure?" with "Yes" and "No" buttons
 function confirmAction(message, onYes) {
   let root = document.getElementById('modalroot');
@@ -1882,10 +1890,13 @@ function saveLocal() {
 function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+window.esc = esc;
 function money(n) {
   return '৳ ' + Number(n || 0).toLocaleString('en-BD', { maximumFractionDigits: 2 });
 }
+window.money = money;
 function notify(s) {
+window.notify = notify;
   let root = document.getElementById('toastroot');
   if (root) {
     root.innerHTML = '<div class="toast">' + esc(s) + '</div>';
@@ -2234,6 +2245,10 @@ document.getElementById('nav').onclick = e => {
     renderPage(target);
     window.toggleNav(false);
   }
+};
+
+window.renderPage = function(p) {
+  return renderPage(p);
 };
 
 function renderPage(p) {
@@ -2687,6 +2702,7 @@ function productRows(arr) {
   }).join('') || '<tr><td colspan="8"><div class="empty">No products found.</div></td></tr>';
 }
 
+let editId = null;
 window.openProduct = function(id = null) {
   editId = id;
   let p = id ? db.products.find(x => x.id === id || String(x.id) === String(id)) : {
@@ -3067,8 +3083,8 @@ function ensureOrderItems(o, forceRefresh = false) {
 }
 
 window.viewOrder = function(id) {
-  let o = db.orders.find(x => x.id === id);
-  if (!o) return;
+  let o = db.orders.find(x => x.id === id || String(x.id) === String(id));
+  if (!o) return notify('Order not found.');
   let items = ensureOrderItems(o, true);
   saveLocal();
   let subtotal = o.subtotal || items.reduce((s, x) => s + (Number(x.price) || 0) * (Number(x.qty) || 1), 0);
@@ -3121,12 +3137,12 @@ window.viewOrder = function(id) {
       <div style="font-size:14px;color:#475569;margin-bottom:6px">Delivery Fee: <b>${deliveryFee > 0 ? money(deliveryFee) : 'FREE (৳ 0)'}</b></div>
       <div style="font-size:18px;font-weight:bold;color:#18733f">Total Amount: ${money(o.total)}</div>
     </div>
-  `, `<button class="btn" onclick="closeModal()">Close</button><button class="btn" style="background:#b43c3c;color:#fff" onclick="deleteOrder('${esc(o.id)}');closeModal()">Delete Order</button><button class="btn primary" onclick="downloadInvoice('${esc(o.id)}')">Download Invoice</button>`);
+  `, `<button class="btn" onclick="closeModal()">Close</button><button class="btn" style="background:#b43c3c;color:#fff" onclick="deleteOrder('${esc(o.id)}');closeModal()">Delete Order</button><button class="btn primary" onclick="downloadInvoice('${esc(o.id)}')">Download / Print Invoice</button>`);
 };
 
 window.downloadInvoice = function(id) {
-  let o = db.orders.find(x => x.id === id);
-  if (!o) return;
+  let o = db.orders.find(x => x.id === id || String(x.id) === String(id));
+  if (!o) return notify('Order not found.');
   let items = ensureOrderItems(o, true);
   let subtotal = o.subtotal || items.reduce((s, x) => s + (Number(x.price) || 0) * (Number(x.qty) || 1), 0);
   let deliveryFee = o.deliveryFee !== undefined ? Number(o.deliveryFee) : Math.max(0, (Number(o.total) || 0) - subtotal);
@@ -3195,9 +3211,31 @@ window.downloadInvoice = function(id) {
   a.download = 'Baromasi-Invoice-' + o.id + '.html';
   document.body.appendChild(a);
   a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1500);
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 2000);
   notify('Invoice generated and downloaded.');
+
+  // Trigger print dialog via hidden iframe for instant print
+  try {
+    let ifr = document.createElement('iframe');
+    ifr.style.position = 'fixed';
+    ifr.style.right = '0';
+    ifr.style.bottom = '0';
+    ifr.style.width = '0';
+    ifr.style.height = '0';
+    ifr.style.border = '0';
+    ifr.srcdoc = html;
+    document.body.appendChild(ifr);
+    ifr.onload = () => {
+      try {
+        ifr.contentWindow.focus();
+        ifr.contentWindow.print();
+      } catch(e) {}
+      setTimeout(() => ifr.remove(), 4000);
+    };
+  } catch(e) {}
 };
 
 // =================== CUSTOMERS ===================
@@ -3563,12 +3601,12 @@ function delivery() {
 }
 
 window.deliveryModal = function(i = null) {
-  let d = i === null ? {
-    order: db.orders.find(o => !db.deliveries.some(x => x.order === o.id))?.id || db.orders[0]?.id,
+  let d = (i !== null && db.deliveries[i]) ? db.deliveries[i] : {
+    order: db.orders.find(o => !db.deliveries.some(x => x.order === o.id))?.id || db.orders[0]?.id || '',
     partner: '', phone: '', status: 'Assigned', tracking: ''
-  } : db.deliveries[i];
+  };
 
-  if (!d.order && !db.orders.length) return notify('Please create or wait for customer orders first.');
+  if (!d || (!d.order && !db.orders.length)) return notify('Please create or wait for customer orders first.');
 
   modal(i === null ? 'Assign Delivery Partner' : 'Edit Delivery Assignment', `
     <form id="deliveryForm">
@@ -3605,7 +3643,7 @@ window.saveDelivery = function() {
   let f = document.getElementById('deliveryForm');
   if (!f || !f.reportValidity()) return;
   let d = Object.fromEntries(new FormData(f).entries());
-  let o = db.orders.find(x => x.id === d.order);
+  let o = db.orders.find(x => x.id === d.order || String(x.id) === String(d.order));
   let record = {
     order: d.order,
     customer: o ? o.customer : 'Customer',
@@ -4910,11 +4948,12 @@ function modal(t, b, foot) {
           <button class="btn" onclick="closeModal()">Close</button>
         </div>
         <div class="modalbody">${b}</div>
-        <div class="modalfoot">${foot}</div>
+        ${foot ? `<div class="modalfoot">${foot}</div>` : ''}
       </div>
     </div>
   `;
 }
+window.modal = modal;
 window.closeModal = function() {
   let root = document.getElementById('modalroot');
   if (root) root.innerHTML = '';
@@ -5246,8 +5285,12 @@ window.exportCSV = function(type) {
   let a = document.createElement('a');
   a.href = url;
   a.download = 'baromasi-' + type + '.csv';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 1500);
   notify('CSV exported successfully.');
 };
 
@@ -5257,8 +5300,12 @@ window.backup = function() {
   let a = document.createElement('a');
   a.href = url;
   a.download = 'baromasi-admin-backup.json';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 1500);
   notify('Complete store backup downloaded.');
 };
 
