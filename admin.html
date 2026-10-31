@@ -1482,7 +1482,17 @@ import {
   getCategoriesFromFirestore,
   subscribeCategories,
   saveCouponsToFirestore,
+  getCouponsFromFirestore,
   subscribeCoupons,
+  saveBrandsToFirestore,
+  getBrandsFromFirestore,
+  subscribeBrands,
+  saveDeliveriesToFirestore,
+  getDeliveriesFromFirestore,
+  subscribeDeliveries,
+  saveStaffToFirestore,
+  getStaffFromFirestore,
+  subscribeStaff,
   saveMessageToFirestore,
   getMessagesFromFirestore,
   updateMessageStatusInFirestore,
@@ -3669,6 +3679,7 @@ window.saveDelivery = function() {
   closeModal();
   renderPage('delivery');
   notify('Delivery partner assignment saved.');
+  saveDeliveriesToFirestore(db.deliveries).catch(e => console.error(e));
 };
 
 window.removeDelivery = function(i) {
@@ -3676,6 +3687,8 @@ window.removeDelivery = function(i) {
     db.deliveries.splice(i, 1);
     saveLocal();
     renderPage('delivery');
+    notify('Delivery assignment removed.');
+    saveDeliveriesToFirestore(db.deliveries).catch(e => console.error(e));
   });
 };
 
@@ -3848,6 +3861,7 @@ window.addBrandModal = function() {
     closeModal();
     renderPage('categories');
     notify('Brand added.');
+    saveBrandsToFirestore(db.brands).catch(e => console.error(e));
   };
 };
 
@@ -3868,6 +3882,7 @@ window.editBrand = function(idx) {
     closeModal();
     renderPage('categories');
     notify('Brand updated.');
+    saveBrandsToFirestore(db.brands).catch(e => console.error(e));
   };
 };
 
@@ -3877,6 +3892,8 @@ window.deleteBrand = function(idx) {
     db.brands.splice(idx, 1);
     saveLocal();
     renderPage('categories');
+    notify('Brand deleted.');
+    saveBrandsToFirestore(db.brands).catch(e => console.error(e));
   });
 };
 
@@ -4267,6 +4284,7 @@ window.saveStaff = function(id) {
   closeModal();
   renderPage('staff');
   notify('Staff record saved.');
+  saveStaffToFirestore(db.staff).catch(e => console.error(e));
 };
 
 window.toggleStaff = function(id) {
@@ -4276,6 +4294,7 @@ window.toggleStaff = function(id) {
   s.status = s.status === 'Active' ? 'Inactive' : 'Active';
   saveLocal();
   renderPage('staff');
+  saveStaffToFirestore(db.staff).catch(e => console.error(e));
 };
 
 window.deleteStaff = function(id) {
@@ -4286,6 +4305,7 @@ window.deleteStaff = function(id) {
     saveLocal();
     renderPage('staff');
     notify('Staff ' + s.name + ' deleted.');
+    saveStaffToFirestore(db.staff).catch(e => console.error(e));
   });
 };
 
@@ -5079,6 +5099,10 @@ function bind() {
       try {
         await saveSettingsToFirestore({
           storeName: d.name,
+          name: d.name,
+          address: d.address,
+          phone: d.phone,
+          email: d.email,
           logo: db.settings.logo || '',
           favicon: db.settings.favicon || ''
         });
@@ -5104,8 +5128,11 @@ function bind() {
       notify('Store preferences saved.');
       try {
         await saveSettingsToFirestore({
+          currency: d.currency,
           deliveryFee: +d.deliveryCharge,
-          freeDelivery: +d.freeDelivery
+          deliveryCharge: +d.deliveryCharge,
+          freeDelivery: +d.freeDelivery,
+          lowStock: +d.lowStock
         });
       } catch(err) {
         console.error(err);
@@ -5769,13 +5796,21 @@ window.removeAdminPhoto = async function() {
 
 subscribeSettings(remoteSettings => {
   if (remoteSettings && typeof remoteSettings === 'object') {
-    if (remoteSettings.storeName) db.settings.name = remoteSettings.storeName;
-    if (remoteSettings.deliveryFee !== undefined) db.settings.deliveryCharge = remoteSettings.deliveryFee;
+    if (remoteSettings.storeName || remoteSettings.name) db.settings.name = remoteSettings.storeName || remoteSettings.name;
+    if (remoteSettings.address !== undefined) db.settings.address = remoteSettings.address;
+    if (remoteSettings.phone !== undefined) db.settings.phone = remoteSettings.phone;
+    if (remoteSettings.email !== undefined) db.settings.email = remoteSettings.email;
+    if (remoteSettings.whatsapp !== undefined) db.settings.whatsapp = remoteSettings.whatsapp;
+    if (remoteSettings.hours !== undefined) db.settings.hours = remoteSettings.hours;
+    if (remoteSettings.currency !== undefined) db.settings.currency = remoteSettings.currency;
+    if (remoteSettings.lowStock !== undefined) db.settings.lowStock = remoteSettings.lowStock;
+    if (remoteSettings.deliveryFee !== undefined || remoteSettings.deliveryCharge !== undefined) db.settings.deliveryCharge = remoteSettings.deliveryFee ?? remoteSettings.deliveryCharge;
     if (remoteSettings.freeDelivery !== undefined) db.settings.freeDelivery = remoteSettings.freeDelivery;
     if (remoteSettings.dealEnd) db.settings.dealEnd = remoteSettings.dealEnd;
     if (remoteSettings.logo) { db.settings.logo = remoteSettings.logo; renderBrandLogo(); }
     if (remoteSettings.favicon !== undefined) { db.settings.favicon = remoteSettings.favicon; window.applyFavicon(remoteSettings.favicon); }
     if (remoteSettings.adminAvatar) { db.settings.adminAvatar = remoteSettings.adminAvatar; renderAdminAvatar(); }
+    if (remoteSettings.adminName) { db.settings.adminName = remoteSettings.adminName; renderAdminAvatar(); }
     if (remoteSettings.hero !== undefined) db.settings.hero = remoteSettings.hero;
     if (remoteSettings.promo1 !== undefined) db.settings.promo1 = remoteSettings.promo1;
     if (remoteSettings.promo2 !== undefined) db.settings.promo2 = remoteSettings.promo2;
@@ -5789,7 +5824,31 @@ subscribeSettings(remoteSettings => {
     if (remoteSettings.contactAddress !== undefined) db.settings.contactAddress = remoteSettings.contactAddress;
     if (remoteSettings.contactHours !== undefined) db.settings.contactHours = remoteSettings.contactHours;
     saveLocal();
-    if (page === 'settings' || page === 'banners' || page === 'pages_content') renderPage(page);
+    if (['settings', 'banners', 'pages_content', 'dashboard'].includes(page)) renderPage(page);
+  }
+});
+
+subscribeBrands(remoteBrands => {
+  if (Array.isArray(remoteBrands) && remoteBrands.length > 0) {
+    db.brands = remoteBrands;
+    saveLocal();
+    if (['categories', 'products'].includes(page)) renderPage(page);
+  }
+});
+
+subscribeDeliveries(remoteDeliveries => {
+  if (Array.isArray(remoteDeliveries) && remoteDeliveries.length > 0) {
+    db.deliveries = remoteDeliveries;
+    saveLocal();
+    if (page === 'delivery') renderPage('delivery');
+  }
+});
+
+subscribeStaff(remoteStaff => {
+  if (Array.isArray(remoteStaff) && remoteStaff.length > 0) {
+    db.staff = remoteStaff;
+    saveLocal();
+    if (page === 'staff') renderPage('staff');
   }
 });
 
@@ -5811,6 +5870,136 @@ subscribeCustomerStatuses(remoteStatuses => {
   }
 });
 
+// Initial boot & Firestore hydration for cross-device parity
+async function initAdminFirestore() {
+  try {
+    const [
+      prodsRes,
+      ordersRes,
+      settingsRes,
+      catsRes,
+      couponsRes,
+      brandsRes,
+      delivsRes,
+      staffRes,
+      msgsRes,
+      statusesRes
+    ] = await Promise.allSettled([
+      getProductsFromFirestore(),
+      getOrdersFromFirestore(),
+      getSettingsFromFirestore(),
+      getCategoriesFromFirestore(),
+      getCouponsFromFirestore(),
+      getBrandsFromFirestore(),
+      getDeliveriesFromFirestore(),
+      getStaffFromFirestore(),
+      getMessagesFromFirestore(),
+      getCustomerStatusesFromFirestore()
+    ]);
+
+    let changed = false;
+
+    if (prodsRes.status === 'fulfilled' && Array.isArray(prodsRes.value) && prodsRes.value.length > 0) {
+      db.products = prodsRes.value.sort((a, b) => (b.id || 0) - (a.id || 0));
+      changed = true;
+    }
+
+    if (ordersRes.status === 'fulfilled' && Array.isArray(ordersRes.value)) {
+      db.orders = ordersRes.value;
+      changed = true;
+    }
+
+    if (settingsRes.status === 'fulfilled' && settingsRes.value) {
+      let remoteSettings = settingsRes.value;
+      if (remoteSettings.storeName || remoteSettings.name) db.settings.name = remoteSettings.storeName || remoteSettings.name;
+      if (remoteSettings.address !== undefined) db.settings.address = remoteSettings.address;
+      if (remoteSettings.phone !== undefined) db.settings.phone = remoteSettings.phone;
+      if (remoteSettings.email !== undefined) db.settings.email = remoteSettings.email;
+      if (remoteSettings.whatsapp !== undefined) db.settings.whatsapp = remoteSettings.whatsapp;
+      if (remoteSettings.hours !== undefined) db.settings.hours = remoteSettings.hours;
+      if (remoteSettings.currency !== undefined) db.settings.currency = remoteSettings.currency;
+      if (remoteSettings.lowStock !== undefined) db.settings.lowStock = remoteSettings.lowStock;
+      if (remoteSettings.deliveryFee !== undefined || remoteSettings.deliveryCharge !== undefined) db.settings.deliveryCharge = remoteSettings.deliveryFee ?? remoteSettings.deliveryCharge;
+      if (remoteSettings.freeDelivery !== undefined) db.settings.freeDelivery = remoteSettings.freeDelivery;
+      if (remoteSettings.dealEnd) db.settings.dealEnd = remoteSettings.dealEnd;
+      if (remoteSettings.logo) db.settings.logo = remoteSettings.logo;
+      if (remoteSettings.favicon) db.settings.favicon = remoteSettings.favicon;
+      if (remoteSettings.adminAvatar) db.settings.adminAvatar = remoteSettings.adminAvatar;
+      if (remoteSettings.adminName) db.settings.adminName = remoteSettings.adminName;
+      if (remoteSettings.hero !== undefined) db.settings.hero = remoteSettings.hero;
+      if (remoteSettings.promo1 !== undefined) db.settings.promo1 = remoteSettings.promo1;
+      if (remoteSettings.promo2 !== undefined) db.settings.promo2 = remoteSettings.promo2;
+      if (remoteSettings.aboutTitle !== undefined) db.settings.aboutTitle = remoteSettings.aboutTitle;
+      if (remoteSettings.aboutSubtitle !== undefined) db.settings.aboutSubtitle = remoteSettings.aboutSubtitle;
+      if (remoteSettings.aboutStory !== undefined) db.settings.aboutStory = remoteSettings.aboutStory;
+      if (remoteSettings.aboutImage !== undefined) db.settings.aboutImage = remoteSettings.aboutImage;
+      if (remoteSettings.contactPhone !== undefined) db.settings.contactPhone = remoteSettings.contactPhone;
+      if (remoteSettings.contactWhatsapp !== undefined) db.settings.contactWhatsapp = remoteSettings.contactWhatsapp;
+      if (remoteSettings.contactEmail !== undefined) db.settings.contactEmail = remoteSettings.contactEmail;
+      if (remoteSettings.contactAddress !== undefined) db.settings.contactAddress = remoteSettings.contactAddress;
+      if (remoteSettings.contactHours !== undefined) db.settings.contactHours = remoteSettings.contactHours;
+      changed = true;
+    } else if (settingsRes.status === 'fulfilled' && !settingsRes.value) {
+      saveSettingsToFirestore(db.settings).catch(e => console.error(e));
+    }
+
+    if (catsRes.status === 'fulfilled' && Array.isArray(catsRes.value) && catsRes.value.length > 0) {
+      db.categories = catsRes.value.map(c => typeof c === 'string' ? c : c.name);
+      catsRes.value.forEach(c => {
+        if (c && c.name && c.image) db.categoryImages[c.name] = c.image;
+      });
+      changed = true;
+    }
+
+    if (couponsRes.status === 'fulfilled' && Array.isArray(couponsRes.value)) {
+      db.coupons = couponsRes.value;
+      changed = true;
+    }
+
+    if (brandsRes.status === 'fulfilled' && Array.isArray(brandsRes.value) && brandsRes.value.length > 0) {
+      db.brands = brandsRes.value;
+      changed = true;
+    } else if (brandsRes.status === 'fulfilled' && (!brandsRes.value || !brandsRes.value.length)) {
+      saveBrandsToFirestore(db.brands).catch(e => console.error(e));
+    }
+
+    if (delivsRes.status === 'fulfilled' && Array.isArray(delivsRes.value) && delivsRes.value.length > 0) {
+      db.deliveries = delivsRes.value;
+      changed = true;
+    }
+
+    if (staffRes.status === 'fulfilled' && Array.isArray(staffRes.value) && staffRes.value.length > 0) {
+      db.staff = staffRes.value;
+      changed = true;
+    } else if (staffRes.status === 'fulfilled' && (!staffRes.value || !staffRes.value.length)) {
+      saveStaffToFirestore(db.staff).catch(e => console.error(e));
+    }
+
+    if (msgsRes.status === 'fulfilled' && Array.isArray(msgsRes.value)) {
+      db.messages = msgsRes.value;
+      changed = true;
+    }
+
+    if (statusesRes.status === 'fulfilled' && statusesRes.value && typeof statusesRes.value === 'object') {
+      customerStatuses = { ...customerStatuses, ...statusesRes.value };
+      try { localStorage.setItem('af_customer_statuses', JSON.stringify(customerStatuses)); } catch(e) {}
+      changed = true;
+    }
+
+    if (changed) {
+      normalizeData();
+      saveLocal();
+      renderBrandLogo();
+      renderAdminAvatar();
+      updateNotifBadge();
+      updateMsgBadge();
+      renderPage(page);
+    }
+  } catch (err) {
+    console.warn('Initial admin Firestore fetch error:', err);
+  }
+}
+
 // Initial boot
 window.applyFavicon(db.settings.favicon || localStorage.getItem('af_favicon'));
 seedInitialNotifications();
@@ -5819,6 +6008,7 @@ updateMsgBadge();
 renderBrandLogo();
 renderAdminAvatar();
 renderPage('dashboard');
+initAdminFirestore();
 </script>
 </body>
 </html>

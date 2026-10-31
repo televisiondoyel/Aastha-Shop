@@ -142,8 +142,18 @@ export interface ProductItem {
 
 export interface StoreSettingsData {
   storeName?: string;
+  name?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  whatsapp?: string;
+  hours?: string;
+  currency?: string;
+  tax?: number;
+  lowStock?: number;
   freeDelivery?: number;
   deliveryFee?: number;
+  deliveryCharge?: number;
   dealEnd?: string;
   logo?: string;
   favicon?: string;
@@ -153,6 +163,7 @@ export interface StoreSettingsData {
   adminAvatar?: string;
   adminName?: string;
   aboutTitle?: string;
+  aboutSubtitle?: string;
   aboutText?: string;
   aboutImage?: string;
   aboutStory?: string;
@@ -715,6 +726,188 @@ export function subscribeCoupons(cb: (items: CouponItem[]) => void) {
     }
   }, (err) => {
     handleFirestoreError(err, OperationType.GET, 'settings/coupons');
+  });
+}
+
+export async function getCouponsFromFirestore(): Promise<CouponItem[]> {
+  const path = 'settings/coupons';
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'coupons'));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        return data.items as CouponItem[];
+      }
+    }
+    return [];
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+    return [];
+  }
+}
+
+// =================== STORE BRANDS ===================
+
+export async function getBrandsFromFirestore(): Promise<string[]> {
+  const path = 'settings/brands';
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'brands'));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        return data.items as string[];
+      }
+    }
+    return [];
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+    return [];
+  }
+}
+
+export async function saveBrandsToFirestore(items: string[]): Promise<string[]> {
+  const path = 'settings/brands';
+  try {
+    const rawPayload = {
+      items,
+      updatedAt: new Date().toISOString()
+    };
+    const payload = JSON.parse(JSON.stringify(rawPayload));
+    await setDoc(doc(db, 'settings', 'brands'), payload, { merge: true });
+    return items;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export function subscribeBrands(cb: (items: string[]) => void) {
+  return onSnapshot(doc(db, 'settings', 'brands'), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        cb(data.items as string[]);
+      }
+    }
+  }, (err) => {
+    handleFirestoreError(err, OperationType.GET, 'settings/brands');
+  });
+}
+
+// =================== STORE DELIVERIES ===================
+
+export interface DeliveryItem {
+  order: string | number;
+  customer?: string;
+  area?: string;
+  partner?: string;
+  phone?: string;
+  status: string;
+  tracking?: string;
+  updatedAt?: string;
+}
+
+export async function getDeliveriesFromFirestore(): Promise<DeliveryItem[]> {
+  const path = 'settings/deliveries';
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'deliveries'));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        return data.items as DeliveryItem[];
+      }
+    }
+    return [];
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+    return [];
+  }
+}
+
+export async function saveDeliveriesToFirestore(items: DeliveryItem[]): Promise<DeliveryItem[]> {
+  const path = 'settings/deliveries';
+  try {
+    const rawPayload = {
+      items,
+      updatedAt: new Date().toISOString()
+    };
+    const payload = JSON.parse(JSON.stringify(rawPayload));
+    await setDoc(doc(db, 'settings', 'deliveries'), payload, { merge: true });
+    return items;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export function subscribeDeliveries(cb: (items: DeliveryItem[]) => void) {
+  return onSnapshot(doc(db, 'settings', 'deliveries'), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        cb(data.items as DeliveryItem[]);
+      }
+    }
+  }, (err) => {
+    handleFirestoreError(err, OperationType.GET, 'settings/deliveries');
+  });
+}
+
+// =================== STORE STAFF ===================
+
+export interface StaffItem {
+  id: number | string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  phone?: string;
+  updatedAt?: string;
+}
+
+export async function getStaffFromFirestore(): Promise<StaffItem[]> {
+  const path = 'settings/staff';
+  try {
+    const snap = await getDoc(doc(db, 'settings', 'staff'));
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        return data.items as StaffItem[];
+      }
+    }
+    return [];
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+    return [];
+  }
+}
+
+export async function saveStaffToFirestore(items: StaffItem[]): Promise<StaffItem[]> {
+  const path = 'settings/staff';
+  try {
+    const rawPayload = {
+      items,
+      updatedAt: new Date().toISOString()
+    };
+    const payload = JSON.parse(JSON.stringify(rawPayload));
+    await setDoc(doc(db, 'settings', 'staff'), payload, { merge: true });
+    return items;
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
+    throw err;
+  }
+}
+
+export function subscribeStaff(cb: (items: StaffItem[]) => void) {
+  return onSnapshot(doc(db, 'settings', 'staff'), (snap) => {
+    if (snap.exists()) {
+      const data = snap.data();
+      if (Array.isArray(data.items)) {
+        cb(data.items as StaffItem[]);
+      }
+    }
+  }, (err) => {
+    handleFirestoreError(err, OperationType.GET, 'settings/staff');
   });
 }
 
